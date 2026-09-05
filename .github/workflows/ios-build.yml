@@ -79,7 +79,7 @@ jobs:
         working-directory: ios
         run: |
           set -euo pipefail
-          WORKSPACE=$(ls *.xcworkspace | head -n1)
+          WORKSPACE=$(ls -d *.xcworkspace | head -n1)
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
           echo "Building $SCHEME from $WORKSPACE"
           mkdir -p build
