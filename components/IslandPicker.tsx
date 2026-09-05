@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { View, Text, TextInput, SectionList, Pressable, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 
 import { getAtollGroups } from '../lib/prayerTimes';
-import { colors } from '../lib/theme';
+import { colors, radius, shadow } from '../lib/theme';
 
 interface Props {
   currentIslandId?: number | null;
@@ -34,14 +35,17 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
-        placeholder={t('onboarding.searchPlaceholder')}
-        placeholderTextColor={colors.textMuted}
-        style={styles.searchInput}
-        autoCorrect={false}
-      />
+      <View style={styles.searchWrap}>
+        <Ionicons name="search" size={17} color={colors.textMuted} style={styles.searchIcon} />
+        <TextInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder={t('onboarding.searchPlaceholder')}
+          placeholderTextColor={colors.textMuted}
+          style={styles.searchInput}
+          autoCorrect={false}
+        />
+      </View>
       <SectionList
         sections={sections}
         keyExtractor={(item) => String(item.islandId)}
@@ -74,15 +78,20 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  searchInput: {
+  searchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginHorizontal: 16,
     marginBottom: 8,
     paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderRadius: radius.md,
     backgroundColor: colors.card,
+    ...shadow.card,
+  },
+  searchIcon: { marginRight: 8 },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 12,
     color: colors.text,
     fontSize: 16,
   },

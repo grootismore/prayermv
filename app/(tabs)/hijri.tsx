@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useSettings } from '../../context/SettingsContext';
 import { getTodayHijri, getHijriMonthInfo } from '../../lib/hijri';
-import { colors } from '../../lib/theme';
+import { colors, radius, shadow } from '../../lib/theme';
+import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import GeometricStar from '../../components/GeometricStar';
+import StarField from '../../components/StarField';
 
 export default function HijriScreen() {
   const { t } = useTranslation();
@@ -15,6 +18,7 @@ export default function HijriScreen() {
   const today = useMemo(() => getTodayHijri(), []);
   const [viewYear, setViewYear] = useState(today.year);
   const [viewMonth, setViewMonth] = useState(today.month);
+  const numeralsReady = useNumeralFont();
 
   const monthInfo = useMemo(
     () => getHijriMonthInfo(viewYear, viewMonth, language),
@@ -22,6 +26,7 @@ export default function HijriScreen() {
   );
 
   const weekdaysShort = t('hijri.weekdaysShort', { returnObjects: true }) as string[];
+  const numeralStyle = numeralsReady && { fontFamily: numeralFont.semibold };
 
   function goToPreviousMonth() {
     if (viewMonth === 1) {
@@ -50,14 +55,23 @@ export default function HijriScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <Text style={styles.title}>{t('hijri.title')}</Text>
 
-      <View style={styles.todayCard}>
-        <View style={styles.todayCardStar}>
-          <GeometricStar size={18} color={colors.goldLight} />
-        </View>
-        <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
-        <Text style={styles.todayDate}>
-          {today.date} {monthInfo.monthName} {today.year}
-        </Text>
+      <View style={styles.todayCardShadow}>
+        <LinearGradient
+          colors={[colors.primary, colors.primaryDeep]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.todayCard}
+        >
+          <StarField color={colors.goldLight} />
+          <View style={styles.todayCardStar}>
+            <GeometricStar size={18} color={colors.goldLight} />
+          </View>
+          <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
+          <Text style={styles.todayDate}>
+            <Text style={numeralStyle}>{today.date}</Text> {monthInfo.monthName}{' '}
+            <Text style={numeralStyle}>{today.year}</Text>
+          </Text>
+        </LinearGradient>
       </View>
 
       <View style={styles.monthNav}>
@@ -65,7 +79,7 @@ export default function HijriScreen() {
           <Ionicons name="chevron-back" size={22} color={colors.primary} />
         </Pressable>
         <Text style={styles.monthLabel}>
-          {monthInfo.monthName} {viewYear}
+          {monthInfo.monthName} <Text style={numeralStyle}>{viewYear}</Text>
         </Text>
         <Pressable onPress={goToNextMonth} hitSlop={12}>
           <Ionicons name="chevron-forward" size={22} color={colors.primary} />
@@ -87,7 +101,9 @@ export default function HijriScreen() {
             <View key={index} style={styles.cell}>
               {day != null && (
                 <View style={[styles.dayCircle, isToday && styles.dayCircleToday]}>
-                  <Text style={[styles.dayText, isToday && styles.dayTextToday]}>{day}</Text>
+                  <Text style={[styles.dayText, numeralStyle, isToday && styles.dayTextToday]}>
+                    {day}
+                  </Text>
                 </View>
               )}
             </View>
@@ -101,13 +117,17 @@ export default function HijriScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, padding: 20 },
   title: { fontSize: 22, fontWeight: '700', color: colors.text, marginBottom: 16 },
+  todayCardShadow: {
+    borderRadius: radius.lg,
+    marginBottom: 20,
+    ...shadow.hero,
+  },
   todayCard: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     padding: 20,
     paddingTop: 26,
     alignItems: 'center',
-    marginBottom: 20,
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.gold,
   },

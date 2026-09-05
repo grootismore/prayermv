@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Animated, Easing, View, StyleSheet } from 'react-native';
 import Svg, { Circle, Rect, Path } from 'react-native-svg';
 
-import { colors } from '../lib/theme';
+import { colors, shadow } from '../lib/theme';
 import GeometricStar from './GeometricStar';
 
 interface Props {
@@ -125,6 +125,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 999,
+    ...shadow.floating,
   },
   starBadge: {
     position: 'absolute',

@@ -1,17 +1,21 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { useSettings } from '../../context/SettingsContext';
 import { useNextPrayer, formatCountdown } from '../../lib/useNextPrayer';
-import { colors } from '../../lib/theme';
+import { colors, radius, shadow } from '../../lib/theme';
+import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import GeometricStar from '../../components/GeometricStar';
+import StarField from '../../components/StarField';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { island } = useSettings();
   const state = useNextPrayer(island?.islandId ?? null);
+  const numeralsReady = useNumeralFont();
 
   if (!island || !state) {
     return (
@@ -32,14 +36,26 @@ export default function HomeScreen() {
         </Pressable>
 
         {state.next && (
-          <View style={styles.nextCard}>
-            <View style={styles.nextCardStar}>
-              <GeometricStar size={18} color={colors.goldLight} />
-            </View>
-            <Text style={styles.nextLabel}>{t('home.nextPrayer')}</Text>
-            <Text style={styles.nextPrayerName}>{t(`prayers.${state.next.call}`)}</Text>
-            <Text style={styles.nextTime}>{state.next.string}</Text>
-            <Text style={styles.countdown}>{formatCountdown(state.millisecondsRemaining)}</Text>
+          <View style={styles.nextCardShadow}>
+            <LinearGradient
+              colors={[colors.primary, colors.primaryDeep]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.nextCard}
+            >
+              <StarField color={colors.goldLight} />
+              <View style={styles.nextCardStar}>
+                <GeometricStar size={18} color={colors.goldLight} />
+              </View>
+              <Text style={styles.nextLabel}>{t('home.nextPrayer')}</Text>
+              <Text style={styles.nextPrayerName}>{t(`prayers.${state.next.call}`)}</Text>
+              <Text style={[styles.nextTime, numeralsReady && styles.numeralFont]}>
+                {state.next.string}
+              </Text>
+              <Text style={[styles.countdown, numeralsReady && styles.numeralFontBold]}>
+                {formatCountdown(state.millisecondsRemaining)}
+              </Text>
+            </LinearGradient>
           </View>
         )}
 
@@ -59,7 +75,15 @@ export default function HomeScreen() {
                 <Text style={[styles.rowLabel, isNext && styles.rowLabelActive]}>
                   {t(`prayers.${entry.call}`)}
                 </Text>
-                <Text style={[styles.rowTime, isNext && styles.rowLabelActive]}>{entry.string}</Text>
+                <Text
+                  style={[
+                    styles.rowTime,
+                    isNext && styles.rowLabelActive,
+                    numeralsReady && styles.numeralFontMedium,
+                  ]}
+                >
+                  {entry.string}
+                </Text>
               </View>
             );
           })}
@@ -81,13 +105,17 @@ const styles = StyleSheet.create({
   },
   islandName: { fontSize: 18, fontWeight: '700', color: colors.text },
   changeIsland: { fontSize: 13, color: colors.primary, fontWeight: '600' },
+  nextCardShadow: {
+    borderRadius: radius.xl,
+    marginBottom: 24,
+    ...shadow.hero,
+  },
   nextCard: {
-    backgroundColor: colors.primary,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     padding: 24,
     paddingTop: 30,
     alignItems: 'center',
-    marginBottom: 24,
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.gold,
   },
@@ -97,11 +125,15 @@ const styles = StyleSheet.create({
   nextTime: { color: '#D6EDE7', fontSize: 16, marginTop: 2 },
   countdown: {
     color: '#FFFFFF',
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '700',
     marginTop: 16,
     fontVariant: ['tabular-nums'],
+    letterSpacing: 1,
   },
+  numeralFont: { fontFamily: numeralFont.semibold },
+  numeralFontBold: { fontFamily: numeralFont.bold },
+  numeralFontMedium: { fontFamily: numeralFont.semibold },
   sectionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -116,10 +148,9 @@ const styles = StyleSheet.create({
   },
   list: {
     backgroundColor: colors.card,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderRadius: radius.lg,
     overflow: 'hidden',
+    ...shadow.card,
   },
   row: {
     flexDirection: 'row',

@@ -10,7 +10,7 @@ import { NOTIFIABLE_PRAYERS } from '../../lib/prayerTimes';
 import { requestNotificationPermissions, sendTestAdhanNotification } from '../../lib/notifications';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import type { AppLanguage, NotificationPrefs } from '../../lib/storage';
-import { colors } from '../../lib/theme';
+import { colors, radius, shadow } from '../../lib/theme';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -70,7 +70,11 @@ export default function SettingsScreen() {
               onPress={() => changeLanguage(lang as AppLanguage)}
             >
               <Text style={styles.cardText}>{t(`languages.${lang}`)}</Text>
-              {language === lang && <Text style={styles.checkmark}>✓</Text>}
+              {language === lang && (
+                <View style={styles.checkBadge}>
+                  <Text style={styles.checkmark}>✓</Text>
+                </View>
+              )}
             </Pressable>
           ))}
         </View>
@@ -126,10 +130,9 @@ const styles = StyleSheet.create({
   sectionSubtitle: { fontSize: 13, color: colors.textMuted, marginBottom: 8 },
   card: {
     backgroundColor: colors.card,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderRadius: radius.md,
     overflow: 'hidden',
+    ...shadow.card,
   },
   cardPadded: { paddingHorizontal: 16, paddingVertical: 14 },
   cardText: { fontSize: 16, color: colors.text },
@@ -144,7 +147,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  checkmark: { color: colors.primary, fontSize: 16, fontWeight: '700' },
+  checkBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkmark: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
   toggleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
