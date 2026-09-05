@@ -58,19 +58,20 @@ struct PrayerEntry: TimelineEntry {
     let date: Date
     let islandLabel: String
     let moment: PrayerMoment?
+    let today: [PrayerMoment]
 }
 
 struct PrayerProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> PrayerEntry {
-        PrayerEntry(date: Date(), islandLabel: SelectableIsland.male.label, moment: nil)
+        PrayerEntry(date: Date(), islandLabel: SelectableIsland.male.label, moment: nil, today: [])
     }
 
     func snapshot(for configuration: SelectIslandIntent, in context: Context) async -> PrayerEntry {
-        makeEntry(for: configuration)
+        makeEntry(for: configuration, on: Date())
     }
 
     func timeline(for configuration: SelectIslandIntent, in context: Context) async -> Timeline<PrayerEntry> {
-        let current = makeEntry(for: configuration)
+        let current = makeEntry(for: configuration, on: Date())
 
         // Refresh right when the shown prayer changes, rather than polling
         // on a tight interval (WidgetKit budgets refresh frequency anyway).
@@ -78,14 +79,19 @@ struct PrayerProvider: AppIntentTimelineProvider {
             return Timeline(entries: [current], policy: .atEnd)
         }
 
-        let nextEntry = PrayerEntry(date: moment.date, islandLabel: current.islandLabel, moment: moment)
+        // Rebuild "today" relative to the *next* entry's own activation
+        // time, not now - if that transition is tomorrow's Fajr (i.e. the
+        // last prayer of today just passed), today's now-stale times
+        // would otherwise still be showing when that entry goes live.
+        let nextEntry = makeEntry(for: configuration, on: moment.date)
         return Timeline(entries: [current, nextEntry], policy: .atEnd)
     }
 
-    private func makeEntry(for configuration: SelectIslandIntent) -> PrayerEntry {
+    private func makeEntry(for configuration: SelectIslandIntent, on date: Date) -> PrayerEntry {
         let island = configuration.island
-        let moment = PrayerData.nextMoment(islandId: island.rawValue)
-        return PrayerEntry(date: Date(), islandLabel: island.label, moment: moment)
+        let today = PrayerData.todayMoments(islandId: island.rawValue, now: date)
+        let moment = PrayerData.nextMoment(islandId: island.rawValue, now: date)
+        return PrayerEntry(date: date, islandLabel: island.label, moment: moment, today: today)
     }
 }
 
@@ -94,7 +100,7 @@ struct PrayerProvider: AppIntentTimelineProvider {
 /// (.primary/.secondary) are *system-appearance-adaptive* though - on a
 /// device in Dark Mode they render near-white regardless of the widget's
 /// own background, which against our fixed-light background is white text
-/// on a near-white card: functionally invisible. So the systemSmall view
+/// on a near-white card: functionally invisible. So the systemMedium view
 /// below uses fixed colors matching the light background instead of the
 /// adaptive defaults.
 private extension Color {
@@ -144,18 +150,43 @@ struct PrayerWidgetView: View {
                 Color.clear
             }
         default:
-            VStack(alignment: .leading, spacing: 6) {
-                Text(entry.islandLabel)
-                    .font(.caption)
-                    .foregroundStyle(Color.widgetTextMuted)
-                Spacer()
-                Text(entry.moment?.name.displayName ?? "-")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(Color.widgetPrimary)
-                Text(entry.moment?.timeString ?? "--:--")
-                    .font(.title3)
-                    .foregroundStyle(Color.widgetText)
+            // .systemMedium - a wide card with the next prayer up top and
+            // the whole day's times in a row underneath, rather than a
+            // small square showing only the next prayer.
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text(entry.islandLabel)
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.widgetTextMuted)
+                    Spacer()
+                    if let moment = entry.moment {
+                        Text("\(moment.name.displayName) \u{00B7} \(moment.timeString)")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color.widgetPrimary)
+                    }
+                }
+
+                Spacer(minLength: 0)
+
+                HStack(spacing: 0) {
+                    ForEach(entry.today, id: \.name) { item in
+                        VStack(spacing: 3) {
+                            Text(item.name.displayName)
+                                .font(.system(size: 10))
+                                .foregroundStyle(Color.widgetTextMuted)
+                            Text(item.timeString)
+                                .font(.system(size: 13, weight: .semibold))
+                                .minimumScaleFactor(0.8)
+                                .lineLimit(1)
+                                .foregroundStyle(
+                                    item.name == entry.moment?.name ? Color.widgetPrimary : Color.widgetText
+                                )
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
             }
             .padding()
             // Required since iOS 17 - without it WidgetKit shows its own
@@ -176,7 +207,7 @@ struct PrayerWidget: Widget {
             PrayerWidgetView(entry: entry)
         }
         .configurationDisplayName("Prayer Times")
-        .description("Shows the next prayer time for your chosen island.")
-        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular])
+        .description("Shows today's prayer times for your chosen island.")
+        .supportedFamilies([.systemMedium, .accessoryCircular, .accessoryRectangular])
     }
 }
