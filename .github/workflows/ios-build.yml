@@ -1,0 +1,124 @@
+name: iOS unsigned build (sideload)
+
+# Builds an unsigned IPA for sideloading via SideStore/AltStore - not an
+# App Store or TestFlight build, and not routed through EAS Build's
+# managed Apple credentials. Codesigning is intentionally skipped at
+# archive time; SideStore/AltStore replace it entirely with your own
+# free personal-team certificate at install time.
+#
+# Required repo configuration (Settings -> Secrets and variables -> Actions
+# -> Variables tab - these are identifiers, not secrets, so plain
+# "Variables" is correct, not "Secrets"):
+#   IOS_BUNDLE_IDENTIFIER  e.g. com.yourname.prayermv
+#   IOS_APP_GROUP_ID       e.g. group.com.yourname.prayermv
+#   APPLE_TEAM_ID          optional, your 10-character Apple Team ID
+#
+# See the end of the workflow run's summary / the project README for what
+# you still need to do manually (registering these IDs under your own
+# Apple ID, installing via SideStore, keeping its refresh VPN alive).
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - claude/maldives-prayer-times-app-tup9y0
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # macOS runners consume GitHub Actions minutes at a 10x multiplier
+    # against the free-tier monthly allowance for private repos (public
+    # repos get unlimited free minutes). Worth knowing before running this
+    # on every push.
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    env:
+      IOS_BUNDLE_IDENTIFIER: ${{ vars.IOS_BUNDLE_IDENTIFIER || 'com.prayermv.app' }}
+      IOS_APP_GROUP_ID: ${{ vars.IOS_APP_GROUP_ID || format('group.{0}', vars.IOS_BUNDLE_IDENTIFIER || 'com.prayermv.app') }}
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          # @bacons/apple-targets needs Xcode 16+ (file system synchronized
+          # groups). Pin to a specific version here if "latest-stable" ever
+          # resolves to something older than that on the runner.
+          xcode-version: latest-stable
+
+      - name: Generate native iOS project (expo prebuild)
+        run: npx expo prebuild -p ios --clean --no-install
+
+      - name: Install CocoaPods
+        working-directory: ios
+        run: pod install
+
+      - name: Show resolved scheme/workspace (diagnostic)
+        working-directory: ios
+        run: |
+          ls -la
+          xcodebuild -list -workspace *.xcworkspace || true
+
+      - name: Archive (unsigned)
+        working-directory: ios
+        run: |
+          set -euo pipefail
+          WORKSPACE=$(ls *.xcworkspace | head -n1)
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          echo "Building $SCHEME from $WORKSPACE"
+          mkdir -p build
+
+          xcodebuild archive \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -archivePath "$PWD/build/App.xcarchive" \
+            -destination "generic/platform=iOS" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package IPA
+        working-directory: ios
+        run: |
+          set -euo pipefail
+          ARCHIVE="build/App.xcarchive"
+          APP_PATH=$(find "$ARCHIVE/Products/Applications" -maxdepth 1 -name "*.app" | head -n1)
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app found in archive - see the Archive step's log above." >&2
+            exit 1
+          fi
+          APP_NAME=$(basename "$APP_PATH")
+          echo "Packaging $APP_NAME"
+
+          PAYLOAD_DIR="build/Payload"
+          mkdir -p "$PAYLOAD_DIR"
+          cp -R "$APP_PATH" "$PAYLOAD_DIR/"
+
+          cd build
+          zip -r -y -q "${APP_NAME%.app}.ipa" Payload
+          echo "IPA_PATH=ios/build/${APP_NAME%.app}.ipa" >> "$GITHUB_ENV"
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: prayermv-unsigned-ipa
+          path: ${{ env.IPA_PATH }}
+          if-no-files-found: error
+          retention-days: 14
