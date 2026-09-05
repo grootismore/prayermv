@@ -8,6 +8,8 @@ import {
   saveLanguage,
   loadNotificationPrefs,
   saveNotificationPrefs,
+  loadQiblaHapticsEnabled,
+  saveQiblaHapticsEnabled,
   DEFAULT_NOTIFICATION_PREFS,
   type AppLanguage,
   type NotificationPrefs,
@@ -21,9 +23,11 @@ interface SettingsContextValue {
   island: Island | null;
   language: AppLanguage;
   notificationPrefs: NotificationPrefs;
+  qiblaHapticsEnabled: boolean;
   selectIsland: (islandId: number) => Promise<void>;
   changeLanguage: (language: AppLanguage) => Promise<void>;
   setNotificationEnabled: (prayer: keyof NotificationPrefs, enabled: boolean) => Promise<void>;
+  setQiblaHapticsEnabled: (enabled: boolean) => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
@@ -33,13 +37,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [island, setIsland] = useState<Island | null>(null);
   const [language, setLanguage] = useState<AppLanguage>('en');
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPrefs>(DEFAULT_NOTIFICATION_PREFS);
+  const [qiblaHapticsEnabled, setQiblaHapticsEnabledState] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const [islandId, storedLanguage, prefs] = await Promise.all([
+      const [islandId, storedLanguage, prefs, hapticsEnabled] = await Promise.all([
         loadSelectedIslandId(),
         loadLanguage(),
         loadNotificationPrefs(),
+        loadQiblaHapticsEnabled(),
       ]);
 
       const resolvedLanguage = storedLanguage ?? 'en';
@@ -52,6 +58,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       }
       setLanguage(resolvedLanguage);
       setNotificationPrefs(prefs);
+      setQiblaHapticsEnabledState(hapticsEnabled);
       setIsLoaded(true);
     })();
   }, []);
@@ -81,17 +88,34 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const setQiblaHapticsEnabled = useCallback(async (enabled: boolean) => {
+    setQiblaHapticsEnabledState(enabled);
+    await saveQiblaHapticsEnabled(enabled);
+  }, []);
+
   const value = useMemo(
     () => ({
       isLoaded,
       island,
       language,
       notificationPrefs,
+      qiblaHapticsEnabled,
       selectIsland,
       changeLanguage,
       setNotificationEnabled,
+      setQiblaHapticsEnabled,
     }),
-    [isLoaded, island, language, notificationPrefs, selectIsland, changeLanguage, setNotificationEnabled]
+    [
+      isLoaded,
+      island,
+      language,
+      notificationPrefs,
+      qiblaHapticsEnabled,
+      selectIsland,
+      changeLanguage,
+      setNotificationEnabled,
+      setQiblaHapticsEnabled,
+    ]
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

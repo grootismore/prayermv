@@ -17,6 +17,7 @@ const KEYS = {
   islandId: 'prayermv.islandId',
   language: 'prayermv.language',
   notificationPrefs: 'prayermv.notificationPrefs',
+  qiblaHapticsEnabled: 'prayermv.qiblaHapticsEnabled',
 } as const;
 
 export async function loadSelectedIslandId(): Promise<number | null> {
@@ -49,4 +50,13 @@ export async function loadNotificationPrefs(): Promise<NotificationPrefs> {
 
 export async function saveNotificationPrefs(prefs: NotificationPrefs): Promise<void> {
   await AsyncStorage.setItem(KEYS.notificationPrefs, JSON.stringify(prefs));
+}
+
+export async function loadQiblaHapticsEnabled(): Promise<boolean> {
+  const raw = await AsyncStorage.getItem(KEYS.qiblaHapticsEnabled);
+  return raw === null ? true : raw === '1';
+}
+
+export async function saveQiblaHapticsEnabled(enabled: boolean): Promise<void> {
+  await AsyncStorage.setItem(KEYS.qiblaHapticsEnabled, enabled ? '1' : '0');
 }

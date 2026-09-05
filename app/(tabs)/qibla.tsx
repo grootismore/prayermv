@@ -14,7 +14,7 @@ import QiblaCompass from '../../components/QiblaCompass';
 
 export default function QiblaScreen() {
   const { t } = useTranslation();
-  const { island } = useSettings();
+  const { island, qiblaHapticsEnabled } = useSettings();
   const { heading, permission, accuracy } = useCompassHeading();
   const [coords, setCoords] = useState<{ lat: number; long: number } | null>(null);
 
@@ -40,7 +40,7 @@ export default function QiblaScreen() {
 
   const qiblaBearing = coords ? getQiblaBearing(coords.lat, coords.long) : null;
   const arrowRotation = qiblaBearing != null && heading != null ? qiblaBearing - heading : null;
-  const isAligned = useQiblaAlignment(arrowRotation);
+  const isAligned = useQiblaAlignment(arrowRotation, qiblaHapticsEnabled);
 
   const stillAcquiring = permission === 'granted' && heading == null;
   // accuracy is a real signal from the OS compass (0 = unreliable, 3 =

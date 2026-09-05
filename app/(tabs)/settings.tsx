@@ -25,7 +25,15 @@ import SunAccent from '../../components/SunAccent';
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const { island, language, notificationPrefs, changeLanguage, setNotificationEnabled } = useSettings();
+  const {
+    island,
+    language,
+    notificationPrefs,
+    qiblaHapticsEnabled,
+    changeLanguage,
+    setNotificationEnabled,
+    setQiblaHapticsEnabled,
+  } = useSettings();
 
   async function handleToggle(prayer: Exclude<(typeof NOTIFIABLE_PRAYERS)[number], 'sunrise'>, value: boolean) {
     if (value) {
@@ -108,6 +116,15 @@ export default function SettingsScreen() {
 
       <SurfaceCard style={styles.rowCard} padded={false}>
         <SettingRow title={t('settings.soundPreview')} onPress={handlePreviewSound} />
+      </SurfaceCard>
+
+      <SectionHeader title={t('settings.qibla')} subtitle={t('settings.qiblaHapticsSubtitle')} />
+      <SurfaceCard padded={false}>
+        <NotificationSwitchRow
+          label={t('settings.qiblaHapticsLabel')}
+          value={qiblaHapticsEnabled}
+          onValueChange={setQiblaHapticsEnabled}
+        />
       </SurfaceCard>
 
       <SectionHeader title={t('settings.testNotifications')} subtitle={t('settings.testNotificationsSubtitle')} />

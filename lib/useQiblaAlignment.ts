@@ -26,8 +26,15 @@ function fireAlignmentHaptic() {
  * (rotation ~ 0). Enter/exit thresholds are deliberately different
  * (hysteresis) so it doesn't flicker in and out of "aligned" while held
  * steady right at the edge of the tolerance.
+ *
+ * `hapticsEnabled` is this app's own in-app preference (Settings -> Qibla),
+ * not an attempt to read the device's system haptics setting - there's no
+ * public API for that, and iOS's UIFeedbackGenerator calls are largely
+ * independent of it by design anyway. Alignment detection itself (and the
+ * "Facing the Qibla" label that depends on the return value) is unaffected
+ * either way - only whether that alignment actually buzzes.
  */
-export function useQiblaAlignment(rotation: number | null): boolean {
+export function useQiblaAlignment(rotation: number | null, hapticsEnabled = true): boolean {
   const [isAligned, setIsAligned] = useState(false);
   const alignedRef = useRef(false);
 
@@ -57,11 +64,11 @@ export function useQiblaAlignment(rotation: number | null): boolean {
   // label to appear, not paying attention to their hand at that exact
   // instant, so a one-shot haptic can come and go unnoticed.
   useEffect(() => {
-    if (!isAligned) return;
+    if (!isAligned || !hapticsEnabled) return;
     fireAlignmentHaptic();
     const interval = setInterval(fireAlignmentHaptic, REPEAT_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [isAligned]);
+  }, [isAligned, hapticsEnabled]);
 
   return isAligned;
 }
