@@ -52,7 +52,13 @@
     "notifications": "ނަމާދު އިޝްޢާރު",
     "notificationsSubtitle": "ހަނދާންކޮށްދޭނެ ނަމާދުތައް ހޮއްވަވާ",
     "soundPreview": "އިޝްޢާރު ސައުންޑް އަޑުއައްސަވާ",
-    "about": "މަޢުލޫމާތު"
+    "about": "މަޢުލޫމާތު",
+    "testNotifications": "އިޝްޢާރު ޓެސްޓް (ވަގުތީ)",
+    "testNotificationsSubtitle": "ބަންގީގެ އަޑާއެކު ދެންމެ ހަގީގީ އިޝްޢާރެއް ފޮނުވާނެ.",
+    "testAdhanButton": "5 ސިކުންތުގައި ޓެސްޓް ބަންގި ފޮނުވާ",
+    "testAdhanScheduled": "ތާވަލުކުރެވިއްޖެ - އަޑުއިވޭތޯ ބައްލަވާ.",
+    "testAdhanTitle": "ޓެސްޓް ބަންގި",
+    "testAdhanBody": "މިއީ ބަންގީގެ އަޑުން ފޮނުވި ޓެސްޓް އިޝްޢާރެއް."
   },
   "languages": {
     "en": "އިނގިރޭސި",

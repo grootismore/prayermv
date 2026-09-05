@@ -7,7 +7,7 @@ import Constants from 'expo-constants';
 
 import { useSettings } from '../../context/SettingsContext';
 import { NOTIFIABLE_PRAYERS } from '../../lib/prayerTimes';
-import { requestNotificationPermissions } from '../../lib/notifications';
+import { requestNotificationPermissions, sendTestAdhanNotification } from '../../lib/notifications';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import type { AppLanguage, NotificationPrefs } from '../../lib/storage';
 import { colors } from '../../lib/theme';
@@ -37,6 +37,15 @@ export default function SettingsScreen() {
       content: { title: t('common.appName'), body: t('settings.soundPreview') },
       trigger: null,
     });
+  }
+
+  async function handleTestAdhan() {
+    try {
+      await sendTestAdhanNotification(5);
+      Alert.alert(t('settings.testAdhanTitle'), t('settings.testAdhanScheduled'));
+    } catch {
+      Alert.alert(t('qibla.permissionDenied'));
+    }
   }
 
   return (
@@ -85,6 +94,12 @@ export default function SettingsScreen() {
           <Text style={styles.cardText}>{t('settings.soundPreview')}</Text>
         </Pressable>
 
+        <Text style={styles.sectionLabel}>{t('settings.testNotifications')}</Text>
+        <Text style={styles.sectionSubtitle}>{t('settings.testNotificationsSubtitle')}</Text>
+        <Pressable style={[styles.card, styles.cardPadded]} onPress={handleTestAdhan}>
+          <Text style={[styles.cardText, styles.testAdhanText]}>{t('settings.testAdhanButton')}</Text>
+        </Pressable>
+
         <Text style={styles.sectionLabel}>{t('settings.about')}</Text>
         <View style={[styles.card, styles.cardPadded]}>
           <Text style={styles.cardText}>
@@ -118,6 +133,7 @@ const styles = StyleSheet.create({
   },
   cardPadded: { paddingHorizontal: 16, paddingVertical: 14 },
   cardText: { fontSize: 16, color: colors.text },
+  testAdhanText: { color: colors.gold, fontWeight: '600' },
   cardAction: { fontSize: 13, color: colors.primary, fontWeight: '600', marginTop: 4 },
   languageRow: {
     flexDirection: 'row',

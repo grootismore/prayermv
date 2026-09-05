@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 // Bundle/App Group identifiers are read from env vars (set as GitHub Actions
 // secrets/variables in CI) rather than hardcoded, since whoever builds this
 // needs to register these under their own Apple ID on the free developer
@@ -6,6 +9,13 @@ const IOS_BUNDLE_IDENTIFIER = process.env.IOS_BUNDLE_IDENTIFIER || 'com.prayermv
 const IOS_APP_GROUP_ID = process.env.IOS_APP_GROUP_ID || `group.${IOS_BUNDLE_IDENTIFIER}`;
 const ANDROID_PACKAGE = process.env.ANDROID_PACKAGE || 'com.prayermv.app';
 const APPLE_TEAM_ID = process.env.APPLE_TEAM_ID || undefined;
+
+// See assets/sounds/README.md - the actual adhan.wav isn't committed yet,
+// so this only gets added to the notifications plugin (which would
+// otherwise fail the prebuild trying to copy a file that doesn't exist)
+// once someone actually drops it in.
+const ADHAN_SOUND_RELATIVE_PATH = './assets/sounds/adhan.wav';
+const adhanSoundExists = fs.existsSync(path.join(__dirname, 'assets/sounds/adhan.wav'));
 
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = {
@@ -57,6 +67,7 @@ module.exports = {
         {
           icon: './assets/icon.png',
           color: '#0F6B5C',
+          ...(adhanSoundExists ? { sounds: [ADHAN_SOUND_RELATIVE_PATH] } : {}),
         },
       ],
       '@bacons/apple-targets',

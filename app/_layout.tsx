@@ -4,12 +4,19 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SettingsProvider } from '../context/SettingsContext';
-import { registerBackgroundRescheduleTask, rescheduleTodayNotifications } from '../lib/notifications';
+import {
+  ensureAdhanChannel,
+  registerBackgroundRescheduleTask,
+  rescheduleTodayNotifications,
+} from '../lib/notifications';
 
 export default function RootLayout() {
   useEffect(() => {
-    registerBackgroundRescheduleTask();
-    rescheduleTodayNotifications();
+    (async () => {
+      await ensureAdhanChannel();
+      await registerBackgroundRescheduleTask();
+      await rescheduleTodayNotifications();
+    })();
   }, []);
 
   return (

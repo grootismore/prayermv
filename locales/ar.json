@@ -52,7 +52,13 @@
     "notifications": "إشعارات الصلاة",
     "notificationsSubtitle": "اختر الصلوات التي تريد تذكيرًا بها",
     "soundPreview": "معاينة صوت الإشعار",
-    "about": "حول التطبيق"
+    "about": "حول التطبيق",
+    "testNotifications": "اختبار الإشعارات (مؤقت)",
+    "testNotificationsSubtitle": "يرسل إشعارًا حقيقيًا بعد ثوانٍ بصوت الأذان، لتتحقق منه على شاشة القفل أو في الخلفية.",
+    "testAdhanButton": "إرسال أذان تجريبي خلال 5 ثوانٍ",
+    "testAdhanScheduled": "تمت الجدولة - أغلق الشاشة أو بدّل التطبيقات لسماعه.",
+    "testAdhanTitle": "أذان تجريبي",
+    "testAdhanBody": "هذا إشعار تجريبي بصوت الأذان."
   },
   "languages": {
     "en": "الإنجليزية",

@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundTask from 'expo-background-task';
@@ -7,6 +8,14 @@ import { loadSelectedIslandId, loadNotificationPrefs, type NotificationPrefs } f
 import i18n from './i18n';
 
 export const BACKGROUND_RESCHEDULE_TASK = 'prayermv-daily-reschedule';
+
+// iOS wants the sound filename with its extension; Android wants the raw
+// resource name without one (see assets/sounds/README.md - the actual
+// adhan.wav file isn't bundled yet, so both fall back to the platform's
+// default notification sound until it's added).
+const ADHAN_SOUND_IOS_FILENAME = 'adhan.wav';
+const ADHAN_SOUND_ANDROID_RESOURCE = 'adhan';
+const ADHAN_CHANNEL_ID = 'prayer-adhan';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -22,6 +31,27 @@ export async function requestNotificationPermissions(): Promise<boolean> {
   if (existing.granted) return true;
   const requested = await Notifications.requestPermissionsAsync();
   return requested.granted;
+}
+
+/**
+ * On Android 8+, notification sound is controlled by the channel, not the
+ * individual notification - so the adhan channel needs to exist before any
+ * notification references it. Safe to call repeatedly (setNotificationChannelAsync
+ * upserts) and safe to call before adhan.wav exists on disk (falls back to
+ * the channel's default sound rather than throwing).
+ */
+export async function ensureAdhanChannel(): Promise<void> {
+  if (Platform.OS !== 'android') return;
+  try {
+    await Notifications.setNotificationChannelAsync(ADHAN_CHANNEL_ID, {
+      name: 'Prayer adhan',
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: ADHAN_SOUND_ANDROID_RESOURCE,
+    });
+  } catch {
+    // Missing raw/adhan resource (not added yet) - keep going with whatever
+    // sound the channel already has rather than crashing.
+  }
 }
 
 /**
@@ -52,13 +82,42 @@ export async function rescheduleTodayNotifications(): Promise<void> {
       content: {
         title: i18n.t(`prayers.${entry.call}`),
         body: entry.string,
+        sound: ADHAN_SOUND_IOS_FILENAME,
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
         date: entry.date,
+        channelId: ADHAN_CHANNEL_ID,
       },
     });
   }
+}
+
+/**
+ * TEMPORARY dev/test helper - fires one local notification a few seconds
+ * from now using the same adhan sound/channel as real prayer notifications,
+ * so it can be verified on-device (lock screen, background, sound) without
+ * waiting for an actual prayer time. Wired to a button in Settings; remove
+ * both once the adhan sound is confirmed working end to end.
+ */
+export async function sendTestAdhanNotification(secondsFromNow = 5): Promise<void> {
+  const granted = await requestNotificationPermissions();
+  if (!granted) throw new Error('Notification permission not granted');
+
+  await ensureAdhanChannel();
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: i18n.t('settings.testAdhanTitle'),
+      body: i18n.t('settings.testAdhanBody'),
+      sound: ADHAN_SOUND_IOS_FILENAME,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: new Date(Date.now() + secondsFromNow * 1000),
+      channelId: ADHAN_CHANNEL_ID,
+    },
+  });
 }
 
 TaskManager.defineTask(BACKGROUND_RESCHEDULE_TASK, async () => {

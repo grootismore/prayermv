@@ -52,7 +52,13 @@
     "notifications": "Prayer notifications",
     "notificationsSubtitle": "Choose which prayers send you a reminder",
     "soundPreview": "Preview notification sound",
-    "about": "About"
+    "about": "About",
+    "testNotifications": "Test notifications (temporary)",
+    "testNotificationsSubtitle": "Fires one real notification a few seconds from now with the adhan sound, so you can check it on the lock screen or in the background.",
+    "testAdhanButton": "Send test adhan in 5s",
+    "testAdhanScheduled": "Scheduled - lock your phone or switch apps to hear it.",
+    "testAdhanTitle": "Test adhan",
+    "testAdhanBody": "This is a test notification using the adhan sound."
   },
   "languages": {
     "en": "English",
