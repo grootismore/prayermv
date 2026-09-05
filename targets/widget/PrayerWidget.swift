@@ -147,15 +147,15 @@ struct PrayerWidgetView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(entry.islandLabel)
                     .font(.caption)
-                    .foregroundStyle(.widgetTextMuted)
+                    .foregroundStyle(Color.widgetTextMuted)
                 Spacer()
                 Text(entry.moment?.name.displayName ?? "-")
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundStyle(.widgetPrimary)
+                    .foregroundStyle(Color.widgetPrimary)
                 Text(entry.moment?.timeString ?? "--:--")
                     .font(.title3)
-                    .foregroundStyle(.widgetText)
+                    .foregroundStyle(Color.widgetText)
             }
             .padding()
             // Required since iOS 17 - without it WidgetKit shows its own
