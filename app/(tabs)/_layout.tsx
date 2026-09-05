@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet } from 'react-native';
+import { View, StyleSheet, type ColorValue } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,22 +8,15 @@ import { colors, radius, shadow, spacing, tabBarMetrics, typography } from '../.
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-function TabBarIcon({ name, label, focused }: { name: IconName; label: string; focused: boolean }) {
+// The pill wraps only the icon - the label beneath it is rendered by
+// react-navigation's own tabBarLabel (tabBarActiveTintColor/tabBarLabelStyle
+// below), the same native Text sizing every React Navigation tab bar relies
+// on, rather than a hand-rolled one prone to clipping/truncating on
+// narrower devices.
+function TabIcon({ name, color, focused }: { name: IconName; color: ColorValue; focused: boolean }) {
   return (
-    <View style={[styles.item, focused && styles.itemActive]}>
-      <Ionicons
-        name={name}
-        color={focused ? colors.primary : colors.textSecondary}
-        size={tabBarMetrics.iconSize}
-      />
-      <Text
-        style={[styles.label, focused && styles.labelActive]}
-        numberOfLines={1}
-        adjustsFontSizeToFit
-        minimumFontScale={0.8}
-      >
-        {label}
-      </Text>
+    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+      <Ionicons name={name} color={color} size={tabBarMetrics.iconSize} />
     </View>
   );
 }
@@ -41,7 +34,9 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarLabelStyle: styles.label,
         tabBarStyle: [styles.tabBar, { height: tabBarMetrics.height + insets.bottom, paddingBottom: insets.bottom }],
         tabBarItemStyle: styles.tabItem,
       }}
@@ -50,8 +45,8 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: t('tabs.home'),
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} label={t('tabs.home')} focused={focused} />
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon name={focused ? 'home' : 'home-outline'} color={color} focused={focused} />
           ),
         }}
       />
@@ -59,8 +54,8 @@ export default function TabsLayout() {
         name="qibla"
         options={{
           title: t('tabs.qibla'),
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon name={focused ? 'compass' : 'compass-outline'} label={t('tabs.qibla')} focused={focused} />
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon name={focused ? 'compass' : 'compass-outline'} color={color} focused={focused} />
           ),
         }}
       />
@@ -68,12 +63,8 @@ export default function TabsLayout() {
         name="hijri"
         options={{
           title: t('tabs.hijri'),
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon
-              name={focused ? 'calendar' : 'calendar-outline'}
-              label={t('tabs.hijri')}
-              focused={focused}
-            />
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} focused={focused} />
           ),
         }}
       />
@@ -81,12 +72,8 @@ export default function TabsLayout() {
         name="settings"
         options={{
           title: t('tabs.settings'),
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon
-              name={focused ? 'settings' : 'settings-outline'}
-              label={t('tabs.settings')}
-              focused={focused}
-            />
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon name={focused ? 'settings' : 'settings-outline'} color={color} focused={focused} />
           ),
         }}
       />
@@ -104,20 +91,16 @@ const styles = StyleSheet.create({
     ...shadow.floating,
   },
   tabItem: {
-    flex: 1,
     paddingTop: 0,
   },
-  item: {
-    flexDirection: 'column',
+  iconWrap: {
+    width: 44,
+    height: 28,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
-    maxWidth: '100%',
-    paddingHorizontal: spacing.xs,
-    paddingVertical: tabBarMetrics.pillPaddingVertical,
-    borderRadius: radius.pill,
   },
-  itemActive: {
+  iconWrapActive: {
     backgroundColor: colors.primarySoft,
     borderWidth: 1,
     borderColor: colors.border,
@@ -125,9 +108,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: typography.size.xs,
     fontWeight: typography.weight.semibold,
-    color: colors.textSecondary,
-  },
-  labelActive: {
-    color: colors.primary,
+    marginTop: 2,
   },
 });

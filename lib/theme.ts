@@ -88,7 +88,6 @@ export const cardPadding = 20;
 export const tabBarMetrics = {
   height: 78,
   iconSize: 22,
-  pillPaddingVertical: 8,
   topRadius: radius.xl,
 };
 
