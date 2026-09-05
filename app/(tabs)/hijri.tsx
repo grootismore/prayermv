@@ -6,65 +6,115 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useSettings } from '../../context/SettingsContext';
-import { getTodayHijri, getHijriMonthInfo } from '../../lib/hijri';
+import { getTodayHijri, getHijriMonthInfo, getHijriMonthName } from '../../lib/hijri';
+import { getTodayGregorian, getGregorianMonthInfo, getGregorianMonthName } from '../../lib/gregorian';
+import { buildCalendarWeeks } from '../../lib/calendarGrid';
 import { colors, radius, shadow } from '../../lib/theme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import GeometricStar from '../../components/GeometricStar';
 import StarField from '../../components/StarField';
 
+type CalendarMode = 'hijri' | 'gregorian';
+
 export default function HijriScreen() {
   const { t } = useTranslation();
   const { language } = useSettings();
-  const today = useMemo(() => getTodayHijri(), []);
-  const [viewYear, setViewYear] = useState(today.year);
-  const [viewMonth, setViewMonth] = useState(today.month);
   const numeralsReady = useNumeralFont();
-
-  const monthInfo = useMemo(
-    () => getHijriMonthInfo(viewYear, viewMonth, language),
-    [viewYear, viewMonth, language]
-  );
-
-  const weekdaysShort = t('hijri.weekdaysShort', { returnObjects: true }) as string[];
   const numeralStyle = numeralsReady && { fontFamily: numeralFont.semibold };
 
+  const [mode, setMode] = useState<CalendarMode>('hijri');
+  const isHijri = mode === 'hijri';
+
+  const todayHijri = useMemo(() => getTodayHijri(), []);
+  const todayGregorian = useMemo(() => getTodayGregorian(), []);
+
+  // Each calendar system keeps its own browsed month, so switching modes
+  // doesn't lose your place in the other one (and doesn't need any
+  // Hijri<->Gregorian conversion to line them up).
+  const [hijriViewYear, setHijriViewYear] = useState(todayHijri.year);
+  const [hijriViewMonth, setHijriViewMonth] = useState(todayHijri.month);
+  const [gregorianViewYear, setGregorianViewYear] = useState(todayGregorian.year);
+  const [gregorianViewMonth, setGregorianViewMonth] = useState(todayGregorian.month);
+
+  const hijriMonthInfo = useMemo(
+    () => getHijriMonthInfo(hijriViewYear, hijriViewMonth, language),
+    [hijriViewYear, hijriViewMonth, language]
+  );
+  const gregorianMonthInfo = useMemo(
+    () => getGregorianMonthInfo(gregorianViewYear, gregorianViewMonth, language),
+    [gregorianViewYear, gregorianViewMonth, language]
+  );
+
+  const monthInfo = isHijri ? hijriMonthInfo : gregorianMonthInfo;
+  const viewYear = isHijri ? hijriViewYear : gregorianViewYear;
+  const viewMonth = isHijri ? hijriViewMonth : gregorianViewMonth;
+  const todayYear = isHijri ? todayHijri.year : todayGregorian.year;
+  const todayMonth = isHijri ? todayHijri.month : todayGregorian.month;
+  const todayDateNum = isHijri ? todayHijri.date : todayGregorian.date;
+  const todayMonthName = isHijri
+    ? getHijriMonthName(todayHijri.month, language)
+    : getGregorianMonthName(todayGregorian.month, language);
+
+  const weekdaysShort = t('hijri.weekdaysShort', { returnObjects: true }) as string[];
+  const weeks = useMemo(
+    () => buildCalendarWeeks(monthInfo.firstDayOfWeek, monthInfo.daysInMonth),
+    [monthInfo.firstDayOfWeek, monthInfo.daysInMonth]
+  );
+
   function goToPreviousMonth() {
-    if (viewMonth === 1) {
-      setViewMonth(12);
-      setViewYear((y) => y - 1);
+    if (isHijri) {
+      if (hijriViewMonth === 1) {
+        setHijriViewMonth(12);
+        setHijriViewYear((y) => y - 1);
+      } else {
+        setHijriViewMonth((m) => m - 1);
+      }
+    } else if (gregorianViewMonth === 1) {
+      setGregorianViewMonth(12);
+      setGregorianViewYear((y) => y - 1);
     } else {
-      setViewMonth((m) => m - 1);
+      setGregorianViewMonth((m) => m - 1);
     }
   }
 
   function goToNextMonth() {
-    if (viewMonth === 12) {
-      setViewMonth(1);
-      setViewYear((y) => y + 1);
+    if (isHijri) {
+      if (hijriViewMonth === 12) {
+        setHijriViewMonth(1);
+        setHijriViewYear((y) => y + 1);
+      } else {
+        setHijriViewMonth((m) => m + 1);
+      }
+    } else if (gregorianViewMonth === 12) {
+      setGregorianViewMonth(1);
+      setGregorianViewYear((y) => y + 1);
     } else {
-      setViewMonth((m) => m + 1);
+      setGregorianViewMonth((m) => m + 1);
     }
-  }
-
-  // Chunked into explicit 7-cell rows rather than a flexWrap grid with
-  // percentage-width cells - `width: '${100 / 7}%'` inside a wrapped flex
-  // row is a known-fragile combination in RN's layout engine (rounding on
-  // aspectRatio + percentage width can make the 7th cell wrap early), and
-  // that's exactly what was happening: every Saturday column came out
-  // empty, with the grid only ever fitting 6 cells per visual row.
-  const cells: (number | null)[] = [
-    ...Array(monthInfo.firstDayOfWeek).fill(null),
-    ...Array.from({ length: monthInfo.daysInMonth }, (_, i) => i + 1),
-  ];
-  while (cells.length % 7 !== 0) cells.push(null);
-  const weeks: (number | null)[][] = [];
-  for (let i = 0; i < cells.length; i += 7) {
-    weeks.push(cells.slice(i, i + 7));
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <Text style={styles.title}>{t('hijri.title')}</Text>
+
+      <View style={styles.modeToggle}>
+        <Pressable
+          onPress={() => setMode('hijri')}
+          style={[styles.modeButton, isHijri && styles.modeButtonActive]}
+        >
+          <Text style={[styles.modeButtonText, isHijri && styles.modeButtonTextActive]}>
+            {t('hijri.hijriMode')}
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setMode('gregorian')}
+          style={[styles.modeButton, !isHijri && styles.modeButtonActive]}
+        >
+          <Text style={[styles.modeButtonText, !isHijri && styles.modeButtonTextActive]}>
+            {t('hijri.gregorianMode')}
+          </Text>
+        </Pressable>
+      </View>
 
       <View style={styles.todayCardShadow}>
         <LinearGradient
@@ -79,8 +129,8 @@ export default function HijriScreen() {
           </View>
           <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
           <Text style={styles.todayDate}>
-            <Text style={numeralStyle}>{today.date}</Text> {monthInfo.monthName}{' '}
-            <Text style={numeralStyle}>{today.year}</Text>
+            <Text style={numeralStyle}>{todayDateNum}</Text> {todayMonthName}{' '}
+            <Text style={numeralStyle}>{todayYear}</Text>
           </Text>
         </LinearGradient>
       </View>
@@ -109,8 +159,7 @@ export default function HijriScreen() {
         {weeks.map((week, weekIndex) => (
           <View key={weekIndex} style={styles.weekRow}>
             {week.map((day, dayIndex) => {
-              const isToday =
-                day != null && viewYear === today.year && viewMonth === today.month && day === today.date;
+              const isToday = day != null && viewYear === todayYear && viewMonth === todayMonth && day === todayDateNum;
               return (
                 <View key={dayIndex} style={styles.cell}>
                   {day != null && (
@@ -133,6 +182,23 @@ export default function HijriScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, padding: 20 },
   title: { fontSize: 22, fontWeight: '700', color: colors.text, marginBottom: 16 },
+  modeToggle: {
+    flexDirection: 'row',
+    backgroundColor: colors.card,
+    borderRadius: radius.pill,
+    padding: 4,
+    marginBottom: 16,
+    ...shadow.card,
+  },
+  modeButton: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+  },
+  modeButtonActive: { backgroundColor: colors.primary },
+  modeButtonText: { fontSize: 14, fontWeight: '600', color: colors.textMuted },
+  modeButtonTextActive: { color: '#FFFFFF' },
   todayCardShadow: {
     borderRadius: radius.lg,
     marginBottom: 20,

@@ -41,8 +41,10 @@
     "aligned": "متجه نحو القبلة"
   },
   "hijri": {
-    "title": "التقويم الهجري",
+    "title": "التقويم",
     "today": "اليوم",
+    "hijriMode": "هجري",
+    "gregorianMode": "ميلادي",
     "weekdaysShort": ["أح", "إث", "ثل", "أر", "خم", "جم", "سب"]
   },
   "settings": {

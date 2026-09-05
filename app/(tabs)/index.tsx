@@ -4,18 +4,28 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { useMemo } from 'react';
+
 import { useSettings } from '../../context/SettingsContext';
 import { useNextPrayer, formatCountdown } from '../../lib/useNextPrayer';
 import { colors, radius, shadow } from '../../lib/theme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
+import { getTodayHijri, getHijriMonthName } from '../../lib/hijri';
+import { getTodayGregorian, getGregorianMonthName } from '../../lib/gregorian';
 import GeometricStar from '../../components/GeometricStar';
 import StarField from '../../components/StarField';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const { island } = useSettings();
+  const { island, language } = useSettings();
   const state = useNextPrayer(island?.islandId ?? null);
   const numeralsReady = useNumeralFont();
+  const numeralStyle = numeralsReady && { fontFamily: numeralFont.semibold };
+
+  const todayHijri = useMemo(() => getTodayHijri(), []);
+  const todayGregorian = useMemo(() => getTodayGregorian(), []);
+  const hijriMonthName = getHijriMonthName(todayHijri.month, language);
+  const gregorianMonthName = getGregorianMonthName(todayGregorian.month, language);
 
   if (!island || !state) {
     return (
@@ -34,6 +44,18 @@ export default function HomeScreen() {
           </Text>
           <Text style={styles.changeIsland}>{t('home.changeIsland')}</Text>
         </Pressable>
+
+        <View style={styles.dateRow}>
+          <Text style={styles.dateText}>
+            <Text style={numeralStyle}>{todayGregorian.date}</Text> {gregorianMonthName}{' '}
+            <Text style={numeralStyle}>{todayGregorian.year}</Text>
+          </Text>
+          <Text style={styles.dateDivider}>{'·'}</Text>
+          <Text style={styles.dateText}>
+            <Text style={numeralStyle}>{todayHijri.date}</Text> {hijriMonthName}{' '}
+            <Text style={numeralStyle}>{todayHijri.year}</Text>
+          </Text>
+        </View>
 
         {state.next && (
           <View style={styles.nextCardShadow}>
@@ -105,6 +127,14 @@ const styles = StyleSheet.create({
   },
   islandName: { fontSize: 18, fontWeight: '700', color: colors.text },
   changeIsland: { fontSize: 13, color: colors.primary, fontWeight: '600' },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 20,
+  },
+  dateText: { fontSize: 13, color: colors.textMuted },
+  dateDivider: { fontSize: 13, color: colors.gold, marginHorizontal: 8 },
   nextCardShadow: {
     borderRadius: radius.xl,
     marginBottom: 24,

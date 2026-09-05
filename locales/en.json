@@ -41,8 +41,10 @@
     "aligned": "Facing the Qibla"
   },
   "hijri": {
-    "title": "Hijri calendar",
+    "title": "Calendar",
     "today": "Today",
+    "hijriMode": "Hijri",
+    "gregorianMode": "Gregorian",
     "weekdaysShort": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
   },
   "settings": {
