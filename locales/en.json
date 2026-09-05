@@ -37,7 +37,8 @@
     "instructions": "Hold your phone flat and rotate until the arrow points up.",
     "permissionDenied": "Compass access was denied. Enable motion & orientation access in Settings to use the Qibla finder.",
     "calibrate": "Compass needs calibration. Move your phone in a figure-8 motion.",
-    "bearing": "{{degrees}}° from north"
+    "bearing": "{{degrees}}° from north",
+    "aligned": "Facing the Qibla"
   },
   "hijri": {
     "title": "Hijri calendar",

@@ -6,6 +6,7 @@ import * as Location from 'expo-location';
 
 import { useSettings } from '../../context/SettingsContext';
 import { useCompassHeading } from '../../lib/useCompassHeading';
+import { useQiblaAlignment } from '../../lib/useQiblaAlignment';
 import { getQiblaBearing } from '../../lib/qibla';
 import { colors } from '../../lib/theme';
 import QiblaCompass from '../../components/QiblaCompass';
@@ -39,6 +40,7 @@ export default function QiblaScreen() {
 
   const qiblaBearing = coords ? getQiblaBearing(coords.lat, coords.long) : null;
   const arrowRotation = qiblaBearing != null && heading != null ? qiblaBearing - heading : null;
+  const isAligned = useQiblaAlignment(arrowRotation);
 
   // The magnetometer API doesn't expose an actual accuracy/calibration
   // signal to check against, so the honest thing to show is a one-time
@@ -59,10 +61,10 @@ export default function QiblaScreen() {
       )}
 
       <View style={styles.compassWrap}>
-        <QiblaCompass rotation={arrowRotation} />
+        <QiblaCompass rotation={arrowRotation} aligned={isAligned} />
         {qiblaBearing != null && (
-          <Text style={styles.bearingText}>
-            {t('qibla.bearing', { degrees: Math.round(qiblaBearing) })}
+          <Text style={[styles.bearingText, isAligned && styles.bearingTextAligned]}>
+            {isAligned ? t('qibla.aligned') : t('qibla.bearing', { degrees: Math.round(qiblaBearing) })}
           </Text>
         )}
       </View>
@@ -91,6 +93,7 @@ const styles = StyleSheet.create({
   },
   compassWrap: { alignItems: 'center', justifyContent: 'center', marginVertical: 24 },
   bearingText: { marginTop: 16, fontSize: 18, fontWeight: '600', color: colors.text },
+  bearingTextAligned: { color: colors.gold, fontWeight: '800' },
   instructions: {
     textAlign: 'center',
     color: colors.textMuted,

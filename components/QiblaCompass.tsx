@@ -8,6 +8,8 @@ import GeometricStar from './GeometricStar';
 interface Props {
   /** Degrees to rotate the arrow, or null while heading/bearing aren't known yet. */
   rotation: number | null;
+  /** Highlights the ring/arrow gold once the phone is pointed at the Qibla. */
+  aligned?: boolean;
   size?: number;
 }
 
@@ -20,7 +22,7 @@ const CARDINAL_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
  * point straight up at rotation 0) rather than a stock icon glyph, whose
  * own default orientation isn't something we control.
  */
-export default function QiblaCompass({ rotation, size = 220 }: Props) {
+export default function QiblaCompass({ rotation, aligned = false, size = 220 }: Props) {
   const spin = useRef(new Animated.Value(rotation ?? 0)).current;
 
   useEffect(() => {
@@ -39,7 +41,14 @@ export default function QiblaCompass({ rotation, size = 220 }: Props) {
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <Circle cx={center} cy={center} r={ringRadius} fill={colors.card} stroke={colors.border} strokeWidth={2} />
+        <Circle
+          cx={center}
+          cy={center}
+          r={ringRadius}
+          fill={colors.card}
+          stroke={aligned ? colors.gold : colors.border}
+          strokeWidth={aligned ? 3 : 2}
+        />
         <Circle
           cx={center}
           cy={center}
@@ -85,14 +94,14 @@ export default function QiblaCompass({ rotation, size = 220 }: Props) {
             },
           ]}
         >
-          <QiblaArrow size={size * 0.5} />
+          <QiblaArrow size={size * 0.5} aligned={aligned} />
         </Animated.View>
       ) : null}
     </View>
   );
 }
 
-function QiblaArrow({ size }: { size: number }) {
+function QiblaArrow({ size, aligned }: { size: number; aligned: boolean }) {
   const cx = size / 2;
   return (
     <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -102,12 +111,12 @@ function QiblaArrow({ size }: { size: number }) {
             L ${cx} ${size * 0.46}
             L ${size * 0.34} ${size * 0.6}
             Z`}
-        fill={colors.primary}
+        fill={aligned ? colors.gold : colors.primary}
         stroke={colors.primaryDark}
         strokeWidth={1}
         strokeLinejoin="round"
       />
-      <Circle cx={cx} cy={size * 0.46} r={size * 0.045} fill={colors.gold} />
+      <Circle cx={cx} cy={size * 0.46} r={size * 0.045} fill={aligned ? colors.primary : colors.gold} />
     </Svg>
   );
 }
