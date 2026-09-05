@@ -1,5 +1,6 @@
 import { Text, View, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +16,12 @@ function TabBarIcon({ name, label, focused }: { name: IconName; label: string; f
         color={focused ? colors.primary : colors.textSecondary}
         size={tabBarMetrics.iconSize}
       />
-      <Text style={[styles.label, focused && styles.labelActive]} numberOfLines={1}>
+      <Text
+        style={[styles.label, focused && styles.labelActive]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+      >
         {label}
       </Text>
     </View>
@@ -24,13 +30,19 @@ function TabBarIcon({ name, label, focused }: { name: IconName; label: string; f
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  // The tab bar's own height only covers its icon/label content - the
+  // home-indicator safe area below it is added as real padding (not just
+  // left for the OS to overlay), and its background color extends through
+  // that padding, so there's no unstyled gap between the bar and the true
+  // bottom edge of the screen on any device.
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { height: tabBarMetrics.height + insets.bottom, paddingBottom: insets.bottom }],
         tabBarItemStyle: styles.tabItem,
       }}
     >
@@ -88,11 +100,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     borderTopLeftRadius: tabBarMetrics.topRadius,
     borderTopRightRadius: tabBarMetrics.topRadius,
-    height: tabBarMetrics.height,
     paddingTop: spacing.sm,
     ...shadow.floating,
   },
   tabItem: {
+    flex: 1,
     paddingTop: 0,
   },
   item: {
@@ -100,8 +112,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,
-    minWidth: 64,
-    paddingHorizontal: tabBarMetrics.pillPaddingHorizontal,
+    maxWidth: '100%',
+    paddingHorizontal: spacing.xs,
     paddingVertical: tabBarMetrics.pillPaddingVertical,
     borderRadius: radius.pill,
   },

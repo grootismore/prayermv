@@ -1,4 +1,5 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
@@ -23,6 +24,7 @@ import SunAccent from '../../components/SunAccent';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const { island, language, notificationPrefs, changeLanguage, setNotificationEnabled } = useSettings();
 
   async function handleToggle(prayer: Exclude<(typeof NOTIFIABLE_PRAYERS)[number], 'sunrise'>, value: boolean) {
@@ -62,7 +64,7 @@ export default function SettingsScreen() {
       backgroundDecoration={
         <>
           <WaveDecoration variant="header" />
-          <View style={styles.sunSpot}>
+          <View style={[styles.sunSpot, { top: insets.top + 4 }]}>
             <SunAccent size={22} />
           </View>
         </>
@@ -125,7 +127,7 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  sunSpot: { position: 'absolute', top: 4, right: 8 },
+  sunSpot: { position: 'absolute', right: 8 },
   title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
   rowCard: { marginTop: spacing.md },
   aboutText: { fontSize: typography.size.md, color: colors.textPrimary },

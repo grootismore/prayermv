@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -23,6 +24,7 @@ const SWIPE_THRESHOLD = 45;
 
 export default function HomeScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const { island, language } = useSettings();
   const state = useNextPrayer(island?.islandId ?? null);
   const numeralsReady = useNumeralFont();
@@ -83,7 +85,7 @@ export default function HomeScreen() {
       backgroundDecoration={
         <>
           <WaveDecoration variant="header" />
-          <View style={styles.sunSpot}>
+          <View style={[styles.sunSpot, { top: insets.top + 4 }]}>
             <SunAccent size={26} />
           </View>
         </>
@@ -165,7 +167,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  sunSpot: { position: 'absolute', top: 4, right: 8 },
+  sunSpot: { position: 'absolute', right: 8 },
   islandName: {
     fontSize: typography.size.xxl,
     fontWeight: typography.weight.bold,
