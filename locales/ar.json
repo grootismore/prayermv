@@ -35,6 +35,11 @@
     "nextPrayer": "الصلاة القادمة",
     "in": "خلال",
     "today": "أوقات الصلاة اليوم",
+    "tomorrow": "أوقات الصلاة غدًا",
+    "yesterday": "أوقات الصلاة أمس",
+    "prayerTimesOn": "أوقات الصلاة · {{date}}",
+    "previousDay": "اليوم السابق",
+    "nextDay": "اليوم التالي",
     "changeIsland": "تغيير الجزيرة"
   },
   "qibla": {

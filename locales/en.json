@@ -35,6 +35,11 @@
     "nextPrayer": "Next prayer",
     "in": "in",
     "today": "Today's prayer times",
+    "tomorrow": "Tomorrow's prayer times",
+    "yesterday": "Yesterday's prayer times",
+    "prayerTimesOn": "Prayer times · {{date}}",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
     "changeIsland": "Change island"
   },
   "qibla": {

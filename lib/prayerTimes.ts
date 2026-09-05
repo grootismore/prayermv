@@ -153,12 +153,16 @@ function buildEntry(
   };
 }
 
+/** Prayer times for an island on an arbitrary date, in display order (Fajr through Isha). */
+export function getPrayerTimesForDate(islandId: number, date: Date): PrayerTimeEntry[] {
+  const island = findIsland(islandId);
+  const entry = getEntryForDay(islandId, daysIntoYear(date));
+  return PRAYER_ORDER.map((call) => buildEntry(call, entry, island.offset, date));
+}
+
 /** Today's prayer times for an island, in display order (Fajr through Isha). */
 export function getTodayPrayerTimes(islandId: number): PrayerTimeEntry[] {
-  const island = findIsland(islandId);
-  const now = new Date();
-  const entry = getEntryForDay(islandId, daysIntoYear(now));
-  return PRAYER_ORDER.map((call) => buildEntry(call, entry, island.offset, now));
+  return getPrayerTimesForDate(islandId, new Date());
 }
 
 /** The next upcoming prayer (or sunrise) for an island, relative to now. */
