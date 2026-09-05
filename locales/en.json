@@ -1,0 +1,61 @@
+{
+  "common": {
+    "appName": "Salat MV",
+    "continue": "Continue",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading…"
+  },
+  "prayers": {
+    "fajr": "Fajr",
+    "sunrise": "Sunrise",
+    "dhuhr": "Dhuhr",
+    "asr": "Asr",
+    "maghrib": "Maghrib",
+    "isha": "Isha"
+  },
+  "tabs": {
+    "home": "Home",
+    "qibla": "Qibla",
+    "hijri": "Calendar",
+    "settings": "Settings"
+  },
+  "onboarding": {
+    "title": "Select your island",
+    "subtitle": "Prayer times are published per island in the Maldives. Pick yours to get started.",
+    "searchPlaceholder": "Search atoll or island",
+    "noResults": "No islands match your search"
+  },
+  "home": {
+    "nextPrayer": "Next prayer",
+    "in": "in",
+    "today": "Today's prayer times",
+    "changeIsland": "Change island"
+  },
+  "qibla": {
+    "title": "Qibla direction",
+    "instructions": "Hold your phone flat and rotate until the arrow points up.",
+    "permissionDenied": "Compass access was denied. Enable motion & orientation access in Settings to use the Qibla finder.",
+    "calibrate": "Compass needs calibration. Move your phone in a figure-8 motion.",
+    "bearing": "{{degrees}}° from north"
+  },
+  "hijri": {
+    "title": "Hijri calendar",
+    "today": "Today",
+    "weekdaysShort": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "island": "Island",
+    "notifications": "Prayer notifications",
+    "notificationsSubtitle": "Choose which prayers send you a reminder",
+    "soundPreview": "Preview notification sound",
+    "about": "About"
+  },
+  "languages": {
+    "en": "English",
+    "dv": "Dhivehi",
+    "ar": "Arabic"
+  }
+}
