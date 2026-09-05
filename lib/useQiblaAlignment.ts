@@ -3,18 +3,29 @@ import * as Haptics from 'expo-haptics';
 
 const ENTER_THRESHOLD_DEG = 5;
 const EXIT_THRESHOLD_DEG = 8;
+const REPEAT_INTERVAL_MS = 1200;
 
 function angleDistance(deg: number): number {
   const normalized = ((deg % 360) + 360) % 360;
   return Math.min(normalized, 360 - normalized);
 }
 
+// A plain notificationAsync(Success) alone can be too subtle to notice
+// while the phone is actively being turned in hand - pairing it with an
+// immediate heavy impact gives a more physically obvious "you're there"
+// thump. Wrapped defensively: haptics are best-effort feedback, never
+// something a missing/failed native call should be allowed to crash the
+// compass over.
+function fireAlignmentHaptic() {
+  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
+  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+}
+
 /**
  * Tracks whether the compass arrow is currently aligned with the Qibla
- * (rotation ~ 0) and fires one haptic pulse the moment it swings into
- * alignment. Enter/exit thresholds are deliberately different (hysteresis)
- * so it doesn't re-fire repeatedly while held steady right at the edge of
- * the tolerance.
+ * (rotation ~ 0). Enter/exit thresholds are deliberately different
+ * (hysteresis) so it doesn't flicker in and out of "aligned" while held
+ * steady right at the edge of the tolerance.
  */
 export function useQiblaAlignment(rotation: number | null): boolean {
   const [isAligned, setIsAligned] = useState(false);
@@ -34,19 +45,23 @@ export function useQiblaAlignment(rotation: number | null): boolean {
     if (!alignedRef.current && distance <= ENTER_THRESHOLD_DEG) {
       alignedRef.current = true;
       setIsAligned(true);
-      // A plain notificationAsync(Success) alone can be too subtle to
-      // notice while the phone is actively being turned in hand - pairing
-      // it with an immediate heavy impact gives a more physically obvious
-      // "you're there" thump. Wrapped defensively: haptics are
-      // best-effort feedback, never something a missing/failed native
-      // call should be allowed to crash the compass over.
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     } else if (alignedRef.current && distance > EXIT_THRESHOLD_DEG) {
       alignedRef.current = false;
       setIsAligned(false);
     }
   }, [rotation]);
+
+  // Pulse repeatedly for as long as the phone stays aligned, not just once
+  // the instant it enters alignment - a single pulse is easy to miss since
+  // the user is typically watching the screen for the "Facing the Qibla"
+  // label to appear, not paying attention to their hand at that exact
+  // instant, so a one-shot haptic can come and go unnoticed.
+  useEffect(() => {
+    if (!isAligned) return;
+    fireAlignmentHaptic();
+    const interval = setInterval(fireAlignmentHaptic, REPEAT_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [isAligned]);
 
   return isAligned;
 }
