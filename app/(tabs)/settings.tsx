@@ -104,6 +104,7 @@ export default function SettingsScreen() {
           />
         ))}
       </SurfaceCard>
+      <Text style={styles.silentModeNote}>{t('settings.silentModeNote')}</Text>
 
       <SurfaceCard style={styles.rowCard} padded={false}>
         <SettingRow title={t('settings.soundPreview')} onPress={handlePreviewSound} />
@@ -130,5 +131,11 @@ const styles = StyleSheet.create({
   sunSpot: { position: 'absolute', right: 8 },
   title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
   rowCard: { marginTop: spacing.md },
+  silentModeNote: {
+    fontSize: typography.size.xs,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.xxs,
+  },
   aboutText: { fontSize: typography.size.md, color: colors.textPrimary },
 });

@@ -34,7 +34,14 @@ export function useQiblaAlignment(rotation: number | null): boolean {
     if (!alignedRef.current && distance <= ENTER_THRESHOLD_DEG) {
       alignedRef.current = true;
       setIsAligned(true);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // A plain notificationAsync(Success) alone can be too subtle to
+      // notice while the phone is actively being turned in hand - pairing
+      // it with an immediate heavy impact gives a more physically obvious
+      // "you're there" thump. Wrapped defensively: haptics are
+      // best-effort feedback, never something a missing/failed native
+      // call should be allowed to crash the compass over.
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     } else if (alignedRef.current && distance > EXIT_THRESHOLD_DEG) {
       alignedRef.current = false;
       setIsAligned(false);

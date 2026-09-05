@@ -66,6 +66,7 @@
     "island": "Island",
     "notifications": "Prayer notifications",
     "notificationsSubtitle": "Choose which prayers send you a reminder",
+    "silentModeNote": "The adhan sound won't play if your phone's Ring/Silent switch is set to silent - that's an iOS restriction, not an app setting. You'll still get the notification and vibration.",
     "soundPreview": "Preview notification sound",
     "about": "About",
     "testNotifications": "Test notifications (temporary)",
