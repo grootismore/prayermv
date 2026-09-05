@@ -101,7 +101,7 @@ export default function HijriScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>{t('hijri.title')}</Text>
 
         <View style={styles.modeToggle}>

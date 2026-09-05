@@ -50,11 +50,14 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>{t('settings.title')}</Text>
 
         <Text style={styles.sectionLabel}>{t('settings.island')}</Text>
-        <Pressable style={[styles.card, styles.cardPadded]} onPress={() => router.push('/onboarding')}>
+        <Pressable
+          style={[styles.card, styles.cardPadded]}
+          onPress={() => router.push({ pathname: '/onboarding', params: { skipIntro: '1' } })}
+        >
           <Text style={styles.cardText}>
             {island ? `${island.atoll} ${island.island}` : '-'}
           </Text>

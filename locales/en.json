@@ -24,7 +24,12 @@
     "title": "Select your island",
     "subtitle": "Prayer times are published per island in the Maldives. Pick yours to get started.",
     "searchPlaceholder": "Search atoll or island",
-    "noResults": "No islands match your search"
+    "noResults": "No islands match your search",
+    "tagline": "Prayer times, Qibla direction, and the Hijri calendar - built for every island in the Maldives.",
+    "feature1": "Accurate prayer times for your island",
+    "feature2": "Find the Qibla direction, wherever you are",
+    "feature3": "Track the Hijri calendar and notable Islamic dates",
+    "getStarted": "Get Started"
   },
   "home": {
     "nextPrayer": "Next prayer",

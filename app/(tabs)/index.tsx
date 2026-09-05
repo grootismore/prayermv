@@ -37,8 +37,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Pressable onPress={() => router.push('/onboarding')} style={styles.islandRow}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <Pressable
+          onPress={() => router.push({ pathname: '/onboarding', params: { skipIntro: '1' } })}
+          style={styles.islandRow}
+        >
           <Text style={styles.islandName}>
             {island.atoll} {island.island}
           </Text>

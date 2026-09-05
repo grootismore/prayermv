@@ -41,10 +41,42 @@ interface RawDayEntry {
   isha: number;
 }
 
-const islands = salatData.islands as Island[];
 const atolls = salatData.atolls as Record<string, RawDayEntry[]>;
 
-/** All islands, as shipped in the mv-prayertimes island DB. */
+/**
+ * mv-prayertimes' island DB (205 islands) doesn't include every populated
+ * island by name - notably Hulhumale' and the Kaafu-atoll Vilingili
+ * (Vilimale'), both a few km from Male' and commonly searched for. Rather
+ * than fabricate astronomically-computed times for islands that aren't
+ * actually published (this app's whole design is built around using
+ * *published* per-island times, not calculated ones), these are added
+ * with Male's real atollId and offset - this dataset publishes times per
+ * atoll-region, so an island genuinely sharing Male's atoll and offset
+ * gets Male's real published times automatically through the exact same
+ * lookup path as any other island, not a special-cased alias.
+ */
+const SUPPLEMENTAL_ISLANDS: Island[] = [
+  {
+    atollId: 57,
+    islandId: -1,
+    atoll: 'K.',
+    island: "Hulhumale'",
+    offset: 0,
+    location: { lat: 4.2105, long: 73.5406 },
+  },
+  {
+    atollId: 57,
+    islandId: -2,
+    atoll: 'K.',
+    island: 'Vilingili',
+    offset: 0,
+    location: { lat: 4.1739, long: 73.4979 },
+  },
+];
+
+const islands = [...(salatData.islands as Island[]), ...SUPPLEMENTAL_ISLANDS];
+
+/** All islands, as shipped in the mv-prayertimes island DB (plus a small supplement - see SUPPLEMENTAL_ISLANDS). */
 export function getAllIslands(): Island[] {
   return islands;
 }

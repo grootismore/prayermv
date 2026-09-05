@@ -51,6 +51,7 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
         keyExtractor={(item) => String(item.islandId)}
         stickySectionHeadersEnabled
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
         renderSectionHeader={({ section }) => (
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionHeaderText}>{section.title}</Text>
