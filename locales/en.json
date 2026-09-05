@@ -51,7 +51,9 @@
     "hijriMode": "Hijri",
     "gregorianMode": "Gregorian",
     "notableDates": "Notable dates this month",
-    "weekdaysShort": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+    "weekdaysShort": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
   },
   "settings": {
     "title": "Settings",

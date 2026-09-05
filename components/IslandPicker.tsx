@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { getAtollGroups } from '../lib/prayerTimes';
-import { colors, radius, shadow } from '../lib/theme';
+import { colors, minTouchTarget, radius, spacing, typography } from '../lib/theme';
 import { useSettings } from '../context/SettingsContext';
 import { localizedIslandName, localizedAtollName } from '../lib/islandNames';
 
@@ -68,13 +68,13 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
               item.islandId === currentIslandId && styles.rowSelected,
               pressed && styles.rowPressed,
             ]}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: item.islandId === currentIslandId }}
           >
             <Text style={styles.rowText}>{localizedIslandName(item, language)}</Text>
           </Pressable>
         )}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>{t('onboarding.noResults')}</Text>
-        }
+        ListEmptyComponent={<Text style={styles.emptyText}>{t('onboarding.noResults')}</Text>}
       />
     </View>
   );
@@ -85,48 +85,51 @@ const styles = StyleSheet.create({
   searchWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 16,
-    marginBottom: 8,
-    paddingHorizontal: 14,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.sm,
     borderRadius: radius.md,
-    backgroundColor: colors.card,
-    ...shadow.card,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  searchIcon: { marginRight: 8 },
+  searchIcon: { marginRight: spacing.xs },
   searchInput: {
     flex: 1,
-    paddingVertical: 12,
-    color: colors.text,
-    fontSize: 16,
+    paddingVertical: spacing.sm,
+    color: colors.textPrimary,
+    fontSize: typography.size.md,
   },
   sectionHeader: {
     backgroundColor: colors.background,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xxs,
   },
   sectionHeaderText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
     color: colors.primary,
     letterSpacing: 0.5,
   },
   row: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    minHeight: minTouchTarget,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   rowSelected: {
-    backgroundColor: colors.primaryLight,
+    backgroundColor: colors.primarySoft,
   },
   rowPressed: {
-    opacity: 0.6,
+    backgroundColor: colors.surfacePressed,
   },
   rowText: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: typography.size.md,
+    color: colors.textPrimary,
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: 24,
+    marginTop: spacing.lg,
     color: colors.textMuted,
   },
 });

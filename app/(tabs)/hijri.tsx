@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,11 +8,14 @@ import { getTodayHijri, getHijriMonthInfo, getHijriMonthName } from '../../lib/h
 import { getTodayGregorian, getGregorianMonthInfo, getGregorianMonthName } from '../../lib/gregorian';
 import { buildCalendarWeeks } from '../../lib/calendarGrid';
 import { getHijriEventsForMonth, getHijriEventForDate } from '../../lib/hijriEvents';
-import { colors, radius, shadow } from '../../lib/theme';
+import { colors, minTouchTarget, spacing, typography } from '../../lib/theme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
-import IslamicRosette from '../../components/IslamicRosette';
-import StarField from '../../components/StarField';
-import OrnamentalDivider from '../../components/OrnamentalDivider';
+import Screen from '../../components/Screen';
+import SurfaceCard from '../../components/SurfaceCard';
+import SegmentedControl from '../../components/SegmentedControl';
+import NoorDivider from '../../components/NoorDivider';
+import WaveDecoration from '../../components/WaveDecoration';
+import SunAccent from '../../components/SunAccent';
 
 type CalendarMode = 'hijri' | 'gregorian';
 
@@ -101,167 +102,122 @@ export default function HijriScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>{t('hijri.title')}</Text>
+    <Screen>
+      <Text style={styles.title}>{t('hijri.title')}</Text>
 
-        <View style={styles.modeToggle}>
-          <Pressable
-            onPress={() => setMode('hijri')}
-            style={[styles.modeButton, isHijri && styles.modeButtonActive]}
-          >
-            <Text style={[styles.modeButtonText, isHijri && styles.modeButtonTextActive]}>
-              {t('hijri.hijriMode')}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => setMode('gregorian')}
-            style={[styles.modeButton, !isHijri && styles.modeButtonActive]}
-          >
-            <Text style={[styles.modeButtonText, !isHijri && styles.modeButtonTextActive]}>
-              {t('hijri.gregorianMode')}
-            </Text>
-          </Pressable>
-        </View>
+      <SegmentedControl
+        segments={[
+          { key: 'hijri', label: t('hijri.hijriMode') },
+          { key: 'gregorian', label: t('hijri.gregorianMode') },
+        ]}
+        selectedKey={mode}
+        onChange={(key) => setMode(key as CalendarMode)}
+      />
 
-        <View style={styles.todayCardShadow}>
-          <LinearGradient
-            colors={[colors.primary, colors.primaryDeep]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.todayCard}
-          >
-            <StarField color={colors.goldLight} />
-            <View style={styles.todayCardStar}>
-              <IslamicRosette size={30} color={colors.goldLight} />
-            </View>
-            <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
-            <Text style={styles.todayDate}>
-              <Text style={numeralStyle}>{todayDateNum}</Text> {todayMonthName}{' '}
-              <Text style={numeralStyle}>{todayYear}</Text>
-            </Text>
-          </LinearGradient>
-        </View>
+      <SurfaceCard elevated style={styles.todayCard}>
+        <SunAccent size={20} />
+        <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
+        <Text style={styles.todayDate}>
+          <Text style={numeralStyle}>{todayDateNum}</Text> {todayMonthName}{' '}
+          <Text style={numeralStyle}>{todayYear}</Text>
+        </Text>
+        <WaveDecoration variant="card" />
+      </SurfaceCard>
 
-        <OrnamentalDivider />
+      <NoorDivider />
 
-        <View style={styles.monthNav}>
-          <Pressable onPress={goToPreviousMonth} hitSlop={12}>
-            <Ionicons name="chevron-back" size={22} color={colors.primary} />
-          </Pressable>
-          <Text style={styles.monthLabel}>
-            {monthInfo.monthName} <Text style={numeralStyle}>{viewYear}</Text>
+      <View style={styles.monthNav}>
+        <Pressable onPress={goToPreviousMonth} hitSlop={12} style={styles.navButton} accessibilityLabel={t('hijri.previousMonth')}>
+          <Ionicons name="chevron-back" size={22} color={colors.primary} />
+        </Pressable>
+        <Text style={styles.monthLabel}>
+          {monthInfo.monthName} <Text style={numeralStyle}>{viewYear}</Text>
+        </Text>
+        <Pressable onPress={goToNextMonth} hitSlop={12} style={styles.navButton} accessibilityLabel={t('hijri.nextMonth')}>
+          <Ionicons name="chevron-forward" size={22} color={colors.primary} />
+        </Pressable>
+      </View>
+
+      <View style={styles.weekdayRow}>
+        {weekdaysShort.map((day, i) => (
+          <Text key={i} style={styles.weekdayText}>
+            {day}
           </Text>
-          <Pressable onPress={goToNextMonth} hitSlop={12}>
-            <Ionicons name="chevron-forward" size={22} color={colors.primary} />
-          </Pressable>
-        </View>
+        ))}
+      </View>
 
-        <View style={styles.weekdayRow}>
-          {weekdaysShort.map((day, i) => (
-            <Text key={i} style={styles.weekdayText}>
-              {day}
-            </Text>
-          ))}
-        </View>
-
-        <View style={styles.grid}>
-          {weeks.map((week, weekIndex) => (
-            <View key={weekIndex} style={styles.weekRow}>
-              {week.map((day, dayIndex) => {
-                const isToday =
-                  day != null && viewYear === todayYear && viewMonth === todayMonth && day === todayDateNum;
-                const hasEvent = isHijri && day != null && getHijriEventForDate(viewMonth, day) != null;
-                return (
-                  <View key={dayIndex} style={styles.cell}>
-                    {day != null && (
-                      <View style={styles.dayCellInner}>
-                        <View style={[styles.dayCircle, isToday && styles.dayCircleToday]}>
-                          <Text style={[styles.dayText, numeralStyle, isToday && styles.dayTextToday]}>
-                            {day}
-                          </Text>
-                        </View>
-                        {hasEvent && <View style={styles.eventDot} />}
+      <View>
+        {weeks.map((week, weekIndex) => (
+          <View key={weekIndex} style={styles.weekRow}>
+            {week.map((day, dayIndex) => {
+              const isToday =
+                day != null && viewYear === todayYear && viewMonth === todayMonth && day === todayDateNum;
+              const hasEvent = isHijri && day != null && getHijriEventForDate(viewMonth, day) != null;
+              return (
+                <View key={dayIndex} style={styles.cell}>
+                  {day != null && (
+                    <View style={styles.dayCellInner}>
+                      <View style={[styles.dayCircle, isToday && styles.dayCircleToday]}>
+                        <Text style={[styles.dayText, numeralStyle, isToday && styles.dayTextToday]}>{day}</Text>
                       </View>
-                    )}
-                  </View>
-                );
-              })}
+                      {hasEvent && <View style={styles.eventDot} />}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        ))}
+      </View>
+
+      {monthEvents.length > 0 && (
+        <SurfaceCard style={styles.legendCard}>
+          <Text style={styles.legendHeader}>{t('hijri.notableDates')}</Text>
+          {monthEvents.map((event) => (
+            <View key={event.date} style={styles.legendRow}>
+              <View style={styles.eventDot} />
+              <Text style={[styles.legendDate, numeralStyle]}>{event.date}</Text>
+              <Text style={styles.legendName}>{event.name[language]}</Text>
             </View>
           ))}
-        </View>
-
-        {monthEvents.length > 0 && (
-          <View style={styles.legendCard}>
-            <Text style={styles.legendHeader}>{t('hijri.notableDates')}</Text>
-            {monthEvents.map((event) => (
-              <View key={event.date} style={styles.legendRow}>
-                <View style={styles.eventDot} />
-                <Text style={[styles.legendDate, numeralStyle]}>{event.date}</Text>
-                <Text style={styles.legendName}>{event.name[language]}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+        </SurfaceCard>
+      )}
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { padding: 20, paddingBottom: 40 },
-  title: { fontSize: 22, fontWeight: '700', color: colors.text, marginBottom: 16 },
-  modeToggle: {
-    flexDirection: 'row',
-    backgroundColor: colors.card,
-    borderRadius: radius.pill,
-    padding: 4,
-    marginBottom: 16,
-    ...shadow.card,
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-  },
-  modeButtonActive: { backgroundColor: colors.primary },
-  modeButtonText: { fontSize: 14, fontWeight: '600', color: colors.textMuted },
-  modeButtonTextActive: { color: '#FFFFFF' },
-  todayCardShadow: {
-    borderRadius: radius.lg,
-    marginBottom: 20,
-    ...shadow.hero,
-  },
+  title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
   todayCard: {
-    borderRadius: radius.lg,
-    padding: 20,
-    paddingTop: 26,
     alignItems: 'center',
+    paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
+    marginTop: spacing.md,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.gold,
   },
-  todayCardStar: { position: 'absolute', top: 10 },
-  todayLabel: { color: '#D6EDE7', fontSize: 13, fontWeight: '600' },
-  todayDate: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', marginTop: 4 },
+  todayLabel: { color: colors.textSecondary, fontSize: typography.size.sm, fontWeight: typography.weight.semibold, marginTop: spacing.xs },
+  todayDate: { color: colors.textPrimary, fontSize: typography.size.xl, fontWeight: typography.weight.heavy, marginTop: spacing.xxs },
   monthNav: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
-  monthLabel: { fontSize: 17, fontWeight: '700', color: colors.text },
-  weekdayRow: { flexDirection: 'row', marginBottom: 4 },
+  navButton: {
+    width: minTouchTarget,
+    height: minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  monthLabel: { fontSize: typography.size.lg, fontWeight: typography.weight.bold, color: colors.textPrimary },
+  weekdayRow: { flexDirection: 'row', marginBottom: spacing.xxs },
   weekdayText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.semibold,
     color: colors.textMuted,
   },
-  grid: {},
   weekRow: { flexDirection: 'row' },
   cell: {
     flex: 1,
@@ -278,41 +234,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayCircleToday: { backgroundColor: colors.primary },
-  dayText: { fontSize: 14, color: colors.text },
-  dayTextToday: { color: '#FFFFFF', fontWeight: '700' },
+  dayText: { fontSize: typography.size.base, color: colors.textPrimary },
+  dayTextToday: { color: colors.backgroundDeep, fontWeight: typography.weight.bold },
   eventDot: {
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: colors.danger,
+    backgroundColor: colors.gold,
     marginTop: 3,
   },
   legendCard: {
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    padding: 16,
-    marginTop: 20,
-    ...shadow.card,
+    marginTop: spacing.lg,
   },
   legendHeader: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.textMuted,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+    color: colors.textSecondary,
     letterSpacing: 0.5,
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   legendRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
+    paddingVertical: spacing.xxs,
+    minHeight: minTouchTarget - 12,
   },
   legendDate: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.danger,
-    marginLeft: 8,
-    marginRight: 10,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    color: colors.gold,
+    marginLeft: spacing.xs,
+    marginRight: spacing.sm,
     minWidth: 20,
   },
-  legendName: { flex: 1, fontSize: 13, color: colors.text },
+  legendName: { flex: 1, fontSize: typography.size.sm, color: colors.textPrimary },
 });

@@ -51,7 +51,9 @@
     "hijriMode": "هجري",
     "gregorianMode": "ميلادي",
     "notableDates": "مناسبات هذا الشهر",
-    "weekdaysShort": ["أح", "إث", "ثل", "أر", "خم", "جم", "سب"]
+    "weekdaysShort": ["أح", "إث", "ثل", "أر", "خم", "جم", "سب"],
+    "previousMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي"
   },
   "settings": {
     "title": "الإعدادات",

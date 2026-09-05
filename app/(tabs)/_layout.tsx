@@ -1,16 +1,23 @@
-import { View, StyleSheet, type ColorValue } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-import { colors, radius, shadow } from '../../lib/theme';
+import { colors, radius, shadow, spacing, tabBarMetrics, typography } from '../../lib/theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-function TabIcon({ name, color, focused }: { name: IconName; color: ColorValue; focused: boolean }) {
+function TabBarIcon({ name, label, focused }: { name: IconName; label: string; focused: boolean }) {
   return (
-    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-      <Ionicons name={name} color={color} size={20} />
+    <View style={[styles.item, focused && styles.itemActive]}>
+      <Ionicons
+        name={name}
+        color={focused ? colors.primary : colors.textSecondary}
+        size={tabBarMetrics.iconSize}
+      />
+      <Text style={[styles.label, focused && styles.labelActive]} numberOfLines={1}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -22,10 +29,8 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
+        tabBarShowLabel: false,
         tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.tabLabel,
         tabBarItemStyle: styles.tabItem,
       }}
     >
@@ -33,28 +38,44 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: t('tabs.home'),
-          tabBarIcon: ({ color, focused }) => <TabIcon name="home" color={color} focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon name={focused ? 'home' : 'home-outline'} label={t('tabs.home')} focused={focused} />
+          ),
         }}
       />
       <Tabs.Screen
         name="qibla"
         options={{
           title: t('tabs.qibla'),
-          tabBarIcon: ({ color, focused }) => <TabIcon name="compass" color={color} focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon name={focused ? 'compass' : 'compass-outline'} label={t('tabs.qibla')} focused={focused} />
+          ),
         }}
       />
       <Tabs.Screen
         name="hijri"
         options={{
           title: t('tabs.hijri'),
-          tabBarIcon: ({ color, focused }) => <TabIcon name="calendar" color={color} focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name={focused ? 'calendar' : 'calendar-outline'}
+              label={t('tabs.hijri')}
+              focused={focused}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: t('tabs.settings'),
-          tabBarIcon: ({ color, focused }) => <TabIcon name="settings" color={color} focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name={focused ? 'settings' : 'settings-outline'}
+              label={t('tabs.settings')}
+              focused={focused}
+            />
+          ),
         }}
       />
     </Tabs>
@@ -63,30 +84,38 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.backgroundDeep,
     borderTopWidth: 0,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
-    height: 78,
-    paddingTop: 10,
+    borderTopLeftRadius: tabBarMetrics.topRadius,
+    borderTopRightRadius: tabBarMetrics.topRadius,
+    height: tabBarMetrics.height,
+    paddingTop: spacing.sm,
     ...shadow.floating,
   },
   tabItem: {
-    paddingTop: 2,
+    paddingTop: 0,
   },
-  tabLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  iconWrap: {
-    width: 40,
-    height: 28,
-    borderRadius: radius.pill,
+  item: {
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 2,
+    minWidth: 64,
+    paddingHorizontal: tabBarMetrics.pillPaddingHorizontal,
+    paddingVertical: tabBarMetrics.pillPaddingVertical,
+    borderRadius: radius.pill,
   },
-  iconWrapActive: {
-    backgroundColor: colors.primaryLight,
+  itemActive: {
+    backgroundColor: colors.primarySoft,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  label: {
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.semibold,
+    color: colors.textSecondary,
+  },
+  labelActive: {
+    color: colors.primary,
   },
 });

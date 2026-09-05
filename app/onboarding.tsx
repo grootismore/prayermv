@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import IslandPicker from '../components/IslandPicker';
 import { useSettings } from '../context/SettingsContext';
-import { colors, radius, shadow } from '../lib/theme';
-import GeometricStar from '../components/GeometricStar';
-import StarField from '../components/StarField';
+import { colors, minTouchTarget, radius, shadow, spacing, typography } from '../lib/theme';
+import WaveDecoration from '../components/WaveDecoration';
+import SunAccent from '../components/SunAccent';
 
 type Step = 'welcome' | 'island';
 
@@ -25,8 +24,8 @@ export default function OnboardingScreen() {
   const { island, selectIsland } = useSettings();
   const { skipIntro } = useLocalSearchParams<{ skipIntro?: string }>();
   // First run (no island yet) shows the welcome step first; navigating
-  // here later to change island (from Home/Settings) skips straight to
-  // the picker via ?skipIntro=1.
+  // here later to change island (from Settings) skips straight to the
+  // picker via ?skipIntro=1.
   const [step, setStep] = useState<Step>(skipIntro === '1' ? 'island' : 'welcome');
 
   async function handleSelect(islandId: number) {
@@ -41,16 +40,10 @@ export default function OnboardingScreen() {
   if (step === 'welcome') {
     return (
       <View style={styles.welcomeRoot}>
-        <LinearGradient
-          colors={[colors.primary, colors.primaryDeep]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-        <StarField color={colors.goldLight} />
+        <WaveDecoration variant="header" />
         <SafeAreaView style={styles.welcomeSafe} edges={['top', 'bottom']}>
           <View style={styles.welcomeHero}>
-            <GeometricStar size={36} color={colors.goldLight} />
+            <SunAccent size={34} />
             <Text style={styles.welcomeAppName}>{t('common.appName')}</Text>
             <Text style={styles.welcomeTagline}>{t('onboarding.tagline')}</Text>
           </View>
@@ -68,7 +61,7 @@ export default function OnboardingScreen() {
 
           <Pressable style={styles.welcomeButton} onPress={() => setStep('island')}>
             <Text style={styles.welcomeButtonText}>{t('onboarding.getStarted')}</Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.primaryDeep} />
+            <Ionicons name="arrow-forward" size={18} color={colors.backgroundDeep} />
           </Pressable>
         </SafeAreaView>
       </View>
@@ -78,10 +71,7 @@ export default function OnboardingScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <View style={styles.titleRow}>
-          <GeometricStar size={13} color={colors.gold} />
-          <Text style={styles.title}>{t('onboarding.title')}</Text>
-        </View>
+        <Text style={styles.title}>{t('onboarding.title')}</Text>
         <Text style={styles.subtitle}>{t('onboarding.subtitle')}</Text>
       </View>
       <IslandPicker currentIslandId={island?.islandId} onSelect={handleSelect} />
@@ -95,75 +85,70 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xxs,
   },
   subtitle: {
-    fontSize: 14,
-    color: colors.textMuted,
+    fontSize: typography.size.base,
+    color: colors.textSecondary,
     lineHeight: 20,
   },
-  welcomeRoot: { flex: 1, backgroundColor: colors.primary },
+  welcomeRoot: { flex: 1, backgroundColor: colors.background },
   welcomeSafe: {
     flex: 1,
-    paddingHorizontal: 28,
+    paddingHorizontal: spacing.xl,
     justifyContent: 'space-between',
   },
   welcomeHero: {
     alignItems: 'center',
-    marginTop: 48,
+    marginTop: spacing.xxl + spacing.sm,
   },
   welcomeAppName: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    marginTop: 16,
+    fontSize: typography.size.display,
+    fontWeight: typography.weight.heavy,
+    color: colors.textPrimary,
+    marginTop: spacing.md,
   },
   welcomeTagline: {
-    fontSize: 15,
-    color: '#D6EDE7',
+    fontSize: typography.size.lg,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
-    marginTop: 10,
-    paddingHorizontal: 8,
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.xs,
   },
-  featureList: { gap: 16 },
+  featureList: { gap: spacing.md },
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: spacing.sm + 2,
   },
   featureIconWrap: {
     width: 36,
     height: 36,
     borderRadius: radius.pill,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: colors.goldSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  featureText: { flex: 1, fontSize: 15, color: '#FFFFFF', fontWeight: '500' },
+  featureText: { flex: 1, fontSize: typography.size.lg, color: colors.textPrimary, fontWeight: typography.weight.medium },
   welcomeButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.goldLight,
+    gap: spacing.xs,
+    minHeight: minTouchTarget + 4,
+    backgroundColor: colors.primary,
     borderRadius: radius.pill,
-    paddingVertical: 16,
-    marginBottom: 24,
+    marginBottom: spacing.lg,
     ...shadow.floating,
   },
-  welcomeButtonText: { fontSize: 16, fontWeight: '700', color: colors.primaryDeep },
+  welcomeButtonText: { fontSize: typography.size.md, fontWeight: typography.weight.bold, color: colors.backgroundDeep },
 });

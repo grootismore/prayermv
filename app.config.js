@@ -26,7 +26,7 @@ module.exports = {
     scheme: 'prayermv',
     orientation: 'portrait',
     icon: './assets/icon.png',
-    userInterfaceStyle: 'light',
+    userInterfaceStyle: 'dark',
     ios: {
       bundleIdentifier: IOS_BUNDLE_IDENTIFIER,
       supportsTablet: true,
@@ -45,7 +45,7 @@ module.exports = {
     android: {
       package: ANDROID_PACKAGE,
       adaptiveIcon: {
-        backgroundColor: '#E6F4FE',
+        backgroundColor: '#031B3D',
         foregroundImage: './assets/android-icon-foreground.png',
         backgroundImage: './assets/android-icon-background.png',
         monochromeImage: './assets/android-icon-monochrome.png',
@@ -66,7 +66,7 @@ module.exports = {
         'expo-splash-screen',
         {
           image: './assets/splash-icon.png',
-          backgroundColor: '#03291D',
+          backgroundColor: '#031B3D',
           imageWidth: 220,
           resizeMode: 'contain',
         },
@@ -75,7 +75,7 @@ module.exports = {
         'expo-notifications',
         {
           icon: './assets/icon.png',
-          color: '#0F6B5C',
+          color: '#13E2E6',
           ...(adhanSoundExists ? { sounds: [ADHAN_SOUND_RELATIVE_PATH] } : {}),
         },
       ],

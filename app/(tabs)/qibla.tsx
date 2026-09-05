@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as Location from 'expo-location';
 
@@ -8,9 +7,10 @@ import { useSettings } from '../../context/SettingsContext';
 import { useCompassHeading } from '../../lib/useCompassHeading';
 import { useQiblaAlignment } from '../../lib/useQiblaAlignment';
 import { getQiblaBearing } from '../../lib/qibla';
-import { colors } from '../../lib/theme';
+import { colors, spacing, typography } from '../../lib/theme';
+import Screen from '../../components/Screen';
+import SurfaceCard from '../../components/SurfaceCard';
 import QiblaCompass from '../../components/QiblaCompass';
-import GeometricStar from '../../components/GeometricStar';
 
 export default function QiblaScreen() {
   const { t } = useTranslation();
@@ -48,21 +48,22 @@ export default function QiblaScreen() {
   const needsCalibration = heading != null && accuracy != null && accuracy <= 1;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.titleRow}>
-        <GeometricStar size={14} color={colors.gold} />
-        <Text style={styles.title}>{t('qibla.title')}</Text>
-        <GeometricStar size={14} color={colors.gold} />
-      </View>
+    <Screen contentContainerStyle={styles.content}>
+      <Text style={styles.title}>{t('qibla.title')}</Text>
 
       {(permission === 'denied' || permission === 'unavailable') && (
-        <Text style={styles.warning}>{t('qibla.permissionDenied')}</Text>
+        <Text style={styles.warning} accessibilityRole="alert">
+          {t('qibla.permissionDenied')}
+        </Text>
       )}
 
       <View style={styles.compassWrap}>
         <QiblaCompass rotation={arrowRotation} aligned={isAligned} />
         {qiblaBearing != null && (
-          <Text style={[styles.bearingText, isAligned && styles.bearingTextAligned]}>
+          <Text
+            style={[styles.bearingText, isAligned && styles.bearingTextAligned]}
+            accessibilityLiveRegion="polite"
+          >
             {isAligned ? t('qibla.aligned') : t('qibla.bearing', { degrees: Math.round(qiblaBearing) })}
           </Text>
         )}
@@ -70,43 +71,53 @@ export default function QiblaScreen() {
 
       <Text style={styles.instructions}>{t('qibla.instructions')}</Text>
       {(stillAcquiring || needsCalibration) && (
-        <Text style={styles.calibrateHint}>{t('qibla.calibrate')}</Text>
+        <SurfaceCard style={styles.calibrateCard} accessibilityLabel={t('qibla.calibrate')}>
+          <Text style={styles.calibrateHint}>{t('qibla.calibrate')}</Text>
+        </SurfaceCard>
       )}
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, alignItems: 'center', padding: 20 },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 8,
-    marginBottom: 16,
+  content: { flexGrow: 1, alignItems: 'center', justifyContent: 'center' },
+  title: {
+    fontSize: typography.size.xl,
+    fontWeight: typography.weight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.lg,
   },
-  title: { fontSize: 22, fontWeight: '700', color: colors.text },
   warning: {
     color: colors.danger,
     textAlign: 'center',
-    marginBottom: 12,
-    paddingHorizontal: 12,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
-  compassWrap: { alignItems: 'center', justifyContent: 'center', marginVertical: 24 },
-  bearingText: { marginTop: 16, fontSize: 18, fontWeight: '600', color: colors.text },
-  bearingTextAligned: { color: colors.gold, fontWeight: '800' },
+  compassWrap: { alignItems: 'center', justifyContent: 'center', marginVertical: spacing.lg },
+  bearingText: {
+    marginTop: spacing.md,
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.semibold,
+    color: colors.textPrimary,
+  },
+  bearingTextAligned: { color: colors.gold, fontWeight: typography.weight.heavy },
   instructions: {
     textAlign: 'center',
-    color: colors.textMuted,
-    fontSize: 14,
-    marginTop: 12,
-    paddingHorizontal: 16,
+    color: colors.textSecondary,
+    fontSize: typography.size.base,
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  calibrateCard: {
+    marginTop: spacing.md,
+    backgroundColor: colors.goldSoft,
+    borderColor: colors.goldMuted,
+    padding: spacing.sm,
   },
   calibrateHint: {
     textAlign: 'center',
-    color: colors.accent,
-    fontSize: 13,
-    marginTop: 8,
-    paddingHorizontal: 16,
+    color: colors.gold,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.medium,
   },
 });

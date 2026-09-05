@@ -1,22 +1,21 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useTranslation } from 'react-i18next';
-
 import { useMemo } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useSettings } from '../../context/SettingsContext';
 import { useNextPrayer, formatCountdown } from '../../lib/useNextPrayer';
-import { colors, radius, shadow } from '../../lib/theme';
+import { colors, shadow, spacing, typography } from '../../lib/theme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import { getTodayHijri, getHijriMonthName } from '../../lib/hijri';
 import { getTodayGregorian, getGregorianMonthName } from '../../lib/gregorian';
 import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
-import GeometricStar from '../../components/GeometricStar';
-import IslamicRosette from '../../components/IslamicRosette';
-import StarField from '../../components/StarField';
+import Screen from '../../components/Screen';
+import SurfaceCard from '../../components/SurfaceCard';
+import PrayerTimeRow from '../../components/PrayerTimeRow';
+import NoorDivider from '../../components/NoorDivider';
+import WaveDecoration from '../../components/WaveDecoration';
+import SunAccent from '../../components/SunAccent';
 import LoadingScreen from '../../components/LoadingScreen';
-import OrnamentalDivider from '../../components/OrnamentalDivider';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -35,159 +34,126 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.islandRow}>
-          <Text style={styles.islandName}>
-            {localizedAtollName(island.atoll, language)} {localizedIslandName(island, language)}
-          </Text>
-        </View>
-
-        <View style={styles.dateRow}>
-          <Text style={styles.dateText}>
-            <Text style={numeralStyle}>{todayGregorian.date}</Text> {gregorianMonthName}{' '}
-            <Text style={numeralStyle}>{todayGregorian.year}</Text>
-          </Text>
-          <Text style={styles.dateDivider}>{'·'}</Text>
-          <Text style={styles.dateText}>
-            <Text style={numeralStyle}>{todayHijri.date}</Text> {hijriMonthName}{' '}
-            <Text style={numeralStyle}>{todayHijri.year}</Text>
-          </Text>
-        </View>
-
-        {state.next && (
-          <View style={styles.nextCardShadow}>
-            <LinearGradient
-              colors={[colors.primary, colors.primaryDeep]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.nextCard}
-            >
-              <StarField color={colors.goldLight} />
-              <View style={styles.nextCardStar}>
-                <IslamicRosette size={30} color={colors.goldLight} />
-              </View>
-              <Text style={styles.nextLabel}>{t('home.nextPrayer')}</Text>
-              <Text style={styles.nextPrayerName}>{t(`prayers.${state.next.call}`)}</Text>
-              <Text style={[styles.nextTime, numeralsReady && styles.numeralFont]}>
-                {state.next.string}
-              </Text>
-              <Text style={[styles.countdown, numeralsReady && styles.numeralFontBold]}>
-                {formatCountdown(state.millisecondsRemaining)}
-              </Text>
-            </LinearGradient>
+    <Screen
+      backgroundDecoration={
+        <>
+          <WaveDecoration variant="header" />
+          <View style={styles.sunSpot}>
+            <SunAccent size={26} />
           </View>
-        )}
+        </>
+      }
+    >
+      <Text style={styles.islandName}>
+        {localizedAtollName(island.atoll, language)} {localizedIslandName(island, language)}
+      </Text>
+      <View style={styles.dateRow}>
+        <Text style={styles.dateText}>
+          <Text style={numeralStyle}>{todayGregorian.date}</Text> {gregorianMonthName}{' '}
+          <Text style={numeralStyle}>{todayGregorian.year}</Text>
+        </Text>
+        <Text style={styles.dateDivider}>{'·'}</Text>
+        <Text style={styles.dateText}>
+          <Text style={numeralStyle}>{todayHijri.date}</Text> {hijriMonthName}{' '}
+          <Text style={numeralStyle}>{todayHijri.year}</Text>
+        </Text>
+      </View>
 
-        <OrnamentalDivider />
+      {state.next && (
+        <SurfaceCard elevated style={styles.nextCard}>
+          <SunAccent size={22} />
+          <Text style={styles.nextLabel}>{t('home.nextPrayer')}</Text>
+          <Text style={styles.nextPrayerName}>{t(`prayers.${state.next.call}`)}</Text>
+          <Text style={[styles.nextTime, numeralsReady && styles.numeralFont]}>{state.next.string}</Text>
+          <View style={styles.countdownDivider} />
+          <Text style={[styles.countdown, numeralsReady && styles.numeralFontBold]}>
+            {formatCountdown(state.millisecondsRemaining)}
+          </Text>
+          <WaveDecoration variant="card" />
+        </SurfaceCard>
+      )}
 
-        <View style={styles.sectionTitleRow}>
-          <GeometricStar size={11} color={colors.gold} />
-          <Text style={styles.sectionTitle}>{t('home.today')}</Text>
-        </View>
-        <View style={styles.list}>
-          {state.today.map((entry) => {
-            const isNext = state.next?.call === entry.call;
-            const isCurrent = state.currentCall === entry.call && !isNext;
-            return (
-              <View
-                key={entry.call}
-                style={[styles.row, isNext && styles.rowNext, isCurrent && styles.rowCurrent]}
-              >
-                <Text style={[styles.rowLabel, isNext && styles.rowLabelActive]}>
-                  {t(`prayers.${entry.call}`)}
-                </Text>
-                <Text
-                  style={[
-                    styles.rowTime,
-                    isNext && styles.rowLabelActive,
-                    numeralsReady && styles.numeralFontMedium,
-                  ]}
-                >
-                  {entry.string}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <NoorDivider />
+
+      <Text style={styles.sectionTitle}>{t('home.today')}</Text>
+      <SurfaceCard padded={false}>
+        {state.today.map((entry) => {
+          const isNext = state.next?.call === entry.call;
+          const isCurrent = state.currentCall === entry.call && !isNext;
+          return (
+            <PrayerTimeRow
+              key={entry.call}
+              label={t(`prayers.${entry.call}`)}
+              time={entry.string}
+              isNext={isNext}
+              isCurrent={isCurrent}
+              numeralsReady={numeralsReady}
+            />
+          );
+        })}
+      </SurfaceCard>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { padding: 20, paddingBottom: 40 },
-  islandRow: {
-    marginBottom: 16,
+  sunSpot: { position: 'absolute', top: 4, right: 8 },
+  islandName: {
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xxs,
   },
-  islandName: { fontSize: 18, fontWeight: '700', color: colors.text },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
-  dateText: { fontSize: 13, color: colors.textMuted },
-  dateDivider: { fontSize: 13, color: colors.gold, marginHorizontal: 8 },
-  nextCardShadow: {
-    borderRadius: radius.xl,
-    marginBottom: 24,
+  dateText: { fontSize: typography.size.sm, color: colors.textSecondary },
+  dateDivider: { fontSize: typography.size.sm, color: colors.gold, marginHorizontal: spacing.xs },
+  nextCard: {
+    alignItems: 'center',
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
+    overflow: 'hidden',
     ...shadow.hero,
   },
-  nextCard: {
-    borderRadius: radius.xl,
-    padding: 24,
-    paddingTop: 30,
-    alignItems: 'center',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.gold,
+  nextLabel: {
+    color: colors.textSecondary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0.5,
+    marginTop: spacing.xs,
   },
-  nextCardStar: { position: 'absolute', top: 12 },
-  nextLabel: { color: '#D6EDE7', fontSize: 13, fontWeight: '600', letterSpacing: 0.5 },
-  nextPrayerName: { color: '#FFFFFF', fontSize: 32, fontWeight: '800', marginTop: 6 },
-  nextTime: { color: '#D6EDE7', fontSize: 16, marginTop: 2 },
+  nextPrayerName: {
+    color: colors.textPrimary,
+    fontSize: 32,
+    fontWeight: typography.weight.heavy,
+    marginTop: spacing.xxs,
+  },
+  nextTime: { color: colors.textSecondary, fontSize: typography.size.lg, marginTop: 2 },
+  countdownDivider: {
+    width: 40,
+    height: 1,
+    backgroundColor: colors.border,
+    marginTop: spacing.md,
+  },
   countdown: {
-    color: '#FFFFFF',
+    color: colors.primary,
     fontSize: 30,
-    fontWeight: '700',
-    marginTop: 16,
+    fontWeight: typography.weight.bold,
+    marginTop: spacing.sm,
     fontVariant: ['tabular-nums'],
     letterSpacing: 1,
   },
   numeralFont: { fontFamily: numeralFont.semibold },
   numeralFontBold: { fontFamily: numeralFont.bold },
-  numeralFontMedium: { fontFamily: numeralFont.semibold },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 8,
-  },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.textMuted,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    color: colors.textSecondary,
     letterSpacing: 0.5,
+    marginBottom: spacing.xs,
   },
-  list: {
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    overflow: 'hidden',
-    ...shadow.card,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  rowNext: { backgroundColor: colors.primaryLight },
-  rowCurrent: { backgroundColor: colors.background },
-  rowLabel: { fontSize: 16, color: colors.text, fontWeight: '600' },
-  rowLabelActive: { color: colors.primary },
-  rowTime: { fontSize: 16, color: colors.textMuted },
 });

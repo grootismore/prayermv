@@ -1,5 +1,4 @@
-import { View, Text, StyleSheet, Switch, Pressable, ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
@@ -10,9 +9,17 @@ import { NOTIFIABLE_PRAYERS } from '../../lib/prayerTimes';
 import { requestNotificationPermissions, sendTestAdhanNotification } from '../../lib/notifications';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import type { AppLanguage, NotificationPrefs } from '../../lib/storage';
-import { colors, radius, shadow } from '../../lib/theme';
+import { colors, spacing, typography } from '../../lib/theme';
 import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
-import OrnamentalDivider from '../../components/OrnamentalDivider';
+import Screen from '../../components/Screen';
+import SurfaceCard from '../../components/SurfaceCard';
+import SectionHeader from '../../components/SectionHeader';
+import SettingRow from '../../components/SettingRow';
+import LanguageRow from '../../components/LanguageRow';
+import NotificationSwitchRow from '../../components/NotificationSwitchRow';
+import NoorDivider from '../../components/NoorDivider';
+import WaveDecoration from '../../components/WaveDecoration';
+import SunAccent from '../../components/SunAccent';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -51,127 +58,75 @@ export default function SettingsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>{t('settings.title')}</Text>
+    <Screen
+      backgroundDecoration={
+        <>
+          <WaveDecoration variant="header" />
+          <View style={styles.sunSpot}>
+            <SunAccent size={22} />
+          </View>
+        </>
+      }
+    >
+      <Text style={styles.title}>{t('settings.title')}</Text>
 
-        <Text style={styles.sectionLabel}>{t('settings.island')}</Text>
-        <Pressable
-          style={[styles.card, styles.cardPadded]}
+      <SectionHeader title={t('settings.island')} />
+      <SurfaceCard padded={false}>
+        <SettingRow
+          title={island ? `${localizedAtollName(island.atoll, language)} ${localizedIslandName(island, language)}` : '-'}
+          actionLabel={t('home.changeIsland')}
           onPress={() => router.push({ pathname: '/onboarding', params: { skipIntro: '1' } })}
-        >
-          <Text style={styles.cardText}>
-            {island
-              ? `${localizedAtollName(island.atoll, language)} ${localizedIslandName(island, language)}`
-              : '-'}
-          </Text>
-          <Text style={styles.cardAction}>{t('home.changeIsland')}</Text>
-        </Pressable>
+        />
+      </SurfaceCard>
 
-        <Text style={styles.sectionLabel}>{t('settings.language')}</Text>
-        <View style={styles.card}>
-          {SUPPORTED_LANGUAGES.map((lang) => (
-            <Pressable
-              key={lang}
-              style={styles.languageRow}
-              onPress={() => changeLanguage(lang as AppLanguage)}
-            >
-              <Text style={styles.cardText}>{t(`languages.${lang}`)}</Text>
-              {language === lang && (
-                <View style={styles.checkBadge}>
-                  <Text style={styles.checkmark}>✓</Text>
-                </View>
-              )}
-            </Pressable>
-          ))}
-        </View>
+      <SectionHeader title={t('settings.language')} />
+      <SurfaceCard padded={false}>
+        {SUPPORTED_LANGUAGES.map((lang) => (
+          <LanguageRow
+            key={lang}
+            label={t(`languages.${lang}`)}
+            selected={language === lang}
+            onPress={() => changeLanguage(lang as AppLanguage)}
+          />
+        ))}
+      </SurfaceCard>
 
-        <Text style={styles.sectionLabel}>{t('settings.notifications')}</Text>
-        <Text style={styles.sectionSubtitle}>{t('settings.notificationsSubtitle')}</Text>
-        <View style={styles.card}>
-          {NOTIFIABLE_PRAYERS.map((prayer) => (
-            <View key={prayer} style={styles.toggleRow}>
-              <Text style={styles.cardText}>{t(`prayers.${prayer}`)}</Text>
-              <Switch
-                value={notificationPrefs[prayer as keyof NotificationPrefs]}
-                onValueChange={(value) => handleToggle(prayer as any, value)}
-                trackColor={{ true: colors.primary }}
-              />
-            </View>
-          ))}
-        </View>
+      <SectionHeader title={t('settings.notifications')} subtitle={t('settings.notificationsSubtitle')} />
+      <SurfaceCard padded={false}>
+        {NOTIFIABLE_PRAYERS.map((prayer) => (
+          <NotificationSwitchRow
+            key={prayer}
+            label={t(`prayers.${prayer}`)}
+            value={notificationPrefs[prayer as keyof NotificationPrefs]}
+            onValueChange={(value) => handleToggle(prayer as any, value)}
+          />
+        ))}
+      </SurfaceCard>
 
-        <Pressable style={[styles.card, styles.cardPadded]} onPress={handlePreviewSound}>
-          <Text style={styles.cardText}>{t('settings.soundPreview')}</Text>
-        </Pressable>
+      <SurfaceCard style={styles.rowCard} padded={false}>
+        <SettingRow title={t('settings.soundPreview')} onPress={handlePreviewSound} />
+      </SurfaceCard>
 
-        <Text style={styles.sectionLabel}>{t('settings.testNotifications')}</Text>
-        <Text style={styles.sectionSubtitle}>{t('settings.testNotificationsSubtitle')}</Text>
-        <Pressable style={[styles.card, styles.cardPadded]} onPress={handleTestAdhan}>
-          <Text style={[styles.cardText, styles.testAdhanText]}>{t('settings.testAdhanButton')}</Text>
-        </Pressable>
+      <SectionHeader title={t('settings.testNotifications')} subtitle={t('settings.testNotificationsSubtitle')} />
+      <SurfaceCard padded={false}>
+        <SettingRow title={t('settings.testAdhanButton')} chevron={false} onPress={handleTestAdhan} />
+      </SurfaceCard>
 
-        <OrnamentalDivider />
+      <NoorDivider />
 
-        <Text style={styles.sectionLabel}>{t('settings.about')}</Text>
-        <View style={[styles.card, styles.cardPadded]}>
-          <Text style={styles.cardText}>
-            {t('common.appName')} · {Constants.expoConfig?.version ?? '1.0.0'}
-          </Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <SectionHeader title={t('settings.about')} />
+      <SurfaceCard>
+        <Text style={styles.aboutText}>
+          {t('common.appName')} · {Constants.expoConfig?.version ?? '1.0.0'}
+        </Text>
+      </SurfaceCard>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { padding: 20, paddingBottom: 40 },
-  title: { fontSize: 22, fontWeight: '700', color: colors.text, marginBottom: 20 },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.textMuted,
-    marginBottom: 6,
-    marginTop: 16,
-    letterSpacing: 0.5,
-  },
-  sectionSubtitle: { fontSize: 13, color: colors.textMuted, marginBottom: 8 },
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    ...shadow.card,
-  },
-  cardPadded: { paddingHorizontal: 16, paddingVertical: 14 },
-  cardText: { fontSize: 16, color: colors.text },
-  testAdhanText: { color: colors.gold, fontWeight: '600' },
-  cardAction: { fontSize: 13, color: colors.primary, fontWeight: '600', marginTop: 4 },
-  languageRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  checkBadge: {
-    width: 22,
-    height: 22,
-    borderRadius: radius.pill,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkmark: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
+  sunSpot: { position: 'absolute', top: 4, right: 8 },
+  title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
+  rowCard: { marginTop: spacing.md },
+  aboutText: { fontSize: typography.size.md, color: colors.textPrimary },
 });
