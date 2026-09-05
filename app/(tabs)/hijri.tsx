@@ -12,8 +12,9 @@ import { buildCalendarWeeks } from '../../lib/calendarGrid';
 import { getHijriEventsForMonth, getHijriEventForDate } from '../../lib/hijriEvents';
 import { colors, radius, shadow } from '../../lib/theme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
-import GeometricStar from '../../components/GeometricStar';
+import IslamicRosette from '../../components/IslamicRosette';
 import StarField from '../../components/StarField';
+import OrnamentalDivider from '../../components/OrnamentalDivider';
 
 type CalendarMode = 'hijri' | 'gregorian';
 
@@ -132,7 +133,7 @@ export default function HijriScreen() {
           >
             <StarField color={colors.goldLight} />
             <View style={styles.todayCardStar}>
-              <GeometricStar size={18} color={colors.goldLight} />
+              <IslamicRosette size={30} color={colors.goldLight} />
             </View>
             <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
             <Text style={styles.todayDate}>
@@ -141,6 +142,8 @@ export default function HijriScreen() {
             </Text>
           </LinearGradient>
         </View>
+
+        <OrnamentalDivider />
 
         <View style={styles.monthNav}>
           <Pressable onPress={goToPreviousMonth} hitSlop={12}>

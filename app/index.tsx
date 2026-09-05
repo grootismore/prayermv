@@ -1,28 +1,25 @@
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
 import { Redirect } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 
 import { useSettings } from '../context/SettingsContext';
-import { colors } from '../lib/theme';
 
 export default function Index() {
   const { isLoaded, island } = useSettings();
 
+  // The native splash screen (configured via the expo-splash-screen plugin
+  // in app.config.js) stays visible - kept alive by preventAutoHideAsync()
+  // in _layout.tsx - until settings finish loading, so there's no flash of
+  // an empty/loading screen underneath it.
+  useEffect(() => {
+    if (isLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoaded]);
+
   if (!isLoaded) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return null;
   }
 
   return <Redirect href={island ? '/(tabs)' : '/onboarding'} />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background,
-  },
-});

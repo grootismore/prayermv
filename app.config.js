@@ -63,6 +63,15 @@ module.exports = {
       'expo-location',
       'expo-font',
       [
+        'expo-splash-screen',
+        {
+          image: './assets/splash-icon.png',
+          backgroundColor: '#03291D',
+          imageWidth: 220,
+          resizeMode: 'contain',
+        },
+      ],
+      [
         'expo-notifications',
         {
           icon: './assets/icon.png',

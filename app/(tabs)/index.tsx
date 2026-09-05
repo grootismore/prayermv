@@ -12,8 +12,12 @@ import { colors, radius, shadow } from '../../lib/theme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import { getTodayHijri, getHijriMonthName } from '../../lib/hijri';
 import { getTodayGregorian, getGregorianMonthName } from '../../lib/gregorian';
+import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
 import GeometricStar from '../../components/GeometricStar';
+import IslamicRosette from '../../components/IslamicRosette';
 import StarField from '../../components/StarField';
+import LoadingScreen from '../../components/LoadingScreen';
+import OrnamentalDivider from '../../components/OrnamentalDivider';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -28,11 +32,7 @@ export default function HomeScreen() {
   const gregorianMonthName = getGregorianMonthName(todayGregorian.month, language);
 
   if (!island || !state) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.muted}>{t('common.loading')}</Text>
-      </SafeAreaView>
-    );
+    return <LoadingScreen label={t('common.loading')} />;
   }
 
   return (
@@ -43,7 +43,7 @@ export default function HomeScreen() {
           style={styles.islandRow}
         >
           <Text style={styles.islandName}>
-            {island.atoll} {island.island}
+            {localizedAtollName(island.atoll, language)} {localizedIslandName(island, language)}
           </Text>
           <Text style={styles.changeIsland}>{t('home.changeIsland')}</Text>
         </Pressable>
@@ -70,7 +70,7 @@ export default function HomeScreen() {
             >
               <StarField color={colors.goldLight} />
               <View style={styles.nextCardStar}>
-                <GeometricStar size={18} color={colors.goldLight} />
+                <IslamicRosette size={30} color={colors.goldLight} />
               </View>
               <Text style={styles.nextLabel}>{t('home.nextPrayer')}</Text>
               <Text style={styles.nextPrayerName}>{t(`prayers.${state.next.call}`)}</Text>
@@ -83,6 +83,8 @@ export default function HomeScreen() {
             </LinearGradient>
           </View>
         )}
+
+        <OrnamentalDivider />
 
         <View style={styles.sectionTitleRow}>
           <GeometricStar size={11} color={colors.gold} />
@@ -121,7 +123,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scrollContent: { padding: 20, paddingBottom: 40 },
-  muted: { color: colors.textMuted, textAlign: 'center', marginTop: 40 },
   islandRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

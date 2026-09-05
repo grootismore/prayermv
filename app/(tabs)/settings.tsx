@@ -11,6 +11,8 @@ import { requestNotificationPermissions, sendTestAdhanNotification } from '../..
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import type { AppLanguage, NotificationPrefs } from '../../lib/storage';
 import { colors, radius, shadow } from '../../lib/theme';
+import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
+import OrnamentalDivider from '../../components/OrnamentalDivider';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -59,7 +61,9 @@ export default function SettingsScreen() {
           onPress={() => router.push({ pathname: '/onboarding', params: { skipIntro: '1' } })}
         >
           <Text style={styles.cardText}>
-            {island ? `${island.atoll} ${island.island}` : '-'}
+            {island
+              ? `${localizedAtollName(island.atoll, language)} ${localizedIslandName(island, language)}`
+              : '-'}
           </Text>
           <Text style={styles.cardAction}>{t('home.changeIsland')}</Text>
         </Pressable>
@@ -106,6 +110,8 @@ export default function SettingsScreen() {
         <Pressable style={[styles.card, styles.cardPadded]} onPress={handleTestAdhan}>
           <Text style={[styles.cardText, styles.testAdhanText]}>{t('settings.testAdhanButton')}</Text>
         </Pressable>
+
+        <OrnamentalDivider />
 
         <Text style={styles.sectionLabel}>{t('settings.about')}</Text>
         <View style={[styles.card, styles.cardPadded]}>

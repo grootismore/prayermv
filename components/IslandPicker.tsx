@@ -5,6 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { getAtollGroups } from '../lib/prayerTimes';
 import { colors, radius, shadow } from '../lib/theme';
+import { useSettings } from '../context/SettingsContext';
+import { localizedIslandName, localizedAtollName } from '../lib/islandNames';
 
 interface Props {
   currentIslandId?: number | null;
@@ -13,6 +15,7 @@ interface Props {
 
 export default function IslandPicker({ currentIslandId, onSelect }: Props) {
   const { t } = useTranslation();
+  const { language } = useSettings();
   const [query, setQuery] = useState('');
 
   const sections = useMemo(() => {
@@ -21,7 +24,7 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
 
     return groups
       .map((group) => ({
-        title: group.atoll,
+        title: localizedAtollName(group.atoll, language),
         data: normalizedQuery
           ? group.islands.filter(
               (island) =>
@@ -31,7 +34,7 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
           : group.islands,
       }))
       .filter((section) => section.data.length > 0);
-  }, [query]);
+  }, [query, language]);
 
   return (
     <View style={styles.container}>
@@ -66,7 +69,7 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
               pressed && styles.rowPressed,
             ]}
           >
-            <Text style={styles.rowText}>{item.island}</Text>
+            <Text style={styles.rowText}>{localizedIslandName(item, language)}</Text>
           </Pressable>
         )}
         ListEmptyComponent={

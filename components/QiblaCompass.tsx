@@ -3,7 +3,7 @@ import { Animated, Easing, View, StyleSheet } from 'react-native';
 import Svg, { Circle, Rect, Path } from 'react-native-svg';
 
 import { colors, shadow } from '../lib/theme';
-import GeometricStar from './GeometricStar';
+import IslamicRosette from './IslamicRosette';
 
 interface Props {
   /** Degrees to rotate the arrow, or null while heading/bearing aren't known yet. */
@@ -73,7 +73,7 @@ export default function QiblaCompass({ rotation, aligned = false, size = 220 }: 
       </Svg>
 
       <View style={styles.starBadge}>
-        <GeometricStar size={22} color={colors.goldLight} />
+        <IslamicRosette size={30} color={colors.goldLight} />
       </View>
 
       {rotation != null ? (
