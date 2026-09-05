@@ -41,6 +41,10 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
   const center = size / 2;
   const ringRadius = center - 8;
   const labelRadius = ringRadius - 20;
+  // Sits just below the N label (same labelRadius geometry the cardinal
+  // labels use) and above the arrow's tip when it's pointing straight up,
+  // so the badge never overlaps either.
+  const badgeTop = center - labelRadius + 13;
 
   return (
     <View
@@ -101,8 +105,8 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
         );
       })}
 
-      <View style={styles.kaabaBadge}>
-        <KaabaMarker size={22} />
+      <View style={[styles.kaabaBadge, { top: badgeTop }]}>
+        <KaabaMarker size={14} />
       </View>
 
       {rotation != null ? (
@@ -183,10 +187,9 @@ const styles = StyleSheet.create({
   },
   kaabaBadge: {
     position: 'absolute',
-    top: 26,
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+    width: 22,
+    height: 22,
+    borderRadius: 7,
     backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
     borderColor: colors.goldSoft,

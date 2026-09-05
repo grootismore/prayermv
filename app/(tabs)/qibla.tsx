@@ -46,6 +46,7 @@ export default function QiblaScreen() {
   // accuracy is a real signal from the OS compass (0 = unreliable, 3 =
   // high) - only warn once we actually have a reading to judge.
   const needsCalibration = heading != null && accuracy != null && accuracy <= 1;
+  const showCalibrate = stillAcquiring || needsCalibration;
 
   return (
     <Screen contentContainerStyle={styles.content}>
@@ -70,11 +71,21 @@ export default function QiblaScreen() {
       </View>
 
       <Text style={styles.instructions}>{t('qibla.instructions')}</Text>
-      {(stillAcquiring || needsCalibration) && (
+      {/* Always mounted, with its space always reserved (opacity toggled
+          instead of conditionally rendering it) - accuracy can flicker
+          in and out of the "needs calibration" range in real time as the
+          phone moves, and mounting/unmounting this card was shifting the
+          compass above it up and down each time. */}
+      <View
+        style={!showCalibrate && styles.calibrateSlotHidden}
+        accessibilityElementsHidden={!showCalibrate}
+        importantForAccessibility={showCalibrate ? 'auto' : 'no-hide-descendants'}
+        pointerEvents={showCalibrate ? 'auto' : 'none'}
+      >
         <SurfaceCard style={styles.calibrateCard} accessibilityLabel={t('qibla.calibrate')}>
           <Text style={styles.calibrateHint}>{t('qibla.calibrate')}</Text>
         </SurfaceCard>
-      )}
+      </View>
     </Screen>
   );
 }
@@ -107,6 +118,9 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
     marginTop: spacing.sm,
     paddingHorizontal: spacing.md,
+  },
+  calibrateSlotHidden: {
+    opacity: 0,
   },
   calibrateCard: {
     marginTop: spacing.md,
