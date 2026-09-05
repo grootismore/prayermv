@@ -95,14 +95,12 @@ struct PrayerProvider: AppIntentTimelineProvider {
     }
 }
 
-/// $widgetBackground (see expo-target.config.js) is a single fixed light
-/// color with no dark-mode variant. SwiftUI's default text styles
-/// (.primary/.secondary) are *system-appearance-adaptive* though - on a
-/// device in Dark Mode they render near-white regardless of the widget's
-/// own background, which against our fixed-light background is white text
-/// on a near-white card: functionally invisible. So the systemMedium view
-/// below uses fixed colors matching the light background instead of the
-/// adaptive defaults.
+/// Matches lib/theme.ts in the RN app, so the widget reads as the same
+/// product rather than a generic system card. Fixed (non-adaptive) colors
+/// throughout, same reasoning as before: this gradient has no separate
+/// dark-mode variant, so text needs to be legible against it regardless of
+/// the device's system appearance rather than following .primary/
+/// .secondary, which shift with Dark Mode independently of our background.
 private extension Color {
     init(hex: UInt32) {
         self.init(
@@ -112,9 +110,28 @@ private extension Color {
         )
     }
 
-    static let widgetText = Color(hex: 0x20241F)
-    static let widgetTextMuted = Color(hex: 0x6E7566)
     static let widgetPrimary = Color(hex: 0x0B6E4F)
+    static let widgetPrimaryDeep = Color(hex: 0x03291D)
+    static let widgetGold = Color(hex: 0xC79A2E)
+    static let widgetGoldLight = Color(hex: 0xF3E6C4)
+    static let widgetMutedOnDark = Color(hex: 0xB9D6C9)
+}
+
+/// An 8-point star (two squares, one rotated 45deg over the other) - the
+/// same construction as components/GeometricStar.tsx in the RN app, used
+/// there as a small decorative accent on hero cards.
+private struct GeometricStarShape: View {
+    var size: CGFloat
+    var color: Color
+
+    var body: some View {
+        let side = size - size * 0.18 * 2
+        return ZStack {
+            Rectangle().fill(color).frame(width: side, height: side)
+            Rectangle().fill(color).frame(width: side, height: side).rotationEffect(.degrees(45))
+        }
+        .frame(width: size, height: size)
+    }
 }
 
 struct PrayerWidgetView: View {
@@ -152,19 +169,23 @@ struct PrayerWidgetView: View {
         default:
             // .systemMedium - a wide card with the next prayer up top and
             // the whole day's times in a row underneath, rather than a
-            // small square showing only the next prayer.
+            // small square showing only the next prayer. Styled as a
+            // miniature version of the app's own hero cards (Home's
+            // next-prayer card, the Calendar screen's today card): an
+            // emerald gradient with a gold star badge, rather than a flat
+            // system-default card.
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Text(entry.islandLabel)
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundStyle(Color.widgetTextMuted)
+                        .foregroundStyle(Color.widgetMutedOnDark)
                     Spacer()
                     if let moment = entry.moment {
                         Text("\(moment.name.displayName) \u{00B7} \(moment.timeString)")
                             .font(.caption)
                             .fontWeight(.bold)
-                            .foregroundStyle(Color.widgetPrimary)
+                            .foregroundStyle(Color.widgetGold)
                     }
                 }
 
@@ -175,13 +196,13 @@ struct PrayerWidgetView: View {
                         VStack(spacing: 3) {
                             Text(item.name.displayName)
                                 .font(.system(size: 10))
-                                .foregroundStyle(Color.widgetTextMuted)
+                                .foregroundStyle(Color.widgetMutedOnDark)
                             Text(item.timeString)
                                 .font(.system(size: 13, weight: .semibold))
                                 .minimumScaleFactor(0.8)
                                 .lineLimit(1)
                                 .foregroundStyle(
-                                    item.name == entry.moment?.name ? Color.widgetPrimary : Color.widgetText
+                                    item.name == entry.moment?.name ? Color.widgetGold : .white
                                 )
                         }
                         .frame(maxWidth: .infinity)
@@ -189,11 +210,19 @@ struct PrayerWidgetView: View {
                 }
             }
             .padding()
+            .overlay(alignment: .top) {
+                GeometricStarShape(size: 14, color: Color.widgetGoldLight)
+                    .padding(.top, 6)
+            }
             // Required since iOS 17 - without it WidgetKit shows its own
             // "Please adopt containerBackground API" placeholder instead of
             // this view at all.
             .containerBackground(for: .widget) {
-                Color("$widgetBackground")
+                LinearGradient(
+                    colors: [Color.widgetPrimary, Color.widgetPrimaryDeep],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
             }
         }
     }
