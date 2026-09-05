@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSettings } from '../../context/SettingsContext';
 import { getTodayHijri, getHijriMonthInfo } from '../../lib/hijri';
 import { colors } from '../../lib/theme';
+import GeometricStar from '../../components/GeometricStar';
 
 export default function HijriScreen() {
   const { t } = useTranslation();
@@ -50,6 +51,9 @@ export default function HijriScreen() {
       <Text style={styles.title}>{t('hijri.title')}</Text>
 
       <View style={styles.todayCard}>
+        <View style={styles.todayCardStar}>
+          <GeometricStar size={18} color={colors.goldLight} />
+        </View>
         <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
         <Text style={styles.todayDate}>
           {today.date} {monthInfo.monthName} {today.year}
@@ -101,9 +105,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 16,
     padding: 20,
+    paddingTop: 26,
     alignItems: 'center',
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colors.gold,
   },
+  todayCardStar: { position: 'absolute', top: 10 },
   todayLabel: { color: '#D6EDE7', fontSize: 13, fontWeight: '600' },
   todayDate: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', marginTop: 4 },
   monthNav: {

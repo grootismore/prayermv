@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useSettings } from '../../context/SettingsContext';
 import { useNextPrayer, formatCountdown } from '../../lib/useNextPrayer';
 import { colors } from '../../lib/theme';
+import GeometricStar from '../../components/GeometricStar';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -32,6 +33,9 @@ export default function HomeScreen() {
 
         {state.next && (
           <View style={styles.nextCard}>
+            <View style={styles.nextCardStar}>
+              <GeometricStar size={18} color={colors.goldLight} />
+            </View>
             <Text style={styles.nextLabel}>{t('home.nextPrayer')}</Text>
             <Text style={styles.nextPrayerName}>{t(`prayers.${state.next.call}`)}</Text>
             <Text style={styles.nextTime}>{state.next.string}</Text>
@@ -39,7 +43,10 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <Text style={styles.sectionTitle}>{t('home.today')}</Text>
+        <View style={styles.sectionTitleRow}>
+          <GeometricStar size={11} color={colors.gold} />
+          <Text style={styles.sectionTitle}>{t('home.today')}</Text>
+        </View>
         <View style={styles.list}>
           {state.today.map((entry) => {
             const isNext = state.next?.call === entry.call;
@@ -78,9 +85,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 20,
     padding: 24,
+    paddingTop: 30,
     alignItems: 'center',
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: colors.gold,
   },
+  nextCardStar: { position: 'absolute', top: 12 },
   nextLabel: { color: '#D6EDE7', fontSize: 13, fontWeight: '600', letterSpacing: 0.5 },
   nextPrayerName: { color: '#FFFFFF', fontSize: 32, fontWeight: '800', marginTop: 6 },
   nextTime: { color: '#D6EDE7', fontSize: 16, marginTop: 2 },
@@ -91,11 +102,16 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontVariant: ['tabular-nums'],
   },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
     color: colors.textMuted,
-    marginBottom: 8,
     letterSpacing: 0.5,
   },
   list: {

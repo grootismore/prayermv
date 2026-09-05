@@ -1,10 +1,16 @@
+// Islamic-inspired palette: deep emerald green (traditionally associated
+// with Islam) and brass/gold accents on a warm parchment ground, echoing
+// manuscript illumination rather than a generic flat-UI teal.
 export const colors = {
-  primary: '#0F6B5C',
-  primaryLight: '#E6F4F1',
-  background: '#FAFAF8',
+  primary: '#0B6E4F',
+  primaryDark: '#054533',
+  primaryLight: '#E4F0EA',
+  background: '#FBF7EE',
   card: '#FFFFFF',
-  text: '#1C2321',
-  textMuted: '#6B7570',
-  border: '#E4E7E5',
-  accent: '#C99A4A',
+  text: '#20241F',
+  textMuted: '#6E7566',
+  border: '#E6DFC8',
+  accent: '#C79A2E',
+  gold: '#C79A2E',
+  goldLight: '#F3E6C4',
 };
