@@ -120,7 +120,7 @@ export default function HomeScreen() {
         </SurfaceCard>
       )}
 
-      <NoorDivider />
+      <NoorDivider compact />
 
       <View style={styles.dayNavRow}>
         <Pressable
@@ -178,14 +178,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   dateText: { fontSize: typography.size.sm, color: colors.textSecondary },
   dateDivider: { fontSize: typography.size.sm, color: colors.gold, marginHorizontal: spacing.xs },
   nextCard: {
     alignItems: 'center',
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
     overflow: 'hidden',
     ...shadow.hero,
   },
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   nextPrayerName: {
     color: colors.textPrimary,
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: typography.weight.heavy,
     marginTop: spacing.xxs,
   },
@@ -207,13 +207,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 1,
     backgroundColor: colors.border,
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   countdown: {
     color: colors.primary,
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: typography.weight.bold,
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
     fontVariant: ['tabular-nums'],
     letterSpacing: 1,
   },

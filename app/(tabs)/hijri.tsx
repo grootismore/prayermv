@@ -124,7 +124,7 @@ export default function HijriScreen() {
         <WaveDecoration variant="card" />
       </SurfaceCard>
 
-      <NoorDivider />
+      <NoorDivider compact />
 
       <View style={styles.monthNav}>
         <Pressable onPress={goToPreviousMonth} hitSlop={12} style={styles.navButton} accessibilityLabel={t('hijri.previousMonth')}>
@@ -187,21 +187,21 @@ export default function HijriScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
+  title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.xs },
   todayCard: {
     alignItems: 'center',
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
-    marginTop: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
+    marginTop: spacing.sm,
     overflow: 'hidden',
   },
   todayLabel: { color: colors.textSecondary, fontSize: typography.size.sm, fontWeight: typography.weight.semibold, marginTop: spacing.xs },
-  todayDate: { color: colors.textPrimary, fontSize: typography.size.xl, fontWeight: typography.weight.heavy, marginTop: spacing.xxs },
+  todayDate: { color: colors.textPrimary, fontSize: typography.size.lg, fontWeight: typography.weight.heavy, marginTop: spacing.xxs },
   monthNav: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   navButton: {
     width: minTouchTarget,
@@ -221,43 +221,47 @@ const styles = StyleSheet.create({
   weekRow: { flexDirection: 'row' },
   cell: {
     flex: 1,
-    aspectRatio: 1,
+    // Fixed (rather than aspectRatio: 1, which would make each row as
+    // tall as the screen is wide / 7) so 5-6 weeks of rows fit on screen
+    // without scrolling - the day circles below are sized to comfortably
+    // fit this height, not the other way around.
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
   dayCellInner: { alignItems: 'center', justifyContent: 'center' },
   dayCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
   dayCircleToday: { backgroundColor: colors.primary },
-  dayText: { fontSize: typography.size.base, color: colors.textPrimary },
+  dayText: { fontSize: typography.size.sm, color: colors.textPrimary },
   dayTextToday: { color: colors.backgroundDeep, fontWeight: typography.weight.bold },
   eventDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: colors.gold,
-    marginTop: 3,
+    marginTop: 2,
   },
   legendCard: {
-    marginTop: spacing.lg,
+    marginTop: spacing.sm,
   },
   legendHeader: {
     fontSize: typography.size.sm,
     fontWeight: typography.weight.bold,
     color: colors.textSecondary,
     letterSpacing: 0.5,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   legendRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.xxs,
-    minHeight: minTouchTarget - 12,
+    paddingVertical: 2,
+    minHeight: 28,
   },
   legendDate: {
     fontSize: typography.size.base,

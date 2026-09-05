@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, minTouchTarget, spacing, typography } from '../lib/theme';
+import { colors, spacing, typography } from '../lib/theme';
 import { numeralFont } from '../lib/useNumeralFont';
 
 interface Props {
@@ -48,7 +48,9 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: minTouchTarget,
+    // Not a touch target (this row has no onPress) - a bit shorter than
+    // minTouchTarget so all 6 rows fit on screen without scrolling.
+    minHeight: 40,
     paddingHorizontal: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.separator,
