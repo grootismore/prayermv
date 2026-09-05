@@ -1,98 +1,74 @@
-# Noor+
+<p align="center">
+  <img src="assets/icon.png" width="120" alt="Noor+ app icon" />
+</p>
 
-Offline-first Maldives prayer times app (Expo Router + TypeScript).
+<h1 align="center">Noor+ / ނޫރް+</h1>
 
-## iOS sideload build (no Mac, no paid Apple Developer account)
+<p align="center">
+  Prayer times, Qibla direction, and the Hijri calendar - built for every island in the Maldives.
+</p>
 
-`.github/workflows/ios-build.yml` builds an **unsigned** IPA on GitHub's
-`macos-latest` runner and uploads it as a workflow artifact. It does not use
-EAS Build or any Apple credentials - codesigning is disabled at archive
-time (`CODE_SIGNING_ALLOWED=NO`) on purpose, since SideStore/AltStore
-replace the signature entirely with your own free personal-team certificate
-when you install the IPA on-device.
+---
 
-### 1. One-time repo setup
+Noor+ is a free, open-source prayer companion built specifically for the
+Maldives. Instead of estimating prayer times from a generic calculation
+method, it uses the officially published times for each individual island,
+so what you see matches what your local mosque uses - whether you're in
+Malé, a resort island, or a small island far from the capital.
 
-Under **Settings -> Secrets and variables -> Actions -> Variables** (plain
-*Variables*, not *Secrets* - these are identifiers, not credentials), add:
+## Features
 
-| Variable | Example | Required? |
-|---|---|---|
-| `IOS_BUNDLE_IDENTIFIER` | `com.yourname.prayermv` | Recommended - pick something you'll register under your own Apple ID |
-| `IOS_APP_GROUP_ID` | `group.com.yourname.prayermv` | Optional - defaults to `group.<bundle id>` |
-| `APPLE_TEAM_ID` | `ABCDE12345` | Optional - your 10-character Team ID from Xcode's Signing & Capabilities tab, if you know it yet |
+**Prayer times for your island**
+Pick your island once during setup and get accurate Fajr, Sunrise, Dhuhr,
+Asr, Maghrib, and Isha times for every day of the year. The Home screen
+shows a live countdown to the next prayer, and you can swipe through
+yesterday, tomorrow, or any other day.
 
-If you skip all three, the build still runs using placeholder
-`com.prayermv.app` identifiers - fine for the first entitlement-provisioning
-test, but you'll want your own before doing anything you plan to keep
-installed long-term.
+**Qibla finder**
+A compass screen points you toward the Qibla from wherever you are, using
+your phone's compass and location. Your location is only used on your
+device to work out the direction - it's never sent anywhere. An optional
+vibration confirms the moment you're correctly facing the Qibla.
 
-### 2. Run the build
+**Hijri & Gregorian calendar**
+Browse a full month view in either the Hijri or Gregorian calendar, with
+notable Islamic dates highlighted. Choose which calendar you'd rather see
+by default in Settings.
 
-Actions tab -> **iOS unsigned build (sideload)** -> **Run workflow** (or
-just push to this branch). Download the `prayermv-unsigned-ipa` artifact
-when it finishes.
+**Prayer notifications**
+Get reminded for each of the five daily prayers, with the option to hear
+the adhan play with the notification. (If your phone's ring/silent switch
+is set to silent, you'll still get the reminder and a vibration - just
+without the adhan sound, which is a restriction of the phone's system, not
+the app.)
 
-**Cost note:** macOS runners consume Actions minutes at a 10x multiplier
-against the free-tier monthly allowance on private repos (public repos get
-unlimited free minutes). Worth knowing before triggering this repeatedly.
+**Home screen widget**
+Add a Noor+ widget to your iPhone's home screen or lock screen to see your
+next prayer at a glance. It follows the island you've set in the app
+automatically, or you can pin a widget to a different island of its own.
 
-### 3. What's in this build
+**Your language**
+Use the app in English, Dhivehi (ދިވެހި), or Arabic, with the Dhivehi and
+Arabic interfaces laid out properly for their own scripts and reading
+direction.
 
-- The main app, plus one WidgetKit extension (`targets/widget`), both with
-  an **App Group capability declared** (`com.apple.security.application-groups`).
-- The widget's island selection follows the app: whenever you pick an
-  island in the app, it's written to the shared App Group storage
-  (`lib/widgetSync.ts`) and the widget reloads to match. You can still pin
-  a widget instance to a different island independently via its own edit
-  UI (long-press -> Edit Widget) - that explicit choice always wins over
-  the app's selection.
-  - If the App Group capability fails to provision on your Apple ID (see
-    the free-tier notes below), the widget just falls back to K. Male'
-    rather than reading the app's selection - it won't crash or fail to
-    show a widget.
-- The widget's own island picker searches the full island list (the same
-  ~200-island dataset the app itself ships, via a dynamic
-  `AppEntity`/`EntityQuery`), not just a curated shortlist - though only a
-  small hand-picked set of islands have verified Dhivehi/Arabic names in
-  the widget (see `curatedIslandLocalization` in `PrayerWidget.swift`);
-  everything else shows its English "Atoll Island" name regardless of the
-  widget's selected display language.
-  - `targets/widget/PrayerData.json` is bundled prayer-time data covering
-    every island, regenerated from `mv-prayertimes` by
-    `scripts/generate-widget-prayer-data.js` (re-run it after upgrading
-    that package).
-- **A thing worth watching:** `expo-notifications`
-  (used for the app's local prayer notifications since Phase 1) always adds
-  an `aps-environment` (Push Notifications) entitlement to the main app,
-  even though this app only ever schedules local notifications. Push
-  capability has *usually* been available on free personal-team accounts,
-  but if the install/sideload fails specifically on that entitlement,
-  that's the other candidate to suspect alongside App Groups.
+**Private by design**
+No account, no sign-up, and no analytics. Everything - your chosen island,
+language, and notification preferences - stays on your device.
 
-### 4. What you still need to do yourself (outside this repo)
+## Design
 
-- **Register the bundle IDs and App Group under your own Apple ID.**
-  SideStore can sometimes auto-register a new bundle ID on install; if it
-  doesn't, log in at [developer.apple.com/account](https://developer.apple.com/account)
-  (free membership is enough) and add the App ID(s) and App Group manually
-  under Certificates, Identifiers & Profiles.
-- **Install via SideStore** and point it at the downloaded IPA. Keep its
-  background VPN refresh connected - that's what silently re-signs the app
-  before the free-tier 7-day certificate expiry, without needing a Mac.
-- **Free-tier limits to watch:** max 10 App IDs and 10 App Groups
-  registered per rolling 7 days on a free personal-team account. Each
-  distinct bundle identifier (main app + widget extension count as two)
-  and each App Group you register counts against that.
-- **Report back what happens** when you sideload this: specifically
-  whether the App Group capability installs cleanly, and whether the
-  widget's island stays in sync with the app's.
+Noor+ uses a calm "Ocean Night" look - midnight navy, lagoon cyan, and a
+touch of sunrise gold - meant to feel at home on an island evening as much
+as at Fajr.
 
-## Project structure
+## Contributing
 
-- `app/` - Expo Router screens
-- `lib/` - shared logic (prayer time computation, notifications, i18n, etc.)
-- `targets/widget/` - iOS WidgetKit extension (via `@bacons/apple-targets`,
-  a config plugin - `ios/` is generated by `expo prebuild` and is a build
-  artifact, not committed)
-- `locales/` - en/dv/ar translations
+Noor+ is open source and contributions are welcome - bug reports, feature
+ideas, translation fixes, and pull requests. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for how to build and run the project
+locally.
+
+## License
+
+Noor+ is released under the [MIT License](LICENSE).
