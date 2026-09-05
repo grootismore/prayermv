@@ -15,7 +15,7 @@ import GeometricStar from '../../components/GeometricStar';
 export default function QiblaScreen() {
   const { t } = useTranslation();
   const { island } = useSettings();
-  const { heading, permission } = useCompassHeading();
+  const { heading, permission, accuracy } = useCompassHeading();
   const [coords, setCoords] = useState<{ lat: number; long: number } | null>(null);
 
   useEffect(() => {
@@ -42,11 +42,10 @@ export default function QiblaScreen() {
   const arrowRotation = qiblaBearing != null && heading != null ? qiblaBearing - heading : null;
   const isAligned = useQiblaAlignment(arrowRotation);
 
-  // The magnetometer API doesn't expose an actual accuracy/calibration
-  // signal to check against, so the honest thing to show is a one-time
-  // "still acquiring a reading" hint rather than a permanent warning that
-  // would keep showing even once the compass is working fine.
   const stillAcquiring = permission === 'granted' && heading == null;
+  // accuracy is a real signal from the OS compass (0 = unreliable, 3 =
+  // high) - only warn once we actually have a reading to judge.
+  const needsCalibration = heading != null && accuracy != null && accuracy <= 1;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -70,7 +69,9 @@ export default function QiblaScreen() {
       </View>
 
       <Text style={styles.instructions}>{t('qibla.instructions')}</Text>
-      {stillAcquiring && <Text style={styles.calibrateHint}>{t('qibla.calibrate')}</Text>}
+      {(stillAcquiring || needsCalibration) && (
+        <Text style={styles.calibrateHint}>{t('qibla.calibrate')}</Text>
+      )}
     </SafeAreaView>
   );
 }
