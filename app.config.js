@@ -45,7 +45,7 @@ module.exports = {
     android: {
       package: ANDROID_PACKAGE,
       adaptiveIcon: {
-        backgroundColor: '#031B3D',
+        backgroundColor: '#011C53',
         foregroundImage: './assets/android-icon-foreground.png',
         backgroundImage: './assets/android-icon-background.png',
         monochromeImage: './assets/android-icon-monochrome.png',
@@ -66,7 +66,7 @@ module.exports = {
         'expo-splash-screen',
         {
           image: './assets/splash-icon.png',
-          backgroundColor: '#031B3D',
+          backgroundColor: '#011C53',
           imageWidth: 220,
           resizeMode: 'contain',
         },

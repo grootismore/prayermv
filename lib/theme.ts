@@ -6,8 +6,11 @@ import { Platform } from 'react-native';
  * spacing, radius, or type value directly.
  */
 export const colors = {
-  background: '#031B3D',
-  backgroundDeep: '#02142F',
+  // background/backgroundDeep are matched to the navy baked into the
+  // official Noor+ app icon/logo mark, so the icon, splash screen, and
+  // in-app screens all read as the same navy rather than three near-misses.
+  background: '#011C53',
+  backgroundDeep: '#010F2E',
   surface: '#072952',
   surfaceElevated: '#0A3565',
   surfacePressed: '#0D4178',
