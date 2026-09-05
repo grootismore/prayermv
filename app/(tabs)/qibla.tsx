@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 22, fontWeight: '700', color: colors.text },
   warning: {
-    color: '#B33A3A',
+    color: colors.danger,
     textAlign: 'center',
     marginBottom: 12,
     paddingHorizontal: 12,

@@ -45,6 +45,7 @@
     "today": "اليوم",
     "hijriMode": "هجري",
     "gregorianMode": "ميلادي",
+    "notableDates": "مناسبات هذا الشهر",
     "weekdaysShort": ["أح", "إث", "ثل", "أر", "خم", "جم", "سب"]
   },
   "settings": {

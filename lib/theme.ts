@@ -17,6 +17,7 @@ export const colors = {
   gold: '#C79A2E',
   goldDeep: '#9C7A22',
   goldLight: '#F3E6C4',
+  danger: '#B33A3A',
 };
 
 export const radius = {
