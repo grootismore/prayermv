@@ -1,4 +1,4 @@
-# Salat MV
+# Noor+
 
 Offline-first Maldives prayer times app (Expo Router + TypeScript).
 

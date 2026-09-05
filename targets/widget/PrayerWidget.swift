@@ -95,12 +95,13 @@ struct PrayerProvider: AppIntentTimelineProvider {
     }
 }
 
-/// Matches lib/theme.ts in the RN app, so the widget reads as the same
-/// product rather than a generic system card. Fixed (non-adaptive) colors
-/// throughout, same reasoning as before: this gradient has no separate
-/// dark-mode variant, so text needs to be legible against it regardless of
-/// the device's system appearance rather than following .primary/
-/// .secondary, which shift with Dark Mode independently of our background.
+/// Matches lib/theme.ts's Noor+ "Ocean Night" palette in the RN app, so the
+/// widget reads as the same product rather than a generic system card.
+/// Fixed (non-adaptive) colors throughout, same reasoning as before: this
+/// gradient has no separate dark-mode variant, so text needs to be legible
+/// against it regardless of the device's system appearance rather than
+/// following .primary/.secondary, which shift with Dark Mode independently
+/// of our background.
 private extension Color {
     init(hex: UInt32) {
         self.init(
@@ -110,27 +111,37 @@ private extension Color {
         )
     }
 
-    static let widgetPrimary = Color(hex: 0x0B6E4F)
-    static let widgetPrimaryDeep = Color(hex: 0x03291D)
-    static let widgetGold = Color(hex: 0xC79A2E)
-    static let widgetGoldLight = Color(hex: 0xF3E6C4)
-    static let widgetMutedOnDark = Color(hex: 0xB9D6C9)
+    static let widgetBackground = Color(hex: 0x011C53)
+    static let widgetBackgroundDeep = Color(hex: 0x010F2E)
+    static let widgetPrimary = Color(hex: 0x13E2E6)
+    static let widgetGold = Color(hex: 0xFFC83D)
+    static let widgetTextPrimary = Color(hex: 0xF7FBFF)
+    static let widgetMutedOnDark = Color(hex: 0xA9C3E2)
 }
 
-/// An 8-point star (two squares, one rotated 45deg over the other) - the
-/// same construction as components/GeometricStar.tsx in the RN app, used
-/// there as a small decorative accent on hero cards.
-private struct GeometricStarShape: View {
+/// A small gold "sun" accent - the same motif as components/SunAccent.tsx
+/// in the RN app (a soft radial glow behind a solid disc), used there as a
+/// restrained highlight on hero cards. Replaces the old geometric-star
+/// badge from the emerald theme, which the RN redesign also retired.
+private struct SunAccentShape: View {
     var size: CGFloat
-    var color: Color
 
     var body: some View {
-        let side = size - size * 0.18 * 2
-        return ZStack {
-            Rectangle().fill(color).frame(width: side, height: side)
-            Rectangle().fill(color).frame(width: side, height: side).rotationEffect(.degrees(45))
+        ZStack {
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [Color.widgetGold.opacity(0.55), Color.widgetGold.opacity(0)],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: size
+                    )
+                )
+                .frame(width: size * 2, height: size * 2)
+            Circle()
+                .fill(Color.widgetGold)
+                .frame(width: size * 0.8, height: size * 0.8)
         }
-        .frame(width: size, height: size)
     }
 }
 
@@ -171,9 +182,10 @@ struct PrayerWidgetView: View {
             // the whole day's times in a row underneath, rather than a
             // small square showing only the next prayer. Styled as a
             // miniature version of the app's own hero cards (Home's
-            // next-prayer card, the Calendar screen's today card): an
-            // emerald gradient with a gold star badge, rather than a flat
-            // system-default card.
+            // next-prayer card, the Calendar screen's today card): a
+            // midnight-navy gradient with a lagoon-cyan highlight on the
+            // active prayer and a small gold sun accent, matching the
+            // Noor+ "Ocean Night" theme rather than a flat system card.
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Text(entry.islandLabel)
@@ -185,7 +197,7 @@ struct PrayerWidgetView: View {
                         Text("\(moment.name.displayName) \u{00B7} \(moment.timeString)")
                             .font(.caption)
                             .fontWeight(.bold)
-                            .foregroundStyle(Color.widgetGold)
+                            .foregroundStyle(Color.widgetPrimary)
                     }
                 }
 
@@ -202,7 +214,7 @@ struct PrayerWidgetView: View {
                                 .minimumScaleFactor(0.8)
                                 .lineLimit(1)
                                 .foregroundStyle(
-                                    item.name == entry.moment?.name ? Color.widgetGold : .white
+                                    item.name == entry.moment?.name ? Color.widgetPrimary : Color.widgetTextPrimary
                                 )
                         }
                         .frame(maxWidth: .infinity)
@@ -211,15 +223,15 @@ struct PrayerWidgetView: View {
             }
             .padding()
             .overlay(alignment: .top) {
-                GeometricStarShape(size: 14, color: Color.widgetGoldLight)
-                    .padding(.top, 6)
+                SunAccentShape(size: 10)
+                    .padding(.top, 4)
             }
             // Required since iOS 17 - without it WidgetKit shows its own
             // "Please adopt containerBackground API" placeholder instead of
             // this view at all.
             .containerBackground(for: .widget) {
                 LinearGradient(
-                    colors: [Color.widgetPrimary, Color.widgetPrimaryDeep],
+                    colors: [Color.widgetBackground, Color.widgetBackgroundDeep],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )

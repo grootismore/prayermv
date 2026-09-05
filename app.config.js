@@ -20,7 +20,7 @@ const adhanSoundExists = fs.existsSync(path.join(__dirname, 'assets/sounds/adhan
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = {
   expo: {
-    name: 'Salat MV',
+    name: 'Noor+',
     slug: 'prayermv',
     version: '1.0.0',
     scheme: 'prayermv',

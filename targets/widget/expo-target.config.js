@@ -7,8 +7,8 @@ module.exports = (config) => ({
   deploymentTarget: '17.0',
   frameworks: ['AppIntents'],
   colors: {
-    $accent: '#0F6B5C',
-    $widgetBackground: '#FAFAF8',
+    $accent: '#13E2E6',
+    $widgetBackground: '#011C53',
   },
   // Declared purely to test whether an App Group capability provisions on
   // a free personal-team Apple ID - the widget itself is self-contained
