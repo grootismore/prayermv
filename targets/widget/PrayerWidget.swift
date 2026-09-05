@@ -102,6 +102,12 @@ struct PrayerWidgetView: View {
                 Text(entry.moment?.timeString ?? "--:--")
                     .font(.caption)
             }
+            // Lock screen accessory widgets are rendered by the system in a
+            // vibrant/monochrome material - a solid fill here would just be
+            // discarded (or look wrong), so leave it transparent.
+            .containerBackground(for: .widget) {
+                Color.clear
+            }
         default:
             VStack(alignment: .leading, spacing: 6) {
                 Text(entry.islandLabel)
@@ -115,6 +121,12 @@ struct PrayerWidgetView: View {
                     .font(.title3)
             }
             .padding()
+            // Required since iOS 17 - without it WidgetKit shows its own
+            // "Please adopt containerBackground API" placeholder instead of
+            // this view at all (that's the bug being fixed here).
+            .containerBackground(for: .widget) {
+                Color("$widgetBackground")
+            }
         }
     }
 }
