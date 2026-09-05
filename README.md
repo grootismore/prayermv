@@ -37,29 +37,32 @@ when it finishes.
 against the free-tier monthly allowance on private repos (public repos get
 unlimited free minutes). Worth knowing before triggering this repeatedly.
 
-### 3. What's in this first build
+### 3. What's in this build
 
-This is deliberately the smallest useful test, not the final widget:
-
-- The main app, plus one WidgetKit extension (`targets/widget`) with an
-  **App Group capability declared** on both targets - the actual point of
-  this round is to find out whether that capability provisions on a free
-  personal-team Apple ID, which has shifted over time and wasn't certain
-  going in.
-- The widget itself does **not** depend on that App Group working. It's
-  configured entirely in its own edit UI (long-press -> Edit Widget, an
-  `AppIntentConfiguration`/`WidgetConfigurationIntent`) with a curated list
-  of 8 islands (one per region), and computes prayer times itself from a
-  small bundled copy of the same published per-island data
-  (`targets/widget/PrayerData.json`) rather than reading anything the RN
-  app wrote. So it should keep working even if App Groups turns out to be
-  unreliable on the free tier.
-  - Full search across all ~200 islands (rather than the curated 8) is
-    intentionally deferred - that needs a dynamic `AppEntity`/`EntityQuery`
-    search UI, which is meaningfully more Swift API surface to get right
-    with no local compiler to verify against. Worth doing once this
-    simpler scaffold is confirmed working end to end.
-- **A second thing worth watching, beyond App Groups:** `expo-notifications`
+- The main app, plus one WidgetKit extension (`targets/widget`), both with
+  an **App Group capability declared** (`com.apple.security.application-groups`).
+- The widget's island selection follows the app: whenever you pick an
+  island in the app, it's written to the shared App Group storage
+  (`lib/widgetSync.ts`) and the widget reloads to match. You can still pin
+  a widget instance to a different island independently via its own edit
+  UI (long-press -> Edit Widget) - that explicit choice always wins over
+  the app's selection.
+  - If the App Group capability fails to provision on your Apple ID (see
+    the free-tier notes below), the widget just falls back to K. Male'
+    rather than reading the app's selection - it won't crash or fail to
+    show a widget.
+- The widget's own island picker searches the full island list (the same
+  ~200-island dataset the app itself ships, via a dynamic
+  `AppEntity`/`EntityQuery`), not just a curated shortlist - though only a
+  small hand-picked set of islands have verified Dhivehi/Arabic names in
+  the widget (see `curatedIslandLocalization` in `PrayerWidget.swift`);
+  everything else shows its English "Atoll Island" name regardless of the
+  widget's selected display language.
+  - `targets/widget/PrayerData.json` is bundled prayer-time data covering
+    every island, regenerated from `mv-prayertimes` by
+    `scripts/generate-widget-prayer-data.js` (re-run it after upgrading
+    that package).
+- **A thing worth watching:** `expo-notifications`
   (used for the app's local prayer notifications since Phase 1) always adds
   an `aps-environment` (Push Notifications) entitlement to the main app,
   even though this app only ever schedules local notifications. Push
@@ -83,9 +86,7 @@ This is deliberately the smallest useful test, not the final widget:
   and each App Group you register counts against that.
 - **Report back what happens** when you sideload this: specifically
   whether the App Group capability installs cleanly, and whether the
-  widget shows up and is configurable. That result decides whether the
-  "real" widget (all islands, richer data) builds on App Groups or stays
-  fully self-contained per the design above.
+  widget's island stays in sync with the app's.
 
 ## Project structure
 

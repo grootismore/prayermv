@@ -2,86 +2,90 @@ import WidgetKit
 import SwiftUI
 import AppIntents
 
-/// A small, curated set of islands (one per region) rather than the full
-/// ~200-island list, so widget configuration doesn't need a dynamic
-/// AppEntity/EntityQuery search UI. Ids match mv-prayertimes' island DB.
-enum SelectableIsland: Int, AppEnum {
-    case male = 102
-    case hithadhoo = 197
-    case fuvahmulah = 196
-    case kulhudhuffushi = 28
-    case gan = 169
-    case naifaru = 93
-    case ukulhas = 108
-    case maafushi = 104
+/// One selectable island, backed by the full island list the RN app itself
+/// ships (see PrayerData.json / lib/prayerTimes.ts's getAllIslands()) -
+/// not a fixed compile-time list - so every island the app can show is also
+/// searchable and selectable directly in the widget's own Edit Widget UI.
+struct IslandEntity: AppEntity, Identifiable {
+    let id: Int
+    let atoll: String
+    let name: String
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Island"
+    static var defaultQuery = IslandEntityQuery()
 
-    var label: String {
-        switch self {
-        case .male: return "K. Male'"
-        case .hithadhoo: return "S. Hithadhoo"
-        case .fuvahmulah: return "Gn. Fuvahmulah"
-        case .kulhudhuffushi: return "HDh. Kulhudhuffushi"
-        case .gan: return "L. Gan"
-        case .naifaru: return "Lh. Naifaru"
-        case .ukulhas: return "AA. Ukulhas"
-        case .maafushi: return "K. Maafushi"
-        }
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(title: "\(atoll) \(name)")
+    }
+}
+
+/// A small, curated shortlist (one per region) shown before the user types
+/// a search - the full ~200-island list is reachable by search, this is
+/// just a sensible starting point. Also the set of islands with
+/// hand-verified Dhivehi/Arabic names below.
+private let curatedIslandIds = [102, 197, 196, 28, 169, 93, 108, 104]
+
+struct IslandEntityQuery: EntityStringQuery {
+    func entities(for identifiers: [Int]) async throws -> [IslandEntity] {
+        let wanted = Set(identifiers)
+        return PrayerData.raw.islands
+            .filter { wanted.contains($0.islandId) }
+            .map { IslandEntity(id: $0.islandId, atoll: $0.atoll, name: $0.island) }
     }
 
-    static var caseDisplayRepresentations: [SelectableIsland: DisplayRepresentation] = [
-        .male: DisplayRepresentation(title: "K. Male'"),
-        .hithadhoo: DisplayRepresentation(title: "S. Hithadhoo"),
-        .fuvahmulah: DisplayRepresentation(title: "Gn. Fuvahmulah"),
-        .kulhudhuffushi: DisplayRepresentation(title: "HDh. Kulhudhuffushi"),
-        .gan: DisplayRepresentation(title: "L. Gan"),
-        .naifaru: DisplayRepresentation(title: "Lh. Naifaru"),
-        .ukulhas: DisplayRepresentation(title: "AA. Ukulhas"),
-        .maafushi: DisplayRepresentation(title: "K. Maafushi"),
-    ]
+    func entities(matching string: String) async throws -> [IslandEntity] {
+        let needle = string.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !needle.isEmpty else { return try await suggestedEntities() }
+        return PrayerData.raw.islands
+            .filter { $0.island.lowercased().contains(needle) || $0.atoll.lowercased().contains(needle) }
+            .prefix(50)
+            .map { IslandEntity(id: $0.islandId, atoll: $0.atoll, name: $0.island) }
+    }
 
-    /// The island name as shown on the widget face, in the selected
-    /// display language. Dhivehi/Arabic values here are the exact same
-    /// strings the RN app itself shows for these 8 islands (produced by
-    /// lib/islandNames.ts's transliterator and copied over by hand), not
-    /// independently guessed - this is a small, fixed, verifiable set,
-    /// unlike porting that whole transliteration engine to Swift for the
-    /// full ~200-island list.
-    func localizedLabel(_ language: WidgetLanguage) -> String {
-        switch language {
-        case .en:
-            return label
-        case .dv:
-            switch self {
-            case .male: return "ކ. މާލެ"
-            case .hithadhoo: return "ސ. ހިތަދޫ"
-            case .fuvahmulah: return "ޏ. ފުވަހްމުލަހް"
-            case .kulhudhuffushi: return "ހދ. ކުޅުދުފްފުށި"
-            case .gan: return "ލ. ގަން"
-            case .naifaru: return "ޅ. ނައިފަރު"
-            case .ukulhas: return "އއ. އުކުޅަސް"
-            case .maafushi: return "ކ. މާފުށި"
-            }
-        case .ar:
-            switch self {
-            case .male: return "ك. مالي"
-            case .hithadhoo: return "س. هيثاذو"
-            case .fuvahmulah: return "غن. فوفاهمولاه"
-            case .kulhudhuffushi: return "هذ. كولوذوففوشي"
-            case .gan: return "ل. جان"
-            case .naifaru: return "ل. نايفارو"
-            case .ukulhas: return "أأ. أكولاس"
-            case .maafushi: return "ك. مافوشي"
-            }
+    func suggestedEntities() async throws -> [IslandEntity] {
+        curatedIslandIds.compactMap { id in
+            PrayerData.island(for: id).map { IslandEntity(id: $0.islandId, atoll: $0.atoll, name: $0.island) }
         }
     }
 }
 
+/// Hand-verified Dhivehi/Arabic names for a small, fixed set of islands -
+/// the exact same strings lib/islandNames.ts's transliterator produces for
+/// them in the RN app, copied over by hand and diffed against its output.
+/// That's safe to do for a small fixed set, but not practical to verify for
+/// the full ~200-island list without either porting that whole
+/// transliteration engine to Swift (unverifiable in this sandbox - no
+/// Swift compiler available) or shipping unverified guesses. Any island
+/// outside this set falls back to its English "Atoll Name" form regardless
+/// of the widget's selected display language.
+private let curatedIslandLocalization: [Int: (dv: String, ar: String)] = [
+    102: ("ކ. މާލެ", "ك. مالي"), // K. Male'
+    197: ("ސ. ހިތަދޫ", "س. هيثاذو"), // S. Hithadhoo
+    196: ("ޏ. ފުވަހްމުލަހް", "غن. فوفاهمولاه"), // Gn. Fuvahmulah
+    28: ("ހދ. ކުޅުދުފްފުށި", "هذ. كولوذوففوشي"), // HDh. Kulhudhuffushi
+    169: ("ލ. ގަން", "ل. جان"), // L. Gan
+    93: ("ޅ. ނައިފަރު", "ل. نايفارو"), // Lh. Naifaru
+    108: ("އއ. އުކުޅަސް", "أأ. أكولاس"), // AA. Ukulhas
+    104: ("ކ. މާފުށި", "ك. مافوشي"), // K. Maafushi
+]
+
+private func localizedIslandLabel(id: Int, atoll: String, name: String, language: WidgetLanguage) -> String {
+    switch language {
+    case .en:
+        return "\(atoll) \(name)"
+    case .dv:
+        return curatedIslandLocalization[id]?.dv ?? "\(atoll) \(name)"
+    case .ar:
+        return curatedIslandLocalization[id]?.ar ?? "\(atoll) \(name)"
+    }
+}
+
 /// The widget's own display language - independent of the host app's
-/// language setting (the widget has no App Group data sharing to read it
-/// from - see PrayerData.swift), so it's its own configuration option
-/// alongside island.
+/// language setting. Unlike island, this deliberately isn't synced through
+/// the shared App Group data (see PrayerData.swift's
+/// appSelectedIslandId()): a language mismatch is far less disruptive than
+/// an island mismatch, and always following the app's language would take
+/// away the ability to pin a widget's language independently of the app's.
 enum WidgetLanguage: String, AppEnum {
     case en, dv, ar
 
@@ -102,16 +106,22 @@ enum WidgetLanguage: String, AppEnum {
     ]
 }
 
-/// Configured entirely inside the widget's own edit UI (long-press ->
-/// Edit Widget) - independent of whatever island/language the host app has
-/// stored, so this works even if App Group data sharing turns out to be
-/// unavailable on a free-tier Apple ID.
+/// Island is optional and unset by default: leaving it unset means "match
+/// whatever island the app itself currently has selected" (via the shared
+/// App Group data lib/widgetSync.ts writes - see
+/// PrayerData.appSelectedIslandId()). Picking one explicitly here, in the
+/// widget's own edit UI (long-press -> Edit Widget), overrides that and
+/// pins the widget to that island regardless of what the app is set to.
+/// Language remains its own independent widget-only setting, since the
+/// widget has no way to read the app's language choice.
 struct SelectIslandIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Select Island"
-    static var description = IntentDescription("Choose which island's prayer times to show, and the display language.")
+    static var description = IntentDescription(
+        "Choose which island's prayer times to show, and the display language. Leave Island unset to always match the island currently selected in the app."
+    )
 
-    @Parameter(title: "Island", default: .male)
-    var island: SelectableIsland
+    @Parameter(title: "Island")
+    var island: IslandEntity?
 
     @Parameter(title: "Language", default: .en)
     var language: WidgetLanguage
@@ -127,7 +137,9 @@ struct PrayerEntry: TimelineEntry {
 
 struct PrayerProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> PrayerEntry {
-        PrayerEntry(date: Date(), islandLabel: SelectableIsland.male.label, moment: nil, today: [], language: .en)
+        let fallback = PrayerData.island(for: PrayerData.defaultIslandId)
+        let label = fallback.map { "\($0.atoll) \($0.island)" } ?? "-"
+        return PrayerEntry(date: Date(), islandLabel: label, moment: nil, today: [], language: .en)
     }
 
     func snapshot(for configuration: SelectIslandIntent, in context: Context) async -> PrayerEntry {
@@ -151,18 +163,22 @@ struct PrayerProvider: AppIntentTimelineProvider {
         return Timeline(entries: [current, nextEntry], policy: .atEnd)
     }
 
+    /// Whatever island was explicitly picked in the widget's own
+    /// configuration wins; otherwise fall back to the app's own current
+    /// selection, and only fall back further to K. Male' if neither is
+    /// available yet (e.g. a fresh install, before onboarding has run).
+    private func resolvedIslandId(for configuration: SelectIslandIntent) -> Int {
+        configuration.island?.id ?? PrayerData.appSelectedIslandId() ?? PrayerData.defaultIslandId
+    }
+
     private func makeEntry(for configuration: SelectIslandIntent, on date: Date) -> PrayerEntry {
-        let island = configuration.island
+        let islandId = resolvedIslandId(for: configuration)
         let language = configuration.language
-        let today = PrayerData.todayMoments(islandId: island.rawValue, now: date)
-        let moment = PrayerData.nextMoment(islandId: island.rawValue, now: date)
-        return PrayerEntry(
-            date: date,
-            islandLabel: island.localizedLabel(language),
-            moment: moment,
-            today: today,
-            language: language
-        )
+        let raw = PrayerData.island(for: islandId)
+        let label = raw.map { localizedIslandLabel(id: $0.islandId, atoll: $0.atoll, name: $0.island, language: language) } ?? "-"
+        let today = PrayerData.todayMoments(islandId: islandId, now: date)
+        let moment = PrayerData.nextMoment(islandId: islandId, now: date)
+        return PrayerEntry(date: date, islandLabel: label, moment: moment, today: today, language: language)
     }
 }
 

@@ -10,9 +10,11 @@ module.exports = (config) => ({
     $accent: '#13E2E6',
     $widgetBackground: '#011C53',
   },
-  // Declared purely to test whether an App Group capability provisions on
-  // a free personal-team Apple ID - the widget itself is self-contained
-  // (see PrayerData.swift) and doesn't read from this at runtime.
+  // Lets the widget read the app's selected island from the shared
+  // UserDefaults suite the app writes to (see lib/widgetSync.ts and
+  // PrayerData.swift's appSelectedIslandId()), so a widget instance that
+  // hasn't been explicitly configured with its own island always matches
+  // whatever island is currently selected in the app.
   entitlements: {
     'com.apple.security.application-groups':
       config.ios.entitlements?.['com.apple.security.application-groups'] ?? [],

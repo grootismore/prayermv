@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# regenerated from IOS_APP_GROUP_ID on every config read - see app.config.js
+/targets/widget/AppGroupConfig.generated.swift

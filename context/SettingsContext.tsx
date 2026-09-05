@@ -17,6 +17,7 @@ import {
 import { initI18n } from '../lib/i18n';
 import i18n from '../lib/i18n';
 import { rescheduleTodayNotifications } from '../lib/notifications';
+import { syncWidgetIsland } from '../lib/widgetSync';
 
 interface SettingsContextValue {
   isLoaded: boolean;
@@ -55,6 +56,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       if (islandId != null) {
         const found = getAllIslands().find((i) => i.islandId === islandId) ?? null;
         setIsland(found);
+        syncWidgetIsland(found?.islandId ?? null);
       }
       setLanguage(resolvedLanguage);
       setNotificationPrefs(prefs);
@@ -66,6 +68,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const selectIsland = useCallback(async (islandId: number) => {
     const found = getAllIslands().find((i) => i.islandId === islandId) ?? null;
     setIsland(found);
+    syncWidgetIsland(found?.islandId ?? null);
     await saveSelectedIslandId(islandId);
     await rescheduleTodayNotifications();
   }, []);
