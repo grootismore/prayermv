@@ -19,6 +19,7 @@ export default function NotificationSwitchRow({ label, value, onValueChange }: P
         trackColor={{ true: colors.primaryMuted, false: colors.surfaceElevated }}
         thumbColor={Platform.OS === 'android' ? (value ? colors.primary : colors.textMuted) : undefined}
         ios_backgroundColor={colors.surfaceElevated}
+        style={styles.switch}
         accessibilityRole="switch"
         accessibilityLabel={label}
         accessibilityState={{ checked: value }}
@@ -33,12 +34,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     minHeight: minTouchTarget,
-    paddingHorizontal: spacing.md,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: colors.separator,
   },
   label: {
+    flexShrink: 1,
     fontSize: typography.size.md,
     color: colors.textPrimary,
   },
+  // The native Switch can render larger than its nominal size under some
+  // system text-scaling settings - a small fixed scale-down keeps it (and
+  // its touch target, which scales with it) safely clear of the card's
+  // rounded border regardless, rather than relying on padding alone.
+  switch: { transform: [{ scaleX: 0.92 }, { scaleY: 0.92 }] },
 });
