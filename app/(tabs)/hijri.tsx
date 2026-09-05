@@ -46,10 +46,21 @@ export default function HijriScreen() {
     }
   }
 
+  // Chunked into explicit 7-cell rows rather than a flexWrap grid with
+  // percentage-width cells - `width: '${100 / 7}%'` inside a wrapped flex
+  // row is a known-fragile combination in RN's layout engine (rounding on
+  // aspectRatio + percentage width can make the 7th cell wrap early), and
+  // that's exactly what was happening: every Saturday column came out
+  // empty, with the grid only ever fitting 6 cells per visual row.
   const cells: (number | null)[] = [
     ...Array(monthInfo.firstDayOfWeek).fill(null),
     ...Array.from({ length: monthInfo.daysInMonth }, (_, i) => i + 1),
   ];
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks: (number | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) {
+    weeks.push(cells.slice(i, i + 7));
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -95,20 +106,25 @@ export default function HijriScreen() {
       </View>
 
       <View style={styles.grid}>
-        {cells.map((day, index) => {
-          const isToday = day != null && viewYear === today.year && viewMonth === today.month && day === today.date;
-          return (
-            <View key={index} style={styles.cell}>
-              {day != null && (
-                <View style={[styles.dayCircle, isToday && styles.dayCircleToday]}>
-                  <Text style={[styles.dayText, numeralStyle, isToday && styles.dayTextToday]}>
-                    {day}
-                  </Text>
+        {weeks.map((week, weekIndex) => (
+          <View key={weekIndex} style={styles.weekRow}>
+            {week.map((day, dayIndex) => {
+              const isToday =
+                day != null && viewYear === today.year && viewMonth === today.month && day === today.date;
+              return (
+                <View key={dayIndex} style={styles.cell}>
+                  {day != null && (
+                    <View style={[styles.dayCircle, isToday && styles.dayCircleToday]}>
+                      <Text style={[styles.dayText, numeralStyle, isToday && styles.dayTextToday]}>
+                        {day}
+                      </Text>
+                    </View>
+                  )}
                 </View>
-              )}
-            </View>
-          );
-        })}
+              );
+            })}
+          </View>
+        ))}
       </View>
     </SafeAreaView>
   );
@@ -149,9 +165,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textMuted,
   },
-  grid: { flexDirection: 'row', flexWrap: 'wrap' },
+  grid: {},
+  weekRow: { flexDirection: 'row' },
   cell: {
-    width: `${100 / 7}%`,
+    flex: 1,
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
