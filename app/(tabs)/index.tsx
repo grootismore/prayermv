@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { useMemo } from 'react';
@@ -38,15 +37,11 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Pressable
-          onPress={() => router.push({ pathname: '/onboarding', params: { skipIntro: '1' } })}
-          style={styles.islandRow}
-        >
+        <View style={styles.islandRow}>
           <Text style={styles.islandName}>
             {localizedAtollName(island.atoll, language)} {localizedIslandName(island, language)}
           </Text>
-          <Text style={styles.changeIsland}>{t('home.changeIsland')}</Text>
-        </Pressable>
+        </View>
 
         <View style={styles.dateRow}>
           <Text style={styles.dateText}>
@@ -124,13 +119,9 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scrollContent: { padding: 20, paddingBottom: 40 },
   islandRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 16,
   },
   islandName: { fontSize: 18, fontWeight: '700', color: colors.text },
-  changeIsland: { fontSize: 13, color: colors.primary, fontWeight: '600' },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'center',
