@@ -40,18 +40,81 @@ enum SelectableIsland: Int, AppEnum {
         .ukulhas: DisplayRepresentation(title: "AA. Ukulhas"),
         .maafushi: DisplayRepresentation(title: "K. Maafushi"),
     ]
+
+    /// The island name as shown on the widget face, in the selected
+    /// display language. Dhivehi/Arabic values here are the exact same
+    /// strings the RN app itself shows for these 8 islands (produced by
+    /// lib/islandNames.ts's transliterator and copied over by hand), not
+    /// independently guessed - this is a small, fixed, verifiable set,
+    /// unlike porting that whole transliteration engine to Swift for the
+    /// full ~200-island list.
+    func localizedLabel(_ language: WidgetLanguage) -> String {
+        switch language {
+        case .en:
+            return label
+        case .dv:
+            switch self {
+            case .male: return "ކ. މާލެ"
+            case .hithadhoo: return "ސ. ހިތަދޫ"
+            case .fuvahmulah: return "ޏ. ފުވަހްމުލަހް"
+            case .kulhudhuffushi: return "ހދ. ކުޅުދުފްފުށި"
+            case .gan: return "ލ. ގަން"
+            case .naifaru: return "ޅ. ނައިފަރު"
+            case .ukulhas: return "އއ. އުކުޅަސް"
+            case .maafushi: return "ކ. މާފުށި"
+            }
+        case .ar:
+            switch self {
+            case .male: return "ك. مالي"
+            case .hithadhoo: return "س. هيثاذو"
+            case .fuvahmulah: return "غن. فوفاهمولاه"
+            case .kulhudhuffushi: return "هذ. كولوذوففوشي"
+            case .gan: return "ل. جان"
+            case .naifaru: return "ل. نايفارو"
+            case .ukulhas: return "أأ. أكولاس"
+            case .maafushi: return "ك. مافوشي"
+            }
+        }
+    }
+}
+
+/// The widget's own display language - independent of the host app's
+/// language setting (the widget has no App Group data sharing to read it
+/// from - see PrayerData.swift), so it's its own configuration option
+/// alongside island.
+enum WidgetLanguage: String, AppEnum {
+    case en, dv, ar
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Language"
+
+    var label: String {
+        switch self {
+        case .en: return "English"
+        case .dv: return "Dhivehi"
+        case .ar: return "Arabic"
+        }
+    }
+
+    static var caseDisplayRepresentations: [WidgetLanguage: DisplayRepresentation] = [
+        .en: DisplayRepresentation(title: "English"),
+        .dv: DisplayRepresentation(title: "Dhivehi"),
+        .ar: DisplayRepresentation(title: "Arabic"),
+    ]
 }
 
 /// Configured entirely inside the widget's own edit UI (long-press ->
-/// Edit Widget) - independent of whatever island the host app has stored,
-/// so this works even if App Group data sharing turns out to be
+/// Edit Widget) - independent of whatever island/language the host app has
+/// stored, so this works even if App Group data sharing turns out to be
 /// unavailable on a free-tier Apple ID.
 struct SelectIslandIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Select Island"
-    static var description = IntentDescription("Choose which island's prayer times to show.")
+    static var description = IntentDescription("Choose which island's prayer times to show, and the display language.")
 
     @Parameter(title: "Island", default: .male)
     var island: SelectableIsland
+
+    @Parameter(title: "Language", default: .en)
+    var language: WidgetLanguage
 }
 
 struct PrayerEntry: TimelineEntry {
@@ -59,11 +122,12 @@ struct PrayerEntry: TimelineEntry {
     let islandLabel: String
     let moment: PrayerMoment?
     let today: [PrayerMoment]
+    let language: WidgetLanguage
 }
 
 struct PrayerProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> PrayerEntry {
-        PrayerEntry(date: Date(), islandLabel: SelectableIsland.male.label, moment: nil, today: [])
+        PrayerEntry(date: Date(), islandLabel: SelectableIsland.male.label, moment: nil, today: [], language: .en)
     }
 
     func snapshot(for configuration: SelectIslandIntent, in context: Context) async -> PrayerEntry {
@@ -89,10 +153,46 @@ struct PrayerProvider: AppIntentTimelineProvider {
 
     private func makeEntry(for configuration: SelectIslandIntent, on date: Date) -> PrayerEntry {
         let island = configuration.island
+        let language = configuration.language
         let today = PrayerData.todayMoments(islandId: island.rawValue, now: date)
         let moment = PrayerData.nextMoment(islandId: island.rawValue, now: date)
-        return PrayerEntry(date: date, islandLabel: island.label, moment: moment, today: today)
+        return PrayerEntry(
+            date: date,
+            islandLabel: island.localizedLabel(language),
+            moment: moment,
+            today: today,
+            language: language
+        )
     }
+}
+
+/// Prayer names in each supported display language - the same strings as
+/// locales/{en,dv,ar}.json's `prayers` section in the RN app, copied over
+/// by hand since this is a small, fixed set of 6 words rather than
+/// something needing the app's general translation machinery.
+private let prayerNames: [WidgetLanguage: [PrayerName: String]] = [
+    .en: [.fajr: "Fajr", .sunrise: "Sunrise", .dhuhr: "Dhuhr", .asr: "Asr", .maghrib: "Maghrib", .isha: "Isha"],
+    .dv: [
+        .fajr: "ފަތިސް", .sunrise: "އިރުއަރާ", .dhuhr: "މެންދުރު",
+        .asr: "އަޞްރު", .maghrib: "މަޣްރިބު", .isha: "ޢިޝާ",
+    ],
+    .ar: [
+        .fajr: "الفجر", .sunrise: "الشروق", .dhuhr: "الظهر",
+        .asr: "العصر", .maghrib: "المغرب", .isha: "العشاء",
+    ],
+]
+
+private func localizedPrayerName(_ prayer: PrayerName, _ language: WidgetLanguage) -> String {
+    prayerNames[language]?[prayer] ?? prayer.displayName
+}
+
+/// For accessoryCircular's tight couple-of-characters-per-line space.
+/// English keeps PrayerName's existing all-caps abbreviations
+/// ("FAJR"/"SUN"/...); Thaana/Arabic have no equivalent all-caps
+/// abbreviation convention (those scripts don't have letter case), so
+/// they fall back to the same full name shown everywhere else.
+private func localizedShortPrayerName(_ prayer: PrayerName, _ language: WidgetLanguage) -> String {
+    language == .en ? prayer.shortName : localizedPrayerName(prayer, language)
 }
 
 /// Matches lib/theme.ts's Noor+ "Ocean Night" palette in the RN app, so the
@@ -150,10 +250,19 @@ struct PrayerWidgetView: View {
     var entry: PrayerEntry
 
     var body: some View {
+        // Arabic reads right-to-left - SwiftUI can mirror the whole layout
+        // for it directly, unlike the RN app side (see lib/i18n.ts) where
+        // that's a bigger, separate piece of work.
+        content
+            .environment(\.layoutDirection, entry.language == .ar ? .rightToLeft : .leftToRight)
+    }
+
+    @ViewBuilder
+    private var content: some View {
         switch family {
         case .accessoryCircular:
             VStack(spacing: 1) {
-                Text(entry.moment?.name.shortName ?? "-")
+                Text(entry.moment.map { localizedShortPrayerName($0.name, entry.language) } ?? "-")
                     .font(.system(size: 11, weight: .semibold))
                 Text(entry.moment?.timeString ?? "--:--")
                     .font(.system(size: 14, weight: .bold))
@@ -169,7 +278,7 @@ struct PrayerWidgetView: View {
             }
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: 2) {
-                Text(entry.moment?.name.displayName ?? "-")
+                Text(entry.moment.map { localizedPrayerName($0.name, entry.language) } ?? "-")
                     .font(.headline)
                 Text(entry.moment?.timeString ?? "--:--")
                     .font(.caption)
@@ -194,7 +303,7 @@ struct PrayerWidgetView: View {
                         .foregroundStyle(Color.widgetMutedOnDark)
                     Spacer()
                     if let moment = entry.moment {
-                        Text("\(moment.name.displayName) \u{00B7} \(moment.timeString)")
+                        Text("\(localizedPrayerName(moment.name, entry.language)) \u{00B7} \(moment.timeString)")
                             .font(.caption)
                             .fontWeight(.bold)
                             .foregroundStyle(Color.widgetPrimary)
@@ -206,7 +315,7 @@ struct PrayerWidgetView: View {
                 HStack(spacing: 0) {
                     ForEach(entry.today, id: \.name) { item in
                         VStack(spacing: 3) {
-                            Text(item.name.displayName)
+                            Text(localizedPrayerName(item.name, entry.language))
                                 .font(.system(size: 10))
                                 .foregroundStyle(Color.widgetMutedOnDark)
                             Text(item.timeString)
