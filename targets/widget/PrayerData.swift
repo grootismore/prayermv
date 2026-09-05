@@ -37,6 +37,19 @@ enum PrayerName: String, CaseIterable {
         case .isha: return "Isha"
         }
     }
+
+    /// For accessoryCircular, which only has room for a couple of
+    /// characters per line.
+    var shortName: String {
+        switch self {
+        case .fajr: return "FAJR"
+        case .sunrise: return "SUN"
+        case .dhuhr: return "DHUHR"
+        case .asr: return "ASR"
+        case .maghrib: return "MAGHRIB"
+        case .isha: return "ISHA"
+        }
+    }
 }
 
 struct PrayerMoment {

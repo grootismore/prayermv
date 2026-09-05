@@ -89,12 +89,50 @@ struct PrayerProvider: AppIntentTimelineProvider {
     }
 }
 
+/// $widgetBackground (see expo-target.config.js) is a single fixed light
+/// color with no dark-mode variant. SwiftUI's default text styles
+/// (.primary/.secondary) are *system-appearance-adaptive* though - on a
+/// device in Dark Mode they render near-white regardless of the widget's
+/// own background, which against our fixed-light background is white text
+/// on a near-white card: functionally invisible. So the systemSmall view
+/// below uses fixed colors matching the light background instead of the
+/// adaptive defaults.
+private extension Color {
+    init(hex: UInt32) {
+        self.init(
+            red: Double((hex >> 16) & 0xFF) / 255,
+            green: Double((hex >> 8) & 0xFF) / 255,
+            blue: Double(hex & 0xFF) / 255
+        )
+    }
+
+    static let widgetText = Color(hex: 0x20241F)
+    static let widgetTextMuted = Color(hex: 0x6E7566)
+    static let widgetPrimary = Color(hex: 0x0B6E4F)
+}
+
 struct PrayerWidgetView: View {
     @Environment(\.widgetFamily) var family
     var entry: PrayerEntry
 
     var body: some View {
         switch family {
+        case .accessoryCircular:
+            VStack(spacing: 1) {
+                Text(entry.moment?.name.shortName ?? "-")
+                    .font(.system(size: 11, weight: .semibold))
+                Text(entry.moment?.timeString ?? "--:--")
+                    .font(.system(size: 14, weight: .bold))
+            }
+            .minimumScaleFactor(0.7)
+            .lineLimit(1)
+            // Lock screen accessory widgets are rendered by the system in a
+            // vibrant/monochrome material that overrides most custom
+            // colors anyway - a solid fill would just be discarded (or
+            // look wrong), so leave it transparent.
+            .containerBackground(for: .widget) {
+                Color.clear
+            }
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.moment?.name.displayName ?? "-")
@@ -102,9 +140,6 @@ struct PrayerWidgetView: View {
                 Text(entry.moment?.timeString ?? "--:--")
                     .font(.caption)
             }
-            // Lock screen accessory widgets are rendered by the system in a
-            // vibrant/monochrome material - a solid fill here would just be
-            // discarded (or look wrong), so leave it transparent.
             .containerBackground(for: .widget) {
                 Color.clear
             }
@@ -112,18 +147,20 @@ struct PrayerWidgetView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(entry.islandLabel)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.widgetTextMuted)
                 Spacer()
                 Text(entry.moment?.name.displayName ?? "-")
                     .font(.title2)
                     .fontWeight(.bold)
+                    .foregroundStyle(.widgetPrimary)
                 Text(entry.moment?.timeString ?? "--:--")
                     .font(.title3)
+                    .foregroundStyle(.widgetText)
             }
             .padding()
             // Required since iOS 17 - without it WidgetKit shows its own
             // "Please adopt containerBackground API" placeholder instead of
-            // this view at all (that's the bug being fixed here).
+            // this view at all.
             .containerBackground(for: .widget) {
                 Color("$widgetBackground")
             }
@@ -140,6 +177,6 @@ struct PrayerWidget: Widget {
         }
         .configurationDisplayName("Prayer Times")
         .description("Shows the next prayer time for your chosen island.")
-        .supportedFamilies([.systemSmall, .accessoryRectangular])
+        .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular])
     }
 }
