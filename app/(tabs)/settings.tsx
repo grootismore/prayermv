@@ -9,7 +9,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { NOTIFIABLE_PRAYERS } from '../../lib/prayerTimes';
 import { requestNotificationPermissions, sendTestAdhanNotification } from '../../lib/notifications';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
-import type { AppLanguage, NotificationPrefs } from '../../lib/storage';
+import type { AppLanguage, CalendarMode, NotificationPrefs } from '../../lib/storage';
 import { colors, spacing, typography } from '../../lib/theme';
 import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
 import Screen from '../../components/Screen';
@@ -18,6 +18,7 @@ import SectionHeader from '../../components/SectionHeader';
 import SettingRow from '../../components/SettingRow';
 import LanguageRow from '../../components/LanguageRow';
 import NotificationSwitchRow from '../../components/NotificationSwitchRow';
+import SegmentedControl from '../../components/SegmentedControl';
 import NoorDivider from '../../components/NoorDivider';
 import WaveDecoration from '../../components/WaveDecoration';
 import SunAccent from '../../components/SunAccent';
@@ -30,9 +31,11 @@ export default function SettingsScreen() {
     language,
     notificationPrefs,
     qiblaHapticsEnabled,
+    calendarMode,
     changeLanguage,
     setNotificationEnabled,
     setQiblaHapticsEnabled,
+    setCalendarMode,
   } = useSettings();
 
   async function handleToggle(prayer: Exclude<(typeof NOTIFIABLE_PRAYERS)[number], 'sunrise'>, value: boolean) {
@@ -100,6 +103,16 @@ export default function SettingsScreen() {
           />
         ))}
       </SurfaceCard>
+
+      <SectionHeader title={t('settings.calendar')} subtitle={t('settings.calendarSubtitle')} />
+      <SegmentedControl
+        segments={[
+          { key: 'hijri', label: t('hijri.hijriMode') },
+          { key: 'gregorian', label: t('hijri.gregorianMode') },
+        ]}
+        selectedKey={calendarMode}
+        onChange={(key) => setCalendarMode(key as CalendarMode)}
+      />
 
       <SectionHeader title={t('settings.notifications')} subtitle={t('settings.notificationsSubtitle')} />
       <SurfaceCard padded={false}>

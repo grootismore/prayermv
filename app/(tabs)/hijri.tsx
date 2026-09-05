@@ -12,21 +12,19 @@ import { colors, minTouchTarget, spacing, typography } from '../../lib/theme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
-import SegmentedControl from '../../components/SegmentedControl';
 import NoorDivider from '../../components/NoorDivider';
 import WaveDecoration from '../../components/WaveDecoration';
 import SunAccent from '../../components/SunAccent';
 
-type CalendarMode = 'hijri' | 'gregorian';
-
 export default function HijriScreen() {
   const { t } = useTranslation();
-  const { language } = useSettings();
+  const { language, calendarMode } = useSettings();
   const numeralsReady = useNumeralFont();
   const numeralStyle = numeralsReady && { fontFamily: numeralFont.semibold };
 
-  const [mode, setMode] = useState<CalendarMode>('hijri');
-  const isHijri = mode === 'hijri';
+  // Which calendar system is shown is now a Settings-level default
+  // (Settings > Calendar), not an in-screen toggle - see settings.tsx.
+  const isHijri = calendarMode === 'hijri';
 
   const todayHijri = useMemo(() => getTodayHijri(), []);
   const todayGregorian = useMemo(() => getTodayGregorian(), []);
@@ -104,15 +102,6 @@ export default function HijriScreen() {
   return (
     <Screen>
       <Text style={styles.title}>{t('hijri.title')}</Text>
-
-      <SegmentedControl
-        segments={[
-          { key: 'hijri', label: t('hijri.hijriMode') },
-          { key: 'gregorian', label: t('hijri.gregorianMode') },
-        ]}
-        selectedKey={mode}
-        onChange={(key) => setMode(key as CalendarMode)}
-      />
 
       <SurfaceCard elevated style={styles.todayCard}>
         <SunAccent size={20} />

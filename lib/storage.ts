@@ -3,6 +3,8 @@ import type { PrayerName } from './prayerTimes';
 
 export type AppLanguage = 'en' | 'dv' | 'ar';
 
+export type CalendarMode = 'hijri' | 'gregorian';
+
 export type NotificationPrefs = Record<Exclude<PrayerName, 'sunrise'>, boolean>;
 
 export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
@@ -18,6 +20,7 @@ const KEYS = {
   language: 'prayermv.language',
   notificationPrefs: 'prayermv.notificationPrefs',
   qiblaHapticsEnabled: 'prayermv.qiblaHapticsEnabled',
+  calendarMode: 'prayermv.calendarMode',
 } as const;
 
 export async function loadSelectedIslandId(): Promise<number | null> {
@@ -59,4 +62,14 @@ export async function loadQiblaHapticsEnabled(): Promise<boolean> {
 
 export async function saveQiblaHapticsEnabled(enabled: boolean): Promise<void> {
   await AsyncStorage.setItem(KEYS.qiblaHapticsEnabled, enabled ? '1' : '0');
+}
+
+/** Which calendar system the Calendar tab shows by default - Hijri unless the user picks Gregorian in Settings. */
+export async function loadCalendarMode(): Promise<CalendarMode> {
+  const raw = await AsyncStorage.getItem(KEYS.calendarMode);
+  return raw === 'gregorian' ? 'gregorian' : 'hijri';
+}
+
+export async function saveCalendarMode(mode: CalendarMode): Promise<void> {
+  await AsyncStorage.setItem(KEYS.calendarMode, mode);
 }
