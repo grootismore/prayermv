@@ -90,8 +90,8 @@ function minutesToTimeString(minutesIntoDay: number): string {
   return [hours, minutes].map((n) => String(n).padStart(2, '0')).join(':');
 }
 
-function minutesToDate(minutesIntoDay: number): Date {
-  const date = new Date();
+function minutesToDate(minutesIntoDay: number, referenceDate: Date): Date {
+  const date = new Date(referenceDate);
   date.setHours(Math.floor(minutesIntoDay / 60));
   date.setMinutes(minutesIntoDay % 60);
   date.setSeconds(0);
@@ -107,16 +107,26 @@ function getEntryForDay(islandId: number, day: number): RawDayEntry {
   return entry;
 }
 
-function buildEntry(call: PrayerName, entry: RawDayEntry, offset: number): PrayerTimeEntry {
+function buildEntry(
+  call: PrayerName,
+  entry: RawDayEntry,
+  offset: number,
+  referenceDate: Date
+): PrayerTimeEntry {
   const minutesIntoDay = entry[call] + offset;
-  return { call, date: minutesToDate(minutesIntoDay), string: minutesToTimeString(minutesIntoDay) };
+  return {
+    call,
+    date: minutesToDate(minutesIntoDay, referenceDate),
+    string: minutesToTimeString(minutesIntoDay),
+  };
 }
 
 /** Today's prayer times for an island, in display order (Fajr through Isha). */
 export function getTodayPrayerTimes(islandId: number): PrayerTimeEntry[] {
   const island = findIsland(islandId);
-  const entry = getEntryForDay(islandId, daysIntoYear(new Date()));
-  return PRAYER_ORDER.map((call) => buildEntry(call, entry, island.offset));
+  const now = new Date();
+  const entry = getEntryForDay(islandId, daysIntoYear(now));
+  return PRAYER_ORDER.map((call) => buildEntry(call, entry, island.offset, now));
 }
 
 /** The next upcoming prayer (or sunrise) for an island, relative to now. */
@@ -126,13 +136,18 @@ export function getNextPrayer(islandId: number): PrayerTimeEntry {
   const todayEntry = getEntryForDay(islandId, daysIntoYear(now));
 
   for (const call of PRAYER_ORDER) {
-    const candidate = buildEntry(call, todayEntry, island.offset);
+    const candidate = buildEntry(call, todayEntry, island.offset, now);
     if (candidate.date.getTime() > now.getTime()) return candidate;
   }
 
+  // Every prayer for today has passed - roll over to tomorrow's Fajr.
+  // setDate() advances the calendar day correctly (month/year rollover,
+  // no DST drift), unlike adding a fixed 24h in milliseconds.
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDay = (daysIntoYear(now) + 1) % 366;
   const tomorrowEntry = getEntryForDay(islandId, tomorrowDay);
-  return buildEntry('fajr', tomorrowEntry, island.offset);
+  return buildEntry('fajr', tomorrowEntry, island.offset, tomorrow);
 }
 
 export type { Island };
