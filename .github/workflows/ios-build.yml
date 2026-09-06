@@ -21,7 +21,7 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      - claude/maldives-prayer-times-app-tup9y0
+      - main
 
 concurrency:
   group: ios-build-${{ github.ref }}
