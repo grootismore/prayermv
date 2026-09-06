@@ -146,7 +146,7 @@ export const TIME_OF_DUA_DUAS: Dua[] = [
     transliteration: 'Alhamdulillaahi hamdan kathiran tayyiban mubaarakan fih',
     translation: {
       en: 'Praise is to Allah, much, good and blessed praise.\n\nWhen the Messenger of Allah (ﷺ) finished the prayer he said: Who amongst you uttered these words? The people remained silent. He (the Prophet ﷺ again said) : Who amongst you uttered these words? He said nothing wrong. Then a man said: I came and had a difficulty in breathing, so I uttered them. He replied: I saw twelve angels facing one another as to who will take them up (to Allah).',
-      dv: 'ﷲ އަށް ޙަމްދު ހުއްޓެވެ. ގިނަގުނަވެގެންވާ، ޠާހިރު، ބަރަކާތްތެރި ޙަމްދަކުންނެވެ.\n\nރަސޫލާ (ﷺ) ނަމާދު ނިންމަވާލެއްވުމަށްފަހު سުވާލުކުރެއްވިއެވެ: "މި ބަސްތައް ބުނީ ކާކު ހެއްޔެވެ؟" މީސްތަކުން ހިމޭނުން ތިއްބެވެ. އެކަލޭގެފާނު އަނެއްކާވެސް އެއްސެވިއެވެ. ދެން އޭނާ ދެންނެވިއެވެ: "އެއީ ތިމަންނާއެވެ. ނޭވާ ކުރުވެގެން ތިމަންނާއަށް އެހެން ކިޔުނީއެވެ." ޙަދީޘްކުރެއްވިއެވެ: "ތިމަންކަލޭގެފާނަށް ފެނިވަޑައިގަތީ ބާރަ މަލާއިކަތުން އެ ބަސްތައް (ﷲ ގެ ޙަޟްރަތަށް) އުފުއްލެވުމަށް އަވަސްވެވަޑައިގަތް ތަނެވެ."',
+      dv: 'ﷲ އަށް ޙަމްދު ހުއްޓެވެ. ގިނަގުނަވެގެންވާ، ޠާހިރު، ބަރަކާތްތެރި ޙަމްދަކުންނެވެ.\n\nރަސޫލާ (ﷺ) ނަމާދު ނިންމަވާލެއްވުމަށްފަހު ސުވާލުކުރެއްވިއެވެ: "މި ބަސްތައް ބުނީ ކާކު ހެއްޔެވެ؟" މީސްތަކުން ހިމޭނުން ތިއްބެވެ. އެކަލޭގެފާނު އަނެއްކާވެސް އެއްސެވިއެވެ. ދެން އޭނާ ދެންނެވިއެވެ: "އެއީ ތިމަންނާއެވެ. ނޭވާ ކުރުވެގެން ތިމަންނާއަށް އެހެން ކިޔުނީއެވެ." ޙަދީޘްކުރެއްވިއެވެ: "ތިމަންކަލޭގެފާނަށް ފެނިވަޑައިގަތީ ބާރަ މަލާއިކަތުން އެ ބަސްތައް (ﷲ ގެ ޙަޟްރަތަށް) އުފުއްލެވުމަށް އަވަސްވެވަޑައިގަތް ތަނެވެ."',
     },
     source: { type: 'hadith', reference: 'Muslim: 600' },
     contentReview: {
