@@ -6,11 +6,14 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
 import { useSettings } from '../../context/SettingsContext';
+import { useDuaPreferences } from '../../hooks/useDuaPreferences';
+import { resetAllDuaCounterProgress } from '../../hooks/useDuaCounter';
 import { NOTIFIABLE_PRAYERS } from '../../lib/prayerTimes';
 import { requestNotificationPermissions, sendTestAdhanNotification } from '../../lib/notifications';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import { ENDING_REMINDER_MINUTES_OPTIONS } from '../../lib/storage';
 import type { AppLanguage, CalendarMode, NotificationPrefs, ThemeMode } from '../../lib/storage';
+import type { DuaArabicFontSize, DuaTranslationLanguage } from '../../types/dua';
 import { spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useThemedStyles } from '../../lib/useTheme';
 import { showToast } from '../../lib/toast';
@@ -22,6 +25,7 @@ import SettingRow from '../../components/SettingRow';
 import LanguageRow from '../../components/LanguageRow';
 import NotificationSwitchRow from '../../components/NotificationSwitchRow';
 import SegmentedControl from '../../components/SegmentedControl';
+import TranslationLanguagePicker from '../../components/dua/TranslationLanguagePicker';
 import NoorDivider from '../../components/NoorDivider';
 import WaveDecoration from '../../components/WaveDecoration';
 import SunAccent from '../../components/SunAccent';
@@ -46,6 +50,12 @@ export default function SettingsScreen() {
     setCalendarMode,
     setThemeMode,
   } = useSettings();
+  const {
+    preferences: duaPreferences,
+    setTranslationLanguage: setDuaTranslationLanguage,
+    setShowTransliteration: setDuaShowTransliteration,
+    setArabicFontSize: setDuaArabicFontSize,
+  } = useDuaPreferences();
 
   async function handleToggle(prayer: Exclude<(typeof NOTIFIABLE_PRAYERS)[number], 'sunrise'>, value: boolean) {
     if (value) {
@@ -117,6 +127,35 @@ export default function SettingsScreen() {
     } catch {
       Alert.alert(t('qibla.permissionDenied'));
     }
+  }
+
+  function handleDuaTranslationChange(value: DuaTranslationLanguage) {
+    setDuaTranslationLanguage(value);
+    showToast(t('settings.toastDuasTranslationChanged'));
+  }
+
+  function handleDuaTransliterationChange(value: boolean) {
+    setDuaShowTransliteration(value);
+    showToast(t(value ? 'settings.toastDuasTransliterationOn' : 'settings.toastDuasTransliterationOff'));
+  }
+
+  function handleDuaArabicFontSizeChange(size: DuaArabicFontSize) {
+    setDuaArabicFontSize(size);
+    showToast(t('settings.toastDuasArabicFontSizeChanged'));
+  }
+
+  function handleResetDuaCounters() {
+    Alert.alert(t('duas.counterResetTitle'), t('settings.duasResetCountersButton'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('duas.counterResetConfirm'),
+        style: 'destructive',
+        onPress: async () => {
+          await resetAllDuaCounterProgress();
+          showToast(t('settings.toastDuasResetCounters'));
+        },
+      },
+    ]);
   }
 
   return (
@@ -219,6 +258,38 @@ export default function SettingsScreen() {
         />
       </SurfaceCard>
 
+      <SectionHeader title={t('settings.duasSection')} subtitle={t('settings.duasSectionSubtitle')} />
+      <Text style={styles.fieldLabel}>{t('settings.duasTranslationLabel')}</Text>
+      <TranslationLanguagePicker
+        value={duaPreferences.translationLanguage}
+        onChange={handleDuaTranslationChange}
+        labels={{
+          auto: t('settings.duasTranslationAuto'),
+          en: t('settings.duasTranslationEn'),
+          dv: t('settings.duasTranslationDv'),
+        }}
+      />
+      <SurfaceCard style={styles.rowCard} padded={false}>
+        <NotificationSwitchRow
+          label={t('settings.duasShowTransliterationLabel')}
+          value={duaPreferences.showTransliteration}
+          onValueChange={handleDuaTransliterationChange}
+        />
+      </SurfaceCard>
+      <Text style={styles.fieldLabel}>{t('settings.duasArabicFontSizeLabel')}</Text>
+      <SegmentedControl
+        segments={[
+          { key: 'small', label: t('settings.duasArabicFontSizeSmall') },
+          { key: 'medium', label: t('settings.duasArabicFontSizeMedium') },
+          { key: 'large', label: t('settings.duasArabicFontSizeLarge') },
+        ]}
+        selectedKey={duaPreferences.arabicFontSize}
+        onChange={(key) => handleDuaArabicFontSizeChange(key as DuaArabicFontSize)}
+      />
+      <SurfaceCard style={styles.rowCard} padded={false}>
+        <SettingRow title={t('settings.duasResetCountersButton')} chevron={false} onPress={handleResetDuaCounters} />
+      </SurfaceCard>
+
       <SectionHeader title={t('settings.testNotifications')} subtitle={t('settings.testNotificationsSubtitle')} />
       <SurfaceCard padded={false}>
         <SettingRow title={t('settings.testAdhanButton')} chevron={false} onPress={handleTestAdhan} />
@@ -241,6 +312,13 @@ const createStyles = (colors: ThemeColors) =>
     sunSpot: { position: 'absolute', right: 8 },
     title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
     rowCard: { marginTop: spacing.md },
+    fieldLabel: {
+      fontSize: typography.size.xs,
+      fontWeight: typography.weight.semibold,
+      color: colors.textSecondary,
+      marginTop: spacing.sm,
+      marginBottom: spacing.xxs,
+    },
     silentModeNote: {
       fontSize: typography.size.xs,
       color: colors.textMuted,
