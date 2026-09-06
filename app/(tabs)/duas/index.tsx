@@ -161,16 +161,20 @@ export default function DuasHomeScreen() {
 
       <SectionHeader title={t('duas.categories')} />
       <SurfaceCard padded={false}>
-        {categories.map((category) => (
-          <DuaCategoryCard
-            key={category.id}
-            title={category.title[resolvedLanguage]}
-            description={category.description?.[resolvedLanguage]}
-            icon={category.icon as keyof typeof Ionicons.glyphMap}
-            countLabel={t(getDuaEntryCountKey(getDuasByCategory(category.id).length), { count: getDuasByCategory(category.id).length })}
-            onPress={() => openCategory(category.id)}
-          />
-        ))}
+        {categories.map((category) => {
+          const count = getDuasByCategory(category.id).length;
+          return (
+            <DuaCategoryCard
+              key={category.id}
+              title={category.title[resolvedLanguage]}
+              description={category.description?.[resolvedLanguage]}
+              icon={category.icon}
+              count={count}
+              countLabel={t(getDuaEntryCountKey(count), { count })}
+              onPress={() => openCategory(category.id)}
+            />
+          );
+        })}
       </SurfaceCard>
     </Screen>
   );

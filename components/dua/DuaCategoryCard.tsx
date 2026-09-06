@@ -1,22 +1,24 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
 
-type IconName = keyof typeof Ionicons.glyphMap;
-
 interface Props {
   title: string;
   description?: string;
-  icon: IconName;
+  /** A single emoji character, not an Ionicons glyph name - see data/duas/categories.ts. */
+  icon: string;
+  count: number;
   countLabel: string;
   onPress: () => void;
 }
 
-/** A category row for the Duas home screen - icon, title, short description, and an entry count. */
-export default function DuaCategoryCard({ title, description, icon, countLabel, onPress }: Props) {
-  const { colors } = useTheme();
+/**
+ * A category row for the Duas home screen: a count bubble, the title (and an
+ * optional short description), and a large emoji - deliberately simple and
+ * scannable across all 44 categories, rather than an icon+chevron treatment.
+ */
+export default function DuaCategoryCard({ title, description, icon, count, countLabel, onPress }: Props) {
   const styles = useThemedStyles(createStyles);
 
   return (
@@ -26,8 +28,8 @@ export default function DuaCategoryCard({ title, description, icon, countLabel, 
       accessibilityRole="button"
       accessibilityLabel={`${title}, ${countLabel}`}
     >
-      <View style={styles.iconWrap}>
-        <Ionicons name={icon} size={22} color={colors.primary} />
+      <View style={styles.countBubble}>
+        <Text style={styles.countText}>{count}</Text>
       </View>
       <View style={styles.textCol}>
         <Text style={styles.title} numberOfLines={1}>
@@ -38,9 +40,8 @@ export default function DuaCategoryCard({ title, description, icon, countLabel, 
             {description}
           </Text>
         ) : null}
-        <Text style={styles.count}>{countLabel}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+      <Text style={styles.emoji}>{icon}</Text>
     </Pressable>
   );
 }
@@ -60,30 +61,39 @@ const createStyles = (colors: ThemeColors) =>
     pressed: {
       backgroundColor: colors.surfacePressed,
     },
-    iconWrap: {
-      width: 40,
-      height: 40,
-      borderRadius: radius.md,
+    countBubble: {
+      width: 36,
+      height: 36,
+      borderRadius: radius.pill,
       backgroundColor: colors.primarySoft,
       alignItems: 'center',
       justifyContent: 'center',
     },
+    countText: {
+      fontSize: typography.size.sm,
+      fontWeight: typography.weight.bold,
+      color: colors.primary,
+      fontVariant: ['tabular-nums'],
+    },
     textCol: {
       flex: 1,
       gap: 2,
+      alignItems: 'center',
     },
     title: {
       fontSize: typography.size.md,
       fontWeight: typography.weight.semibold,
       color: colors.textPrimary,
+      textAlign: 'center',
     },
     description: {
       fontSize: typography.size.sm,
       color: colors.textSecondary,
+      textAlign: 'center',
     },
-    count: {
-      fontSize: typography.size.xs,
-      color: colors.textMuted,
-      marginTop: 2,
+    emoji: {
+      fontSize: 28,
+      width: 36,
+      textAlign: 'center',
     },
   });

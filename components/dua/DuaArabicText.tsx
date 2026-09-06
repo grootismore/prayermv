@@ -13,9 +13,9 @@ interface Props {
 }
 
 const FONT_SIZES: Record<DuaArabicFontSize, number> = {
-  small: 17,
-  medium: 21,
-  large: 26,
+  small: 20,
+  medium: 26,
+  large: 32,
 };
 
 /**
