@@ -60,7 +60,7 @@ export const AFTER_SALAH_DUAS: Dua[] = [
       "Subhanallah (thirty-three times), walhamdu lillah (thirty-three times), wallahu akbar (thirty-three times), then to complete a hundred: la ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadeer.",
     translation: {
       en: 'Glory be to Allah (33 times), praise be to Allah (33 times), Allah is the Greatest (33 times) - that is ninety-nine - and to complete a hundred: none has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent.',
-      dv: 'سبحان الله (٣٣ ފަހަރު)، الحمد لله (٣٣ ފަހަރު)، الله أكبر (٣٣ ފަހަރު) - އެއީ ނުވަދިހަ ނުވައެވެ. ސަތޭކަ ފުރިހަމަކުރުމަށް: لا إله إلا الله وحده لا شريك له، له الملك وله الحمد، وهو على كل شيء قدير.',
+      dv: 'ﷲ ހުސްޠާހިރުވަންތަކަމާއެވެ (٣٣ ފަހަރު)، ޙަމްދު ﷲ އަށެވެ (٣٣ ފަހަރު)، ﷲ އީ އެންމެ ބޮޑުވަންތަ ރަސްކަލާނގެއެވެ (٣٣ ފަހަރު) - އެއީ ނުވަދިހަ ނުވަ ފަހަރެވެ. ސަތޭކަ ފުރިހަމަކުރުމަށް: ﷲ މެނުވީ ޙައްޤުވެގެން އަޅުކަމެއް ވެވޭ އިލާހަކު ނުވެއެވެ. އެކަލާނގެ އެއްކައުވަންތައެވެ. އެކަލާނގެއަށް ބައިވެރިޔަކު ނުވެއެވެ. ވެރިކަން ވަނީ އެކަލާނގެއަށެވެ. އަދި ޙަމްދު ވަނީ އެކަލާނގެއަށެވެ. އަދި އެކަލާނގެއީ ކޮންމެ ކަމެއްގެ މައްޗަށް ކުޅަދުންވަންތަ ރަސްކަލާނގެއެވެ.',
     },
     source: { type: 'hadith', reference: 'Sahih Muslim 597', grading: 'Sahih' },
     benefits: {
@@ -75,19 +75,19 @@ export const AFTER_SALAH_DUAS: Dua[] = [
       {
         arabic: 'سُبْحَانَ اللَّهِ',
         transliteration: 'Subhanallah.',
-        translation: { en: 'Glory be to Allah.', dv: 'اللهގެ سبحان ވަންތަކަން ބަޔާންކުރަމެވެ.' },
+        translation: { en: 'Glory be to Allah.', dv: 'ﷲ ހުސްޠާހިރުވަންތަކަމާއެވެ!' },
         repetitions: 33,
       },
       {
         arabic: 'وَالْحَمْدُ لِلَّهِ',
         transliteration: 'Walhamdu lillah.',
-        translation: { en: 'Praise be to Allah.', dv: 'ހަމްދު ސަނާ ވަނީ اللهއަށެވެ.' },
+        translation: { en: 'Praise be to Allah.', dv: 'ޙަމްދު ﷲ އަށެވެ.' },
         repetitions: 33,
       },
       {
         arabic: 'وَاللَّهُ أَكْبَرُ',
         transliteration: 'Wallahu akbar.',
-        translation: { en: 'Allah is the Greatest.', dv: 'اللهއީ އެންމެ ބޮޑުވަންތަ ރަސްކަލާނގެއެވެ.' },
+        translation: { en: 'Allah is the Greatest.', dv: 'ﷲ އީ އެންމެ ބޮޑުވަންތަ ރަސްކަލާނގެއެވެ.' },
         repetitions: 33,
       },
       {
@@ -97,7 +97,7 @@ export const AFTER_SALAH_DUAS: Dua[] = [
           "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadeer.",
         translation: {
           en: 'None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent.',
-          dv: 'اللهމެނުވީ حق ގޮތުގައި އަޅުކަން ވެވޭ إلـه އެއް ނުވެއެވެ. އެކަލާނގެ އެއްކައުވަންތަ ރަސްކަލާނގެއެވެ، شريك އަކާ ނުލައި. ވެރިކަމާއި ހަމްދު ވަނީ އެކަލާނގެއަށެވެ. އަދި އެކަލާނގެއީ ކޮންމެ ކަމެއްގެ މައްޗަށް ކުޅަދުންވަންތަ ރަސްކަލާނގެއެވެ.',
+          dv: 'ﷲ މެނުވީ ޙައްޤުވެގެން އަޅުކަމެއް ވެވޭ އިލާހަކު ނުވެއެވެ. އެކަލާނގެ އެއްކައުވަންތައެވެ. އެކަލާނގެއަށް ބައިވެރިޔަކު ނުވެއެވެ. ވެރިކަން ވަނީ އެކަލާނގެއަށެވެ. އަދި ޙަމްދު ވަނީ އެކަލާނގެއަށެވެ. އަދި އެކަލާނގެއީ ކޮންމެ ކަމެއްގެ މައްޗަށް ކުޅަދުންވަންތަ ރަސްކަލާނގެއެވެ.',
         },
         repetitions: 1,
       },

@@ -16,7 +16,7 @@ export const SLEEP_DUAS: Dua[] = [
       "Amanar-rasulu bima unzila ilayhi mir-rabbihi wal-mu'minun, kullun amana billahi wa mala'ikatihi wa kutubihi wa rusulih, la nufarriqu bayna ahadim-mir-rusulih, wa qalu sami'na wa ata'na ghufranaka rabbana wa ilaykal-masir. La yukallifullahu nafsan illa wus'aha, laha ma kasabat wa 'alayha mak-tasabat, rabbana la tu'akhidhna in-nasina aw akhta'na, rabbana wa la tahmil 'alayna isran kama hamaltahu 'alal-ladhina min qablina, rabbana wa la tuhammilna ma la taqata lana bih, wa'fu 'anna waghfir lana warhamna, anta mawlana fansurna 'alal-qawmil-kafirin.",
     translation: {
       en: 'The Messenger has believed in what was revealed to him from his Lord, and so have the believers. All of them have believed in Allah, His angels, His books, and His messengers - "We make no distinction between any of His messengers." And they say, "We hear and we obey. Your forgiveness, our Lord, and to You is the final destination." Allah does not charge a soul except with that within its capacity; it will have what it has earned, and it will bear what it has earned. "Our Lord, do not impose blame upon us if we forget or err. Our Lord, do not lay upon us a burden like that You laid upon those before us. Our Lord, do not burden us with what we have no ability to bear. Pardon us, forgive us, and have mercy upon us. You are our protector, so give us victory over the disbelieving people."',
-      dv: 'رسول ބާވައިލެއްވި ފޮތާމެދު إيمان ވެވަޑައިގަތެވެ. مؤمن ންވެސް އެފަދައެވެ. ހުރިހާ ބޭފުޅުން اللهއަށާއި، އެކަލާނގެ ملائكة ންނަށާއި، ފޮތްތަކަށާއި، رسول ބޭކަލުންނަށް إيمان ވެއެވެ. رسول ބޭކަލުންގެ ތެރެއިން އެއްވެސް ބޭކަލަކާ ދެމެދު ތަފާތެއް ނުކުރަމުއޭ ބުނެއެވެ. އަދި ބުނެއެވެ: ތިމަންމެން އަޑުއެހީމުއެވެ. ކިޔަމަންވެސް ވީމުއެވެ. އޭ ވެރިރަސްކަލާކޯ! ފުއްސެވުމަށް އެދެމުއެވެ. އަދި އިބައިލާހުގެ حضرة އަށް އެނބުރި ދިއުންވަނީއެވެ. (٢٨٥) الله އެއްވެސް نفس އަކަށް ކުޅަދާނަވެގެންވާ ވަރަށްވުރެ ބުރަ ނުޖައްސަވައެވެ. ކޮންމެ نفس އަކަށްވެސް، އެ نفس އެއް ހޯދި ހެޔޮކަމުގެ ثواب ލިބޭނެއެވެ. އަދި އެ نفس އެއް ހޯދި ނުބައިކަމުގެ عقوبة ލިބޭނެއެވެ. އޭ ވެރިރަސްކަލާކޯ! ތިމަންމެން ހަނދާން ނެތިއްޖެނަމަ، ނުވަތަ ގޯސްކޮށްފިނަމަ، ސުވާލު ނުކުރައްވާނދޭވެ! އޭ ވެރިރަސްކަލާކޯ! ތިމަންމެންގެ ކުރީގެ މީހުންނަށް ބުރަކުރެއްވި ފަދަ ބުރައެއް ތިމަންމެންނަށް ނުޖައްސަވާނދޭވެ! އޭ ވެރިރަސްކަލާކޯ! ތިމަންމެންނަށް ކުޅަދާނަނުވާ ބުރައެއް ނުޖައްސަވާނދޭވެ! ތިމަންމެންނަށް عفو ކުރައްވާ، ފުއްސަވާ، ރަޙްމަތް ލައްވާނދޭވެ! އިބައިލާހީ ތިމަންމެންގެ ވެރި ފަރާތެވެ. ފަހެ كافر ބައިގަނޑުގެ މައްޗަށް ތިމަންމެންނަށް نصر ދެއްވާނދޭވެ! (٢٨٦)',
+      dv: 'رسول އާއަށް، އެކަލޭގެފާނުގެ ވެރިރަސްކަލާނގެ حضرة ން ބާވައިލެއްވި އެއްޗަކަށް (އެބަހީ: ކީރިތި قرآن އަށް) رسول އާއާއި مؤمن ން إيمان ވިއެވެ. އެ އެންމެންމެ اللَّه އާއި، އެކަލާނގެ ملائكة ންނާއި، އެކަލާނގެ (ބާވައިލެއްވި) ފޮތްތަކާއި، އެކަލާނގެ ފޮނުއްވި رسول ންނަށް إيمان ވިއެވެ. (އެއުރެން ބުނެތެވެ.) ތިމަންމެން، އެކަލާނގެ رسول ންގެ ތެރެއިން އެކަކާމެދުވެސް ތަފާތެއް ނުކުރަމުއެވެ. އަދި، އެއުރެން ބުނޫއެވެ. ތިމަންމެން އަހައި ކިޔަމަންވެއްޖައީމުއެވެ. އަޅަމެންގެ ވެރިރަސްކަލާކޯއެވެ! އަޅަމެންގެ ފާފަފުއްސަވައިފާނދޭވެއެވެ! އަދި، އެނބުރި ދިއުންވަނީ، އިބަރަސްކަލާނގެ حضرة އަށެވެ. (٢٨٥) اللَّه، އެއްވެސް نفس އަކަށް، އެ نفس އަކަށް ކުޅަދާނަވެގެންވާ ކަމަކަށް މެނުވީ تكليف އެއް ނުޖައްސަވައެވެ. އެ نفس އެއް ހޯދި ހެޔޮކަމެއް (ގެ ثواب) އެ نفس އަކަށް ވެއެވެ. އަދި، އެ نفس އެއް ހޯދި ނުބައިކަމެއް (ގެ عقاب) އެ نفس އެއްގެ މައްޗަށްވެއެވެ. އަޅަމެންގެ ވެރިރަސްކަލާކޮ! އަޅަމެން ހަނދާންނެތިއްޖެނަމަ، ނުވަތަ، قصد އެއްނެތި އަޅަމެންނަށް ކުށެއް ވެވިއްޖެނަމަ (އެކަމަށް) އަޅަމެންނަށް عقوبات ނުދެއްވާނދޭވެ! އަޅަމެންގެ ވެރިރަސްކަލާކޮ! އަޅަމެންގެ ކުރިންތިބި މީހުންނަށް އުފުލުމަށް ޖެއްސެވިފަދަ ބުރަކަމެއް އަޅަމެން އުފުލުމަށް ނުޖައްސަވާނދޭވެ! އަޅަމެންގެ ވެރިރަސްކަލާކޮ! އަޅަމެންނަށް އެކަމަކަށް ކުޅަދާނަވެގެން ނުވާކަމެއް އުފުލުމަށް އަޅަމެންނަށް ނުޖައްސަވާނދޭވެ! އަދި، އަޅަމެންނަށް عفو ކުރައްވާނދޭވެ! އަދި، އަޅަމެންނަށް ފާފަފުއްސަވާނދޭވެ! އަދި، އަޅަމެންނަށް رحمة ލައްވާނދޭވެ! އިބަރަސްކަލާނގެއީ އަޅަމެންގެ އެހީތެރިވަންތަ ރަސްކަލާނގެއެވެ. ފަހެ، كافر ވެގެންވާ قوم ގެ މައްޗަށް އަޅަމެންނަށް نصر ދެއްވާނދޭވެ! (٢٨٦)',
     },
     source: { type: 'quran', reference: 'Quran 2:285-286' },
     benefits: {
@@ -40,7 +40,7 @@ export const SLEEP_DUAS: Dua[] = [
     transliteration: 'Bismika Allahumma amutu wa ahya.',
     translation: {
       en: 'In Your name, O Allah, I die and I live.',
-      dv: 'އޭ اللهއެވެ! އިބައިލާހުގެ اسم ފުޅުން ތިމަން މަރުވަމެވެ. އަދި ދިރިހުރެމެވެ.',
+      dv: 'އޭ ﷲ! އިބަރަސްކަލާނގެ އިސްމުފުޅުން މިއަޅާ މަރުވެ ދިރިއުޅެމެވެ.',
     },
     source: { type: 'hadith', reference: 'Sahih al-Bukhari 6324', grading: 'Sahih' },
     searchTerms: ['bismika amutu wa ahya', 'before sleep dua'],
@@ -60,7 +60,7 @@ export const SLEEP_DUAS: Dua[] = [
     transliteration: "Alhamdu lillahil-ladhi ahyana ba'da ma amatana wa ilayhin-nushur.",
     translation: {
       en: 'All praise is for Allah who gave us life after having taken it from us, and unto Him is the resurrection.',
-      dv: 'ހަމްދު ސަނާ ހުރީ ތިމަންމެން މަރުކުރެއްވުމަށްފަހު، ދިރުއްވި اللهއަށެވެ. އަދި އެކަލާނގެ حضرة އަށް محشر ކުރެއްވުންވަނީއެވެ.',
+      dv: 'ޙަމްދު ހުރީ، އަޅަމެން މަރުކުރެއްވުމަށްފަހު ދިރުއްވި ﷲ އަށެވެ. އަދި އެކަލާނގެ ޙަޟްރަތަށް އަލުން ދިރުއްވައި މަޙްޝަރު ކުރެއްވުންވަނީއެވެ.',
     },
     source: { type: 'hadith', reference: 'Sahih al-Bukhari 6312', grading: 'Sahih' },
     searchTerms: ['waking up dua', 'alhamdulillahil-ladhi ahyana'],
