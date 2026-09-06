@@ -15,7 +15,7 @@ export const EVENING_DUAS: Dua[] = [
       "Amsayna wa amsal-mulku lillah, walhamdu lillah, la ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadeer.",
     translation: {
       en: 'We have reached the evening and at this very time all sovereignty belongs to Allah, and all praise is for Allah. None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent.',
-      dv: 'ތިމަންމެންނަށް ހަވީރުވެއްޖެއެވެ. އަދި ހުރިހާ ވެރިކަމެއް ވަނީ اللهއަށެވެ. ހަމްދާއި ސަނާ ވަނީ اللهއަށެވެ. اللهމެނުވީ حق ގޮތުގައި އަޅުކަން ވެވޭ إلـه އެއް ނުވެއެވެ. އެކަލާނގެ އެއްކައުވަންތަ ރަސްކަލާނގެއެވެ، شريك އަކާ ނުލައި. ވެރިކަމާއި ހަމްދު ވަނީ އެކަލާނގެއަށެވެ. އަދި އެކަލާނގެއީ ކޮންމެ ކަމެއްގެ މައްޗަށް ކުޅަދުންވަންތަ ރަސްކަލާނގެއެވެ.',
+      dv: 'އަޅަމެން ހަވީރުކޮށްފީމެވެ. އަދި މުޅި ވެރިކަން ﷲ އަށް މިލްކްވެގެންވާ ޙާލު ހަވީރުވެއްޖެއެވެ. ޙަމްދު ހުރީ ﷲ އަށެވެ. ﷲ މެނުވީ ޙައްޤުވެގެން އަޅުކަމެއް ވެވޭ އިލާހަކު ނުވެއެވެ. އެކަލާނގެ އެއްކައުވަންތައެވެ. އެކަލާނގެއަށް ބައިވެރިޔަކު ނުވެއެވެ. ވެރިކަން ވަނީ އެކަލާނގެއަށެވެ. އަދި ޙަމްދު ވަނީ އެކަލާނގެއަށެވެ. އަދި އެކަލާނގެއީ ކޮންމެ ކަމެއްގެ މައްޗަށް ކުޅަދުންވަންތަ ރަސްކަލާނގެއެވެ.',
     },
     source: { type: 'hadith', reference: 'Sahih Muslim 2723', grading: 'Sahih' },
     searchTerms: ['amsayna', 'evening sovereignty'],
@@ -37,7 +37,7 @@ export const EVENING_DUAS: Dua[] = [
       "Allahumma bika amsayna, wa bika asbahna, wa bika nahya, wa bika namutu, wa ilaykal-maseer.",
     translation: {
       en: 'O Allah, by You we enter the evening, by You we enter the morning, by You we live, by You we die, and to You is the final return.',
-      dv: 'އޭ اللهއެވެ! އިބައިލާހުގެ حضرة ން ތިމަންމެންނަށް ހަވީރުވެއްޖެއެވެ. އަދި އިބައިލާހުގެ حضرة ން ހެނދުނުވެއެވެ. އަދި އިބައިލާހުގެ حضرة ން ތިމަންމެން ދިރިއުޅެމެވެ. އަދި އިބައިލާހުގެ حضرة ން ތިމަންމެން މަރުވަމެވެ. އަދި އިބައިލާހުގެ حضرة އަށް އެނބުރި ދިއުންވަނީއެވެ.',
+      dv: 'އޭ ﷲ! އަޅަމެން ހަވީރުކުރީ އިބަރަސްކަލާނގެ އިރާދަފުޅާއެކުގައެވެ. އަދި އަޅަމެން ހެނދުނުކުރީވެސް އިބަރަސްކަލާނގެ އިރާދަފުޅާއެކުގައެވެ. އަދި އަޅަމެން ދިރިތިބެނީ އިބަރަސްކަލާނގެ އިރާދަފުޅާއެކުގައެވެ. އަދި އަޅަމެން މަރުވަނީވެސް އިބަރަސްކަލާނގެ އިރާދަފުޅާއެކުގައެވެ. އަދި (މަރުވުމަށްފަހު) އެނބުރި ދިއުން ވަނީ އިބަރަސްކަލާނގެ ޙަޟްރަތަށެވެ.',
     },
     source: { type: 'hadith', reference: 'Jami at-Tirmidhi 3391', grading: 'Hasan' },
     searchTerms: ['allahumma bika amsayna'],

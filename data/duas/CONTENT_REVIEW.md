@@ -39,6 +39,48 @@ A `notes` string on most entries records anything specific worth flagging
 for that item (e.g. "confirm this hadith number against a current print
 edition").
 
+## Dhivehi translation pass (this update)
+
+The `translation.dv` field for 22 of the 25 entries (everything except
+`prayer-astaghfirullah-3` and `prayer-antas-salam`, which were already
+accurate) was replaced, since the original set was first-draft AI
+paraphrase with at least one confirmed systematic error: `بِكَ` ("by/through
+You", instrumental) had been rendered as `حضرة ން` ("from Your presence"),
+shifting the meaning - see `morning-bika-asbahna` / `evening-bika-amsayna`.
+Replacements came from:
+
+- **The 3 Quranic entries** (`protection-ayat-al-kursi`,
+  `sleep-last-two-baqarah`, `morning-three-quls`) - the official Dhivehi
+  Quran translation published by the Office of the President of the
+  Maldives, fetched via the `dv.divehi` edition on
+  [alquran.cloud](https://alquran.cloud). This is a named, authoritative,
+  government-published translation - the strongest possible source for
+  Quranic text - and should be preferred over any paraphrase if this
+  content is ever revised again.
+- **14 hadith-based entries** - the [Masnun Dua](https://github.com/islamicapi/masnun-dua)
+  open dataset (maintained by IslamicAPI.com, credited in its README to
+  Hisnul Muslim by Said ibn Ali Al-Qahtani among other sources; free/open,
+  no attribution required). Each match was verified by comparing the
+  dataset's Arabic text character-for-character against this app's
+  `arabic` field before taking its Dhivehi translation - several entries in
+  that dataset had internally mismatched Arabic/translation pairs (a data
+  bug in that project, not this one) and were skipped rather than trusted
+  blindly.
+- **5 entries plus the 4 `prayer-tasbih-hundred` segments**
+  (`home-entering`, `home-leaving`, `mosque-entering`, `mosque-leaving`,
+  `sleep-waking-up`, and the tasbih segments/combined text) - no clean
+  matching entry could be found in the sourced dataset for these
+  (the corresponding IDs there had the same Arabic/translation mismatch
+  bug), so these were manually retranslated with care. They still carry
+  the **lowest** confidence of the update and are the first place a native
+  Dhivehi reviewer should look.
+
+`translationVerified.dv` is left `false` on every entry regardless of
+source, per the review requirement below - a citation from an authoritative
+source is a large improvement over first-draft paraphrase, but it is not
+the same as a qualified human reviewer checking phrasing and register
+against this app's specific Dhivehi conventions.
+
 ## Why this approach, not silence or refusal
 
 The feature spec this content was built for is explicit: never invent
