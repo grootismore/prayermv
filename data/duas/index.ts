@@ -1,8 +1,11 @@
 import type { Dua, DuaCategory } from '../../types/dua';
 import { DUA_CATEGORIES } from './categories';
 import { CAT_40_RABBANA_DUAS_DUAS } from './content/40-rabbana-duas';
+import { ABLUTION_AND_BATH_DUAS } from './content/ablution-and-bath';
+import { ADHAAN_AND_IQAMAH_DUAS } from './content/adhaan-and-iqamah';
 import { ANIMALS_DUAS } from './content/animals';
 import { ANXIETY_DUAS } from './content/anxiety';
+import { CLOTHS_DUAS } from './content/cloths';
 import { CONDEMNATIONPRAISE_DUAS } from './content/condemnationpraise';
 import { DANGER_DUAS } from './content/danger';
 import { DEBT_DUAS } from './content/debt';
@@ -21,11 +24,13 @@ import { GATHERING_DUAS } from './content/gathering';
 import { GRAVE_FUNERAL_DUAS } from './content/grave-funeral';
 import { GREATEST_NAME_OF_ALLAH_DUAS } from './content/greatest-name-of-allah';
 import { HAJJ_AND_UMRAH_DUAS } from './content/hajj-and-umrah';
+import { HOME_DUAS } from './content/home';
 import { JINNDISEASES_DUAS } from './content/jinndiseases';
 import { MANNERS_DUAS } from './content/manners';
 import { MARRIAGE_DUAS } from './content/marriage';
 import { MASNUN_DUAS_DUAS } from './content/masnun-duas';
 import { MORNING_AND_EVENING_DUAS } from './content/morning-and-evening';
+import { MOSQUE_DUAS } from './content/mosque';
 import { OTHER_DUAS_DUAS } from './content/other-duas';
 import { PROPHETS_DUA_DUAS } from './content/prophets-dua';
 import { QURANIC_DUA_DUAS } from './content/quranic-dua';
@@ -50,7 +55,12 @@ export const ALL_DUAS: Dua[] = [
   ...DUA_ACCEPTANCE_DUAS,
   ...MORNING_AND_EVENING_DUAS,
   ...SLEEP_DUAS,
+  ...CLOTHS_DUAS,
+  ...HOME_DUAS,
   ...TOILET_DUAS,
+  ...ADHAAN_AND_IQAMAH_DUAS,
+  ...ABLUTION_AND_BATH_DUAS,
+  ...MOSQUE_DUAS,
   ...SALAH_DUAS,
   ...WITR_AND_OTHER_DUAS,
   ...GRAVE_FUNERAL_DUAS,

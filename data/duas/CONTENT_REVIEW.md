@@ -160,6 +160,66 @@ Also fixed in the same pass: the cross-screen "favourite not appearing
 right away" bug reported alongside the translation issue - unrelated to
 this content dataset, see `hooks/useDuaFavourites.ts`.
 
+## Backfill: restoring the 5 emptied categories (Sept 2026)
+
+The 5 categories emptied in the follow-up above (`cloths`, `home`,
+`adhaan-and-iqamah`, `ablution-and-bath`, `mosque`) were later repopulated
+with fresh content from two different open repositories, at the user's
+explicit direction, rather than left empty indefinitely:
+
+- **Arabic text**: [Kind-Unes/Adhkar-Duaa-Multilingual-Database](https://github.com/Kind-Unes/Adhkar-Duaa-Multilingual-Database)
+  (`java-script/arabic/duaa_ar.js` and `adhkar_ar.js`). This repository
+  ships **no LICENSE file at all**, which under default copyright means
+  "all rights reserved" despite being public - it is not, strictly, free
+  to reuse. The user was told this explicitly and chose to proceed anyway;
+  this is a known, accepted risk, not an oversight.
+- **English transliteration, translation, and reference**:
+  [samiulahmedjoy/hisnulmuslim](https://github.com/samiulahmedjoy/hisnulmuslim)
+  (`main_hisnulmuslim.txt`), a plain-text rendering of Said ibn Ali
+  Al-Qahtani's *Hisn al-Muslim* sourced from sunnah.com. This repository is
+  **GPLv3-licensed** - a strong copyleft license - which could in
+  principle create an obligation to release this app's source if content
+  from it is considered a "work based on the Program." The user was told
+  this explicitly and chose to proceed anyway; this is also a known,
+  accepted risk, not an oversight. Revisit this if the app is ever
+  distributed in a way where that matters.
+
+**Why these two combine cleanly**: both ultimately derive from the same
+classical source (*Hisn al-Muslim*), just split across two unrelated
+projects - one Arabic-only, one English-only. Their chapter/category order
+matches closely enough that pairing them by topic (e.g. Kind-Unes'
+"دعاء الخروج من الخلاء" against hisnulmuslim's "Chapter 7: After leaving
+the bathroom") was reliable, and every pairing used here was verified by
+hand against both the Arabic and the English side before being included -
+none were guessed. Entries use a new `hisnul-<N>` id scheme (`<N>` being
+that book's own numbering, which both sources independently cite) rather
+than `masnun-<N>`, since they don't come from the Masnun Dua dataset.
+Purely instructional lines with no fixed recitable phrase (e.g. "repeat
+what the Mu'adhin says", "supplicate freely between adhan and iqamah")
+were left out, same as the exclusion rule the original pipeline used.
+
+**Dhivehi is the one new departure from this project's practice so far**:
+neither source has any Dhivehi at all (Kind-Unes is Arabic-only,
+hisnulmuslim is English-only), so every `title.dv` and `translation.dv` for
+these 17 entries was **written by AI from the English/Arabic**, not copied
+from a dataset or an already-verified duplicate elsewhere in the app like
+every other Dhivehi string in this codebase. The user was told this
+explicitly before it was done and asked for it anyway. Treat these 17
+entries' Dhivehi with extra suspicion during human review - they carry the
+same `translationVerified.dv: false` flag as everything else, but unlike
+the rest of the app, there is no upstream dataset to blame if it's wrong.
+
+**Deduplication**: before adding any of the 17 new entries, each candidate
+Arabic phrase was grep-checked against every existing `data/duas/content/*.ts`
+file to confirm it wasn't already present under a different category -
+none were found, so nothing here duplicates the existing 761 (now 778)
+duas.
+
+Net effect: the app is back to shipping all **44 categories** (778 duas
+total, up from 761), with `cloths` (5), `home` (3), `adhaan-and-iqamah` (2),
+`ablution-and-bath` (4), and `mosque` (3) now populated with independently
+verified Arabic/English pairings and AI-authored Dhivehi.
+
 ## What needs review, specifically
 
 Every `Dua` object carries a `contentReview` field with three boolean
