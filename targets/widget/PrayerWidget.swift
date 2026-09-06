@@ -14,8 +14,27 @@ struct IslandEntity: AppEntity, Identifiable {
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Island"
     static var defaultQuery = IslandEntityQuery()
 
+    /// A sentinel entity (id 0 - never a real island id; mv-prayertimes'
+    /// own ids start at 1, and the supplemental islands in
+    /// lib/prayerTimes.ts use -1/-2) standing in for "whatever the app
+    /// currently has selected". This used to be modeled as leaving the
+    /// `island` @Parameter unset (Optional), but WidgetKit can resolve an
+    /// unconfigured optional parameter to some concrete value on its own
+    /// (e.g. for a widget added straight from the gallery, without ever
+    /// opening Edit Widget) before this code gets a chance to treat "no
+    /// explicit choice" as "follow the app" - which is exactly what was
+    /// making freshly-added widgets show a fixed island instead. Making
+    /// this an explicit, always-first-suggested entity, combined with
+    /// IslandEntityQuery.defaultResult() below, gives WidgetKit a real
+    /// value to resolve to instead of leaving it to guess.
+    static let matchApp = IslandEntity(id: 0, atoll: "", name: "")
+
+    var isMatchApp: Bool { id == 0 }
+
     var displayRepresentation: DisplayRepresentation {
-        DisplayRepresentation(title: "\(atoll) \(name)")
+        isMatchApp
+            ? DisplayRepresentation(title: "Match App Selection")
+            : DisplayRepresentation(title: "\(atoll) \(name)")
     }
 }
 
@@ -27,10 +46,15 @@ private let curatedIslandIds = [102, 197, 196, 28, 169, 93, 108, 104]
 
 struct IslandEntityQuery: EntityStringQuery {
     func entities(for identifiers: [Int]) async throws -> [IslandEntity] {
+        var results: [IslandEntity] = []
+        if identifiers.contains(0) {
+            results.append(.matchApp)
+        }
         let wanted = Set(identifiers)
-        return PrayerData.raw.islands
+        results += PrayerData.raw.islands
             .filter { wanted.contains($0.islandId) }
             .map { IslandEntity(id: $0.islandId, atoll: $0.atoll, name: $0.island) }
+        return results
     }
 
     func entities(matching string: String) async throws -> [IslandEntity] {
@@ -43,9 +67,15 @@ struct IslandEntityQuery: EntityStringQuery {
     }
 
     func suggestedEntities() async throws -> [IslandEntity] {
-        curatedIslandIds.compactMap { id in
+        [.matchApp] + curatedIslandIds.compactMap { id in
             PrayerData.island(for: id).map { IslandEntity(id: $0.islandId, atoll: $0.atoll, name: $0.island) }
         }
+    }
+
+    /// The value WidgetKit uses for this parameter before the user has
+    /// ever explicitly configured it - see IslandEntity.matchApp's comment.
+    func defaultResult() async -> IslandEntity? {
+        .matchApp
     }
 }
 
@@ -106,22 +136,23 @@ enum WidgetLanguage: String, AppEnum {
     ]
 }
 
-/// Island is optional and unset by default: leaving it unset means "match
-/// whatever island the app itself currently has selected" (via the shared
-/// App Group data lib/widgetSync.ts writes - see
-/// PrayerData.appSelectedIslandId()). Picking one explicitly here, in the
-/// widget's own edit UI (long-press -> Edit Widget), overrides that and
-/// pins the widget to that island regardless of what the app is set to.
-/// Language remains its own independent widget-only setting, since the
-/// widget has no way to read the app's language choice.
+/// Island defaults to IslandEntity.matchApp (via IslandEntityQuery's
+/// defaultResult()), which means "match whatever island the app itself
+/// currently has selected" (via the shared App Group data
+/// lib/widgetSync.ts writes - see PrayerData.appSelectedIslandId()).
+/// Picking a real island explicitly here, in the widget's own edit UI
+/// (long-press -> Edit Widget), overrides that and pins the widget to
+/// that island regardless of what the app is set to. Language remains its
+/// own independent widget-only setting, since the widget has no way to
+/// read the app's language choice.
 struct SelectIslandIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Select Island"
     static var description = IntentDescription(
-        "Choose which island's prayer times to show, and the display language. Leave Island unset to always match the island currently selected in the app."
+        "Choose which island's prayer times to show, and the display language. Leave Island as \"Match App Selection\" to always match the island currently selected in the app."
     )
 
     @Parameter(title: "Island")
-    var island: IslandEntity?
+    var island: IslandEntity
 
     @Parameter(title: "Language", default: .en)
     var language: WidgetLanguage
@@ -164,11 +195,15 @@ struct PrayerProvider: AppIntentTimelineProvider {
     }
 
     /// Whatever island was explicitly picked in the widget's own
-    /// configuration wins; otherwise fall back to the app's own current
-    /// selection, and only fall back further to K. Male' if neither is
+    /// configuration wins; "Match App Selection" (the default - see
+    /// IslandEntity.matchApp) instead falls back to the app's own current
+    /// selection, and only falls back further to K. Male' if neither is
     /// available yet (e.g. a fresh install, before onboarding has run).
     private func resolvedIslandId(for configuration: SelectIslandIntent) -> Int {
-        configuration.island?.id ?? PrayerData.appSelectedIslandId() ?? PrayerData.defaultIslandId
+        if !configuration.island.isMatchApp {
+            return configuration.island.id
+        }
+        return PrayerData.appSelectedIslandId() ?? PrayerData.defaultIslandId
     }
 
     private func makeEntry(for configuration: SelectIslandIntent, on date: Date) -> PrayerEntry {
