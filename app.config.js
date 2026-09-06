@@ -137,6 +137,10 @@ module.exports = {
     },
     extra: {
       iosAppGroupId: IOS_APP_GROUP_ID,
+      eas: {
+        projectId: '5eec6b7b-3abb-4f79-9a83-d2ca5aa0dfbe',
+      },
     },
+    owner: 'locallymv',
   },
 };
