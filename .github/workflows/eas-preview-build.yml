@@ -1,11 +1,18 @@
-name: EAS iOS preview build (ad-hoc device testing)
+name: EAS preview build (ad-hoc device testing)
 
 # On-demand alternative to ios-build.yml's unsigned SideStore archive: this
 # one hands the build off to EAS Build's cloud infra using the "preview"
 # profile in eas.json (distribution: internal, ios.simulator: false), then
 # posts the resulting expo.dev build page link to this run's step summary
 # so it's a single tap away on your phone - open it there and hand the IPA
-# link to SideStore.
+# link to SideStore (Android's .apk installs directly, no extra tool needed).
+#
+# Builds both platforms as separate matrix legs (fail-fast: false) so an
+# iOS failure never masks/blocks the Android leg, or vice versa. iOS
+# requires an Apple Developer team linked to the EAS account's credentials
+# (`eas credentials`, run interactively) - until that's set up, the iOS leg
+# will fail at the credentials step while Android (which EAS can sign with
+# an auto-generated keystore, no external account needed) still succeeds.
 #
 # Required repo secret (Settings -> Secrets and variables -> Actions ->
 # Secrets tab):
@@ -31,6 +38,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [android, ios]
 
     steps:
       - name: Checkout
@@ -51,8 +62,10 @@ jobs:
       - name: Install JS dependencies
         run: npm ci
 
-      - name: Run EAS Build (iOS, preview profile)
-        run: eas build --platform ios --profile preview --non-interactive | tee eas-build.log
+      - name: Run EAS Build (${{ matrix.platform }}, preview profile)
+        run: |
+          set -o pipefail
+          eas build --platform ${{ matrix.platform }} --profile preview --non-interactive | tee eas-build.log
 
       - name: Post build link to step summary
         if: always()
@@ -61,13 +74,13 @@ jobs:
           URL=$(grep -Eo 'https://expo\.dev/accounts/[^ ]+/builds/[a-zA-Z0-9-]+' eas-build.log | tail -n1 || true)
 
           {
-            echo "## EAS iOS preview build"
+            echo "## EAS ${{ matrix.platform }} preview build"
             echo
             if [ -n "$URL" ]; then
               echo "**Build page:** $URL"
               echo
-              echo "Open this on your phone and hand it to SideStore."
+              echo "Open this on your phone - hand an iOS build to SideStore, or install an Android .apk directly."
             else
-              echo "Couldn't find a build URL in the EAS CLI output above - the build step's log (or \`eas build:list --platform ios --limit 1\`) has the details."
+              echo "Couldn't find a build URL in the EAS CLI output above - the build step's log (or \`eas build:list --platform ${{ matrix.platform }} --limit 1\`) has the details."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
