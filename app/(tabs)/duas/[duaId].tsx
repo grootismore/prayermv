@@ -103,6 +103,13 @@ export default function DuaReadingScreen() {
         >
           <Ionicons name="chevron-back" size={24} color={colors.primary} />
         </Pressable>
+        {currentIndex >= 0 && siblings.length > 0 ? (
+          <View style={styles.positionPill}>
+            <Text style={styles.positionPillText}>
+              {currentIndex + 1} | {siblings.length}
+            </Text>
+          </View>
+        ) : null}
         <Text style={styles.headerTitle} numberOfLines={1}>
           {titleText}
         </Text>
@@ -163,41 +170,32 @@ export default function DuaReadingScreen() {
             arabicFontSize={preferences.arabicFontSize}
           />
         ) : (
-          <>
-            <SurfaceCard elevated style={styles.arabicCard}>
-              <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} />
-            </SurfaceCard>
+          <SurfaceCard elevated style={styles.arabicCard}>
+            <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} align="center" />
 
             {preferences.showTransliteration ? (
               <Text style={styles.transliteration}>{dua.transliteration}</Text>
             ) : null}
-          </>
+
+            <Text style={styles.translation}>{translationText}</Text>
+
+            <View style={styles.sourceRow}>
+              <View style={styles.sourceAccent} />
+              <Text style={styles.sourceText}>
+                {dua.source.reference}
+                {dua.source.grading ? ` · ${dua.source.grading}` : ''}
+              </Text>
+            </View>
+          </SurfaceCard>
         )}
-
-        <NoorDivider compact />
-
-        <Text style={styles.sectionLabel}>{t('duas.meaning')}</Text>
-        <Text style={styles.translation}>{translationText}</Text>
 
         {benefitsText ? (
           <>
+            <NoorDivider compact />
             <Text style={styles.sectionLabel}>{t('duas.benefits')}</Text>
-            <Text style={styles.translation}>{benefitsText}</Text>
+            <Text style={styles.benefitsText}>{benefitsText}</Text>
           </>
         ) : null}
-
-        <View style={styles.sourceRow}>
-          <Ionicons
-            name={dua.source.type === 'quran' ? 'book-outline' : 'library-outline'}
-            size={16}
-            color={colors.textMuted}
-          />
-          <Text style={styles.sourceText}>
-            {dua.source.reference}
-            {dua.source.grading ? ` · ${dua.source.grading}` : ''}
-          </Text>
-        </View>
-
       </ScrollView>
 
       <View style={[styles.navRow, { paddingBottom: insets.bottom + spacing.sm }]}>
@@ -257,8 +255,23 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.textPrimary,
       textAlign: 'center',
     },
+    positionPill: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+      borderRadius: radius.pill,
+      backgroundColor: colors.surfaceElevated,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    positionPillText: {
+      fontSize: typography.size.xs,
+      fontWeight: typography.weight.bold,
+      color: colors.textSecondary,
+      fontVariant: ['tabular-nums'],
+    },
     arabicCard: {
-      paddingVertical: spacing.lg,
+      paddingVertical: spacing.xl,
+      paddingHorizontal: spacing.lg,
     },
     fontSizeRow: {
       flexDirection: 'row',
@@ -297,7 +310,8 @@ const createStyles = (colors: ThemeColors) =>
       textAlign: 'center',
     },
     transliteration: {
-      marginTop: spacing.sm,
+      marginTop: spacing.md,
+      textAlign: 'center',
       fontSize: typography.size.md,
       fontStyle: 'italic',
       color: colors.textSecondary,
@@ -312,6 +326,13 @@ const createStyles = (colors: ThemeColors) =>
       marginBottom: spacing.xxs,
     },
     translation: {
+      marginTop: spacing.md,
+      textAlign: 'center',
+      fontSize: typography.size.md,
+      color: colors.textPrimary,
+      lineHeight: typography.size.md * 1.6,
+    },
+    benefitsText: {
       fontSize: typography.size.md,
       color: colors.textPrimary,
       lineHeight: typography.size.md * 1.6,
@@ -319,13 +340,19 @@ const createStyles = (colors: ThemeColors) =>
     sourceRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xxs,
-      marginTop: spacing.md,
+      justifyContent: 'center',
+      gap: spacing.xs,
+      marginTop: spacing.lg,
+    },
+    sourceAccent: {
+      width: 3,
+      height: 14,
+      borderRadius: 2,
+      backgroundColor: colors.primary,
     },
     sourceText: {
-      fontSize: typography.size.sm,
+      fontSize: typography.size.xs,
       color: colors.textMuted,
-      fontStyle: 'italic',
     },
     navRow: {
       flexDirection: 'row',
