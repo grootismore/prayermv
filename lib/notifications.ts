@@ -3,8 +3,13 @@ import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundTask from 'expo-background-task';
 
-import { getTodayPrayerTimes, NOTIFIABLE_PRAYERS, type PrayerName } from './prayerTimes';
-import { loadSelectedIslandId, loadNotificationPrefs, type NotificationPrefs } from './storage';
+import { getTodayPrayerTimes, getTodayPrayerWindows, NOTIFIABLE_PRAYERS, type PrayerName } from './prayerTimes';
+import {
+  loadSelectedIslandId,
+  loadNotificationPrefs,
+  loadEndingReminderPrefs,
+  type NotificationPrefs,
+} from './storage';
 import i18n from './i18n';
 
 export const BACKGROUND_RESCHEDULE_TASK = 'prayermv-daily-reschedule';
@@ -65,6 +70,7 @@ export async function rescheduleTodayNotifications(): Promise<void> {
   if (islandId == null) return;
 
   const prefs = await loadNotificationPrefs();
+  const endingReminderPrefs = await loadEndingReminderPrefs();
   await Notifications.cancelAllScheduledNotificationsAsync();
 
   const granted = await Notifications.getPermissionsAsync();
@@ -90,6 +96,35 @@ export async function rescheduleTodayNotifications(): Promise<void> {
         channelId: ADHAN_CHANNEL_ID,
       },
     });
+  }
+
+  if (endingReminderPrefs.enabled) {
+    const windows = getTodayPrayerWindows(islandId);
+
+    for (const window of windows) {
+      if (!prefs[window.call as Exclude<PrayerName, 'sunrise'>]) continue;
+
+      const reminderDate = new Date(window.end.getTime() - endingReminderPrefs.minutesBefore * 60_000);
+      if (reminderDate.getTime() <= now.getTime()) continue;
+      // Guards against a configured lead time longer than the window itself
+      // (e.g. Asr-to-Maghrib can run under 20 minutes near the equator in
+      // some seasons) firing the reminder before the prayer has even started.
+      if (reminderDate.getTime() <= window.start.getTime()) continue;
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: i18n.t('settings.endingSoonTitle', { prayer: i18n.t(`prayers.${window.call}`) }),
+          body: i18n.t('settings.endingSoonBody', {
+            prayer: i18n.t(`prayers.${window.call}`),
+            minutes: endingReminderPrefs.minutesBefore,
+          }),
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: reminderDate,
+        },
+      });
+    }
   }
 }
 

@@ -94,7 +94,16 @@
     "testAdhanButton": "إرسال أذان تجريبي خلال 5 ثوانٍ",
     "testAdhanScheduled": "تمت الجدولة - أغلق الشاشة أو بدّل التطبيقات لسماعه.",
     "testAdhanTitle": "أذان تجريبي",
-    "testAdhanBody": "هذا إشعار تجريبي بصوت الأذان."
+    "testAdhanBody": "هذا إشعار تجريبي بصوت الأذان.",
+    "endingReminder": "تذكير قبل انتهاء الوقت",
+    "endingReminderSubtitle": "احصل على تنبيه قبل دقائق من انتهاء وقت كل صلاة مفعّلة",
+    "endingReminderLabel": "ذكّرني قبل انتهاء الوقت",
+    "endingReminderMinutesOption": "{{count}} دقيقة",
+    "endingSoonTitle": "ينتهي وقت {{prayer}} قريبًا",
+    "endingSoonBody": "تبقّى {{minutes}} دقيقة لأداء صلاة {{prayer}}",
+    "toastEndingReminderOn": "تم تشغيل تذكير انتهاء الوقت",
+    "toastEndingReminderOff": "تم إيقاف تذكير انتهاء الوقت",
+    "toastEndingReminderMinutesChanged": "تم ضبط التذكير على {{minutes}} دقيقة قبل الانتهاء"
   },
   "languages": {
     "en": "الإنجليزية",

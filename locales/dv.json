@@ -94,7 +94,16 @@
     "testAdhanButton": "5 ސިކުންތުގައި ޓެސްޓް ބަންގި ފޮނުވާ",
     "testAdhanScheduled": "ތާވަލުކުރެވިއްޖެ - އަޑުއިވޭތޯ ބައްލަވާ.",
     "testAdhanTitle": "ޓެސްޓް ބަންގި",
-    "testAdhanBody": "މިއީ ބަންގީގެ އަޑުން ފޮނުވި ޓެސްޓް އިޝްޢާރެއް."
+    "testAdhanBody": "މިއީ ބަންގީގެ އަޑުން ފޮނުވި ޓެސްޓް އިޝްޢާރެއް.",
+    "endingReminder": "ވަގުތު ހަމަވުމުގެ ހަނދާންކޮށްދިނުން",
+    "endingReminderSubtitle": "ހުއްދަދީފައިވާ ނަމާދުތަކުގެ ވަގުތު ހަމަވުމުގެ ކުޑަ ވަގުތުކޮޅެއް ކުރިން ހަނދާންކޮށްދޭނެ",
+    "endingReminderLabel": "ވަގުތު ހަމަވުމުގެ ކުރިން ހަނދާންކޮށްދީ",
+    "endingReminderMinutesOption": "{{count}} މިނިޓް",
+    "endingSoonTitle": "{{prayer}} ވަގުތު ހަމަވަނީ",
+    "endingSoonBody": "{{prayer}} ނަމާދު ކުރުމަށް {{minutes}} މިނިޓް ބާކީ އެބައޮތް",
+    "toastEndingReminderOn": "ވަގުތު ހަމަވުމުގެ ހަނދާންކޮށްދިނުން ޖައްސައިފި",
+    "toastEndingReminderOff": "ވަގުތު ހަމަވުމުގެ ހަނދާންކޮށްދިނުން ނިއްވާލައިފި",
+    "toastEndingReminderMinutesChanged": "ހަނދާންކޮށްދޭ ވަގުތު {{minutes}} މިނިޓަށް ބަދަލުކުރެވިއްޖެ"
   },
   "languages": {
     "en": "އިނގިރޭސި",

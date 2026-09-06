@@ -17,10 +17,23 @@ export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
   isha: true,
 };
 
+export interface EndingReminderPrefs {
+  enabled: boolean;
+  minutesBefore: number;
+}
+
+export const ENDING_REMINDER_MINUTES_OPTIONS = [5, 10, 15, 20] as const;
+
+export const DEFAULT_ENDING_REMINDER_PREFS: EndingReminderPrefs = {
+  enabled: false,
+  minutesBefore: 15,
+};
+
 const KEYS = {
   islandId: 'prayermv.islandId',
   language: 'prayermv.language',
   notificationPrefs: 'prayermv.notificationPrefs',
+  endingReminderPrefs: 'prayermv.endingReminderPrefs',
   qiblaHapticsEnabled: 'prayermv.qiblaHapticsEnabled',
   calendarMode: 'prayermv.calendarMode',
   themeMode: 'prayermv.themeMode',
@@ -56,6 +69,20 @@ export async function loadNotificationPrefs(): Promise<NotificationPrefs> {
 
 export async function saveNotificationPrefs(prefs: NotificationPrefs): Promise<void> {
   await AsyncStorage.setItem(KEYS.notificationPrefs, JSON.stringify(prefs));
+}
+
+export async function loadEndingReminderPrefs(): Promise<EndingReminderPrefs> {
+  const raw = await AsyncStorage.getItem(KEYS.endingReminderPrefs);
+  if (!raw) return DEFAULT_ENDING_REMINDER_PREFS;
+  try {
+    return { ...DEFAULT_ENDING_REMINDER_PREFS, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_ENDING_REMINDER_PREFS;
+  }
+}
+
+export async function saveEndingReminderPrefs(prefs: EndingReminderPrefs): Promise<void> {
+  await AsyncStorage.setItem(KEYS.endingReminderPrefs, JSON.stringify(prefs));
 }
 
 export async function loadQiblaHapticsEnabled(): Promise<boolean> {

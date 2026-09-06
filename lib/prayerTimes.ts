@@ -24,6 +24,12 @@ export interface PrayerTimeEntry {
   string: string;
 }
 
+export interface PrayerWindow {
+  call: PrayerName;
+  start: Date;
+  end: Date;
+}
+
 export interface AtollGroup {
   atollId: number;
   atoll: string;
@@ -163,6 +169,28 @@ export function getPrayerTimesForDate(islandId: number, date: Date): PrayerTimeE
 /** Today's prayer times for an island, in display order (Fajr through Isha). */
 export function getTodayPrayerTimes(islandId: number): PrayerTimeEntry[] {
   return getPrayerTimesForDate(islandId, new Date());
+}
+
+/**
+ * Today's notifiable prayers, each with the window's start and end time -
+ * "end" being when the next entry in PRAYER_ORDER begins (Fajr ends at
+ * Sunrise, Dhuhr ends at Asr, and so on). Isha has no later entry today, so
+ * its window ends at tomorrow's Fajr.
+ */
+export function getTodayPrayerWindows(islandId: number): PrayerWindow[] {
+  const today = getPrayerTimesForDate(islandId, new Date());
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowFajr = getPrayerTimesForDate(islandId, tomorrow).find((entry) => entry.call === 'fajr')!;
+
+  const windows: PrayerWindow[] = [];
+  for (let i = 0; i < today.length; i++) {
+    const entry = today[i];
+    if (!NOTIFIABLE_PRAYERS.includes(entry.call)) continue;
+    const nextEntry = today[i + 1] ?? tomorrowFajr;
+    windows.push({ call: entry.call, start: entry.date, end: nextEntry.date });
+  }
+  return windows;
 }
 
 /** The next upcoming prayer (or sunrise) for an island, relative to now. */
