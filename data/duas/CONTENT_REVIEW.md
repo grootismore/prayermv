@@ -67,10 +67,12 @@ Not every one of the dataset's 1,001 entries became a `Dua` here:
    introduced here).
 
 **844 of the original 1,001 entries survived this pipeline** and are what
-ships in `data/duas/content/*.ts`. The three previously-hand-curated
+originally shipped in `data/duas/content/*.ts`. The three previously-hand-curated
 Quranic entries (Ayat al-Kursi, the last two verses of Al-Baqarah, the
 Three Quls) are included among these 844 via the dataset's own Quranic
-entries rather than the earlier bespoke ones.
+entries rather than the earlier bespoke ones. **See the "Follow-up" section
+below** - a second corruption pass later found and removed more entries,
+so the currently-shipping count is lower than 844.
 
 ### What this pipeline does *not* catch
 
@@ -97,6 +99,66 @@ into `segments` at this volume was not something this pass attempted.
 Revisiting that (as was done by hand for the old `prayer-tasbih-hundred`
 entry) would be a good follow-up for the highest-traffic categories
 (`morning-and-evening`, `salah`).
+
+## Follow-up: a second, much larger Dhivehi corruption found (Sept 2026)
+
+A user report - "Toilet Dua translated to thirst dua" - turned out to be
+one symptom of a far bigger version of the same upstream bug described in
+step 3 of the filtering pipeline above. That automated check only ran
+against Arabic strings opening with a handful of recognizable formulas; it
+missed a large contiguous run of the dataset's own numbering, roughly ids
+140-284, where the same swap pattern recurs but the Arabic doesn't start
+with one of the checked formulas. Manual side-by-side reading of the
+English and Dhivehi fields for that id range (both the `translation` and,
+critically, the dataset's own `title`/`introduction`/`benefits` copy, which
+turned out to carry the same swap and confirms it's a bug in the source
+JSON itself, not just this app's extraction) found:
+
+- **`toilet`**: masnun-161's Dhivehi title and translation belonged to an
+  unrelated Ramadan iftar dua. Fixed by hand - `title.dv` and
+  `translation.dv` now correctly render "Dua for Leaving the Toilet" /
+  `غُفْرَانَكَ` ("I ask You for forgiveness").
+- **`cloths`, `adhaan-and-iqamah`, `ablution-and-bath`, `mosque`**: every
+  single entry in all four categories had Dhivehi content swapped with an
+  unrelated dua (predominantly Quranic prophet-story duas - Ibrahim's dua
+  for his father, Zakariyya's dua for a child, Musa's dua against
+  Pharaoh's people, Yunus's and Ayyub's duas). No correct Dhivehi text
+  existed anywhere else in the dataset to substitute in. All entries in
+  these four categories were removed, which leaves each category with zero
+  duas - so the categories themselves were removed from `DUA_CATEGORIES`
+  and their now-empty content files deleted, rather than shipping an empty
+  category screen.
+- **`home`**: both entries (masnun-156 "leaving the house", masnun-158
+  "before entering home") had their entire Dhivehi side - title,
+  translation, hadith, benefits - swapped with an unrelated rain/istisqa
+  dua, confirmed by checking the raw dataset JSON directly (not just this
+  app's extracted fields). No correct Dhivehi duplicate exists elsewhere in
+  the dataset. Both entries were removed and the now-empty `home` category
+  was removed the same way as the four above.
+- **`salah`**: shrank from 68 entries to 11. Two of the removed-then-fixed
+  entries, masnun-254 (Ayat al-Kursi) and masnun-255 (the three Quls),
+  turned out to have an exact correct Dhivehi duplicate already shipped
+  elsewhere in the app (`morning-and-evening.ts`'s masnun-96/97, which
+  cover the same verses for the morning/evening adhkar context) - that
+  verified text was copied over rather than the entries being dropped. The
+  other 57 flagged entries had no such duplicate and were removed.
+- **`witr-and-other`**: shrank from 9 to 5 entries on the same basis; the 4
+  removed had no correct Dhivehi text available anywhere in the dataset.
+
+This means **5 categories were removed outright** (cloths, home,
+adhaan-and-iqamah, ablution-and-bath, mosque) and the app now ships **761
+duas across 39 categories** (down from 844 across 44). This is a
+deliberate coverage-vs-correctness tradeoff consistent with the rest of
+this document: an empty category is a worse outcome for users than it
+sounds, but a wrong Dhivehi religious translation is worse still, and
+there was no source of correct Dhivehi text to recover these entries with.
+Backfilling `cloths`/`home`/`adhaan-and-iqamah`/`ablution-and-bath`/`mosque`
+with fresh, independently-verified content (rather than this dataset's
+corrupted entries) would be a reasonable follow-up.
+
+Also fixed in the same pass: the cross-screen "favourite not appearing
+right away" bug reported alongside the translation issue - unrelated to
+this content dataset, see `hooks/useDuaFavourites.ts`.
 
 ## What needs review, specifically
 
