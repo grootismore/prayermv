@@ -86,7 +86,17 @@ module.exports = {
       [
         'expo-notifications',
         {
-          icon: './assets/icon.png',
+          // Android's status-bar notification icon must be a plain white
+          // silhouette on a transparent background - Android ignores color
+          // info and derives the shape from the alpha channel only, so
+          // pointing this at the full-color launcher icon (as it was)
+          // renders as an unrecognizable solid blob rather than the Noor+
+          // mark. Reusing the adaptive icon's monochrome layer here since
+          // it's already exactly that: the same mark, already prepared as
+          // a white-on-transparent silhouette. (iOS always shows the app's
+          // actual icon for notifications - there's no separate small icon
+          // to configure there.)
+          icon: './assets/android-icon-monochrome.png',
           color: '#13E2E6',
           ...(adhanSoundExists ? { sounds: [ADHAN_SOUND_RELATIVE_PATH] } : {}),
         },
