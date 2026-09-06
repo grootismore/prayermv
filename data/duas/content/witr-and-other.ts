@@ -5,44 +5,6 @@ import type { Dua } from '../../../types/dua';
 // and the human-review requirement that still applies to every item here.
 export const WITR_AND_OTHER_DUAS: Dua[] = [
   {
-    id: 'masnun-275',
-    type: 'dua',
-    categoryId: 'witr-and-other',
-    title: { en: 'Dua after Witr Namaz (Allahumma Inni a\'uzu Bi Ridaka)', dv: 'ރައްބަނާ ދުޢާ (٥٩) - ނޫރު ފުރިހަމަކޮށްދެއްވުން އެދި' },
-    arabic: 'اَللَّهُمَّ إِنِّي أَعُوْذُ بِرِضَاكَ مِنْ سَخَطِكَ، وَبِمُعَافَاتِكَ مِنْ عُقُوبَتِكَ، وَأَعُــوذُ بِكَ مِنْكَ، لَا أُحْصِيْ ثَنَاءً عَلَيْكَ، أَنْتَ كَمَا أَثْنَيْتَ عَلَى نَفْسِكَ',
-    transliteration: 'Allaahumma \'innee \'a\'oodhu biridhaaka min sakhatik, wa bimu\'aafaatika min \'uqoobatik wa \'a\'oodhu bika minka, laa \'uhsee thanaa\'an \'alayka \'Anta kamaa \'athnayta \'alaa nafsik',
-    translation: {
-      en: 'O Allah, I seek refuge with Your Pleasure from Your anger. I seek refuge in Your forgiveness from Your punishment. I seek refuge in You from You. I cannot count Your praises, You are as You have praised Yourself.\n\nAli (RA) said, Rasulullah (ﷺ) used to say the words at the end of Witr prayer. The end of Witr prayer here is not clearly stated before the salaam or after the salaam. Therefore, a believer can recite this dua at the end of Salatul Witr prayer before Salaam or after Salaam.',
-      dv: 'އަޅަމެންގެ ވެރިރަސްކަލާނކޮ! އަޅަމެންނަށް، އަޅަމެންގެ ނޫރު ފުރިހަމަކޮށްދެއްވާނދޭވެ! އަދި އަޅަމެންނަށް ފާފަ ފުއްސަވާނދޭވެ! ހަމަކަށަވަރުން، އިބަރަސްކަލާނގެއީ، ކޮންމެ ކަމެއްގެ މައްޗަށް ކުޅަދުންވަންތަ ރަސްކަލާނގެއެވެ.',
-    },
-    source: { type: 'hadith', reference: 'Sahih. Abu Dawud: 1427' },
-    contentReview: {
-      arabicVerified: false,
-      transliterationVerified: false,
-      translationVerified: { en: false, dv: false },
-      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
-    },
-  },
-  {
-    id: 'masnun-276',
-    type: 'dua',
-    categoryId: 'witr-and-other',
-    title: { en: 'Dua after witr salah (Rabbul-mala\'ikati war ruh)', dv: 'ރައްބަނާ ދުޢާ (٦٠) - ސުވަރުގޭގެ ގަނޑުވަރަކަށް އެދި (އާސިޔާގެފާނުގެ ދުޢާ)' },
-    arabic: 'رَبُّ الْمَلَائِكَةِ وَالرُّوحِ',
-    transliteration: 'Rabbul-malaa\'ikati warrooh',
-    translation: {
-      en: 'Lord of the angels and the Spirit.',
-      dv: 'މިއަޅާގެ ވެރިރަސްކަލާނކޮ! އިބަރަސްކަލާނގެ ޙަޟްރަތުގައި، ސުވަރުގޭގައި މިއަޅާއަށްޓަކައި ގެއެއް ބިނާކޮށްދެއްވާނދޭވެ! އަދި ފިރުޢައުނާއި، އޭނާގެ ޢަމަލުތަކުން މިއަޅާ ސަލާމަތްކުރައްވާނދޭވެ! އަދި އަނިޔާވެރި ޤައުމުގެ މީހުންގެ ކިބައިންވެސް މިއަޅާ ސަލާމަތްކުރައްވާނދޭވެ!',
-    },
-    source: { type: 'hadith', reference: 'Sunan Daraqutni 2/31, Mu\'jamul Awsat 8/108, Sunan Bayhaqi 3/40' },
-    contentReview: {
-      arabicVerified: false,
-      transliterationVerified: false,
-      translationVerified: { en: false, dv: false },
-      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
-    },
-  },
-  {
     id: 'masnun-278',
     type: 'dua',
     categoryId: 'witr-and-other',
@@ -100,25 +62,6 @@ export const WITR_AND_OTHER_DUAS: Dua[] = [
     },
   },
   {
-    id: 'masnun-281',
-    type: 'dua',
-    categoryId: 'witr-and-other',
-    title: { en: 'Dua before Tahajjud (Last 10 verses of Surah AL Imran)', dv: 'ތަހައްޖުދުގެ ކުރިން ކިޔާ ދުޢާ (އާލު ޢިމްރާންގެ ފަހު ١٠ އާޔަތް)' },
-    arabic: 'إِنَّ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ وَاخْتِلَافِ اللَّيْلِ وَالنَّهَارِ لَآيَاتٍ لِّأُولِي الْأَلْبَابِ ﴿١٩٠﴾ الَّذِينَ يَذْكُرُونَ اللَّـهَ قِيَامًا وَقُعُودًا وَعَلَىٰ جُنُوبِهِمْ وَيَتَفَكَّرُونَ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ رَبَّنَا مَا خَلَقْتَ هَـٰذَا بَاطِلًا سُبْحَانَكَ فَقِنَا عَذَابَ النَّارِ ﴿١٩١﴾ رَبَّنَا إِنَّكَ مَن تُدْخِلِ النَّارَ فَقَدْ أَخْزَيْتَهُ ۖ وَمَا لِلظَّالِمِينَ مِنْ أَنصَارٍ ﴿١٩٢﴾ رَّبَّنَا إِنَّنَا سَمِعْنَا مُنَادِيًا يُنَادِي لِلْإِيمَانِ أَنْ آمِنُوا بِرَبِّكُمْ فَآمَنَّا ۚ رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ ﴿١٩٣﴾ رَبَّنَا وَآتِنَا مَا وَعَدتَّنَا عَلَىٰ رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ الْقِيَامَةِ ۗ إِنَّكَ لَا تُخْلِفُ الْمِيعَادَ ﴿١٩٤﴾فَاسْتَجَابَ لَهُمْ رَبُّهُمْ أَنِّي لَا أُضِيعُ عَمَلَ عَامِلٍ مِّنكُم مِّن ذَكَرٍ أَوْ أُنثَىٰ ۖ بَعْضُكُم مِّن بَعْضٍ ۖ فَالَّذِينَ هَاجَرُوا وَأُخْرِجُوا مِن دِيَارِهِمْ وَأُوذُوا فِي سَبِيلِي وَقَاتَلُوا وَقُتِلُوا لَأُكَفِّرَنَّ عَنْهُمْ سَيِّئَاتِهِمْ وَلَأُدْخِلَنَّهُمْ جَنَّاتٍ تَجْرِي مِن تَحْتِهَا الْأَنْهَارُ ثَوَابًا مِّنْ عِندِ اللَّـهِ ۗ وَاللَّـهُ عِندَهُ حُسْنُ الثَّوَابِ ﴿١٩٥﴾ لَا يَغُرَّنَّكَ تَقَلُّبُ الَّذِينَ كَفَرُوا فِي الْبِلَادِ ﴿١٩٦﴾ مَتَاعٌ قَلِيلٌ ثُمَّ مَأْوَاهُمْ جَهَنَّمُ ۚ وَبِئْسَ الْمِهَادُ ﴿١٩٧﴾ لَـٰكِنِ الَّذِينَ اتَّقَوْا رَبَّهُمْ لَهُمْ جَنَّاتٌ تَجْرِي مِن تَحْتِهَا الْأَنْهَارُ خَالِدِينَ فِيهَا نُزُلًا مِّنْ عِندِ اللَّـهِ ۗ وَمَا عِندَ اللَّـهِ خَيْرٌ لِّلْأَبْرَارِ ﴿١٩٨﴾ وَإِنَّ مِنْ أَهْلِ الْكِتَابِ لَمَن يُؤْمِنُ بِاللَّـهِ وَمَا أُنزِلَ إِلَيْكُمْ وَمَا أُنزِلَ إِلَيْهِمْ خَاشِعِينَ لِلَّـهِ لَا يَشْتَرُونَ بِآيَاتِ اللَّـهِ ثَمَنًا قَلِيلًا ۗ أُولَـٰئِكَ لَهُمْ أَجْرُهُمْ عِندَ رَبِّهِمْ ۗ إِنَّ اللَّـهَ سَرِيعُ الْحِسَابِ ﴿١٩٩﴾ يَا أَيُّهَا الَّذِينَ آمَنُوا اصْبِرُوا وَصَابِرُوا وَرَابِطُوا وَاتَّقُوا اللَّـهَ لَعَلَّكُمْ تُفْلِحُونَ ﴿٢٠٠﴾',
-    transliteration: 'Inna fee khalqis-samaawaati wal-ardi wakhtilaafil-layli wan-nahaari la-aayaatil-li-ulil-albaab. Allazeena yazkuroonallaaha qiyaaman wa qu\'oodan wa \'alaa junoobihim wa yatafakkaroona fee khalqis-samaawaati wal-ardi Rabbanaa maa khalaqta haazaa baatilan Subhaanaka faqinaa \'azaaban-Naar. Rabbanaa innaka man tudkhilin-Naara faqad akhzaitahoo wa maa lizzaalimeena min ansaar. Rabbanaa innanaa sami\'naa munaadiyan yunaadee lil-eemaani an aaminoo bi-Rabbikum fa-aamannaa; Rabbanaa faghfir lanaa zunoobanaa wa kaffir \'annaa sayyi-aatinaa wa tawaffanaa ma\'al-abraar. Rabbanaa wa aatinaa maa wa\'adtanaa \'alaa rusulika wa laa tukhzinaa Yawmal-Qiyaamah; innaka laa tukhliful-mee\'aad. Fastajaaba lahum Rabbuhum annee laaa udee\'u \'amala \'aamilim-minkum min zakarin aw unthaa; ba\'dukum min ba\'d; fallazeena haajaroo wa ukhrijoo min diyaarihim wa oozoo fee sabeelee wa qaataloo wa qutiloo la-ukaffiranna \'anhum sayyi-aatihim wa la-udkhilannahum jannaatin tajree min tahtihal-anhaar; thawaaban min \'indillaah; wallaahu \'indahoo husnuth-thawaab. Laa yaghurrannaka taqallubul-lazeena kafaroo fil-bilaad. Mataa\'un qaleelun thumma ma\'waahum Jahannamu wa bi\'sal-mihaad. Laakinil-lazeena-ttaqaw Rabbahum lahum jannaatun tajree min tahtihal-anhaaru khaalideena feehaa nuzulan min \'indillaah; wa maa \'indallaahi khairul-lil-abraar. Wa inna min Ahlil-Kitaabi laman yu\'minu billaahi wa maaa unzila ilaikum wa maaa unzila ilaihim khaashi\'eena lillaahi laa yashtaroona bi-aayaatillaahi thamanan qaleelaa; ulaaa\'ika lahum ajruhum \'inda Rabbihim; innallaaha saree\'ul-hisaab. Yaaa ayyuhal-lazeena aamanus-biroo wa saabiroo wa raabitoo wattaqullaaha la\'allakum tuflihoon.',
-    translation: {
-      en: '(190) Indeed, in the creation of the heavens and the earth and the alternation of the night and the day are signs for those of understanding. (191) Who remember Allah while standing or sitting or [lying] on their sides and give thought to the creation of the heavens and the earth, [saying], "Our Lord, You did not create this aimlessly; exalted are You [above such a thing]; then protect us from the punishment of the Fire. (192) Our Lord, indeed whoever You admit to the Fire - You have disgraced him, and for the wrongdoers there are no helpers. (193) Our Lord, indeed we have heard a caller calling to faith, [saying], \'Believe in your Lord,\' and we have believed. Our Lord, so forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (194) Our Lord, and grant us what You promised us through Your messengers and do not disgrace us on the Day of Resurrection. Indeed, You do not fail in [Your] promise." (195) And their Lord responded to them, "Never will I allow to be lost the work of [any] worker among you, whether male or female; you are of one another. So those who emigrated or were evicted from their homes or were harmed in My cause or fought or were killed - I will surely remove from them their misdeeds, and I will surely admit them to gardens beneath which rivers flow as reward from Allah, and Allah has with Him the best reward." (196) Be not deceived by the [uninhibited] movement of the disbelievers throughout the land. (197) [It is but] a small enjoyment; then their [final] refuge is Hell, and wretched is the resting place. (198) But those who feared their Lord will have gardens beneath which rivers flow, abiding eternally therein, as accommodation from Allah . And that which is with Allah is best for the righteous. (199) And indeed, among the People of the Scripture are those who believe in Allah and what was revealed to you and what was revealed to them, [being] humbly submissive to Allah . They do not exchange the verses of Allah for a small price. Those will have their reward with their Lord. Indeed, Allah is swift in account. (200) O you who have believed, persevere and endure and remain stationed and fear Allah that you may be successful. (Surah Al-Imran 3:190-200)\n\nIn another narration, The Prophet (ﷺ) used to get up from his bed and look at the sky and recite the first five verses of the last Ruku\' of Surah Ali-Imran. [2]',
-      dv: 'ހަމަކަށަވަރުން، އުޑުތަކާއި ބިން ހެއްދެވުމުގައްޔާއި، ރޭދުވާ ތަފާތުވުމުގައި، ބުއްދިވެރިންނަށް ކަށަވަރުވެގެންވާ ހެކިތަކެއް ވެއެވެ. (ޚާއްޞަކޮށް މި ދުޢާ): "އަޅަމެންގެ ވެރިރަސްކަލާނކޮ! އިބަރަސްކަލާނގެ މިތަކެތި ހެއްދެވީ ބާޠިލު ގޮތުގައެއް ނޫނެވެ. އިބަރަސްކަލާނގެ ހުސްޠާހިރުވަންތަކަމާއެވެ! ފަހެ، ނަރަކައިގެ ޢަޛާބުން އަޅަމެން ސަލާމަތްކުރައްވާނދޭވެ!"',
-    },
-    source: { type: 'hadith', reference: '[1] Bukhari: 992 [2] Sahih. Nasa\'i: 1626' },
-    contentReview: {
-      arabicVerified: false,
-      transliterationVerified: false,
-      translationVerified: { en: false, dv: false },
-      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
-    },
-  },
-  {
     id: 'masnun-282',
     type: 'zikr',
     categoryId: 'witr-and-other',
@@ -150,25 +93,6 @@ export const WITR_AND_OTHER_DUAS: Dua[] = [
       dv: 'އޭ ﷲ! އިބަރަސްކަލާނގެ ޢިލްމުފުޅުން (މިކަމުގެ) ހެޔޮކަމަށް މިއަޅާ އެދެމެވެ. އަދި އިބަރަސްކަލާނގެ ކުޅަދުންވަންތަކަމުން (މިކަން ކުރުމުގެ) ކުޅަދާނަކަމަށް އެދެމެވެ. އަދި އިބަރަސްކަލާނގެ ބޮޑުވެގެންވާ ފަޟްލަވަންތަކަމުން މިއަޅާ އެދެމެވެ. ފަހެ، ހަމަކަށަވަރުން އިބަރަސްކަލާނގެ ކުޅަދުންވަންތައެވެ. މިއަޅާ ކުޅަދާނަވެގެނެއް ނުވެއެވެ. އަދި އިބަރަސްކަލާނގެ ދެނެވޮޑިގެންވެއެވެ. މިއަޅާއަކަށް ނޭނގެއެވެ. އިބަރަސްކަލާނގެއީ ޣައިބުތައް އެންމެ މޮޅަށް ދެނެވޮޑިގެންވާ ރަސްކަލާނގެއެވެ. އޭ ﷲ! މިކަމަކީ (މިތާނގައި ކަމުގެ ނަން ކިޔާނީ) މިއަޅާގެ ދީނަށާއި، ދުނިޔެއަށާއި، އާޚިރަތަށް ހެޔޮ ކަމެއް ކަމުގައި އިބަރަސްކަލާނގެ ދެނެވޮޑިގެންވާނަމަ، މިއަޅާއަށް މިކަން މިންވަރުކުރައްވާނދޭވެ! އަދި މިއަޅާއަށް މިކަން ފަސޭހަކޮށްދެއްވާނދޭވެ! ދެން މިކަމުގައި މިއަޅާއަށް ބަރަކާތް ލައްވާނދޭވެ! އަދި މިކަމަކީ މިއަޅާގެ ދީނަށާއި، ދުނިޔެއަށާއި، އާޚިރަތަށް ނުބައި ކަމެއް ކަމުގައި އިބަރަސްކަލާނގެ ދެނެވޮޑިގެންވާނަމަ، މިއަޅާއާ މިކަން ދުރުކުރައްވާނދޭވެ! އަދި މިކަމާ މިއަޅާވެސް ދުރުކުރައްވާނދޭވެ! އަދި ހެޔޮކަން ވަނީ ކޮންމެ ތަނެއްގައި ކަމުގައި ވިޔަސް މިއަޅާއަށް އެކަން މިންވަރުކުރައްވާނދޭވެ! ދެން އެކަމާމެދު މިއަޅާ ރުއްސަވާނދޭވެ!',
     },
     source: { type: 'hadith', reference: 'Al-Bukhari 7/162, No. 1162, 7390' },
-    contentReview: {
-      arabicVerified: false,
-      transliterationVerified: false,
-      translationVerified: { en: false, dv: false },
-      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
-    },
-  },
-  {
-    id: 'masnun-284',
-    type: 'dua',
-    categoryId: 'witr-and-other',
-    title: { en: 'Dua for Repentance after Sin (2 Rakat Prayer)', dv: 'ތައުބާވުމުގެ ދުޢާ (٢ ރަކްޢަތް ނަމާދަށްފަހު)' },
-    arabic: 'وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ وَمَن يَغْفِرُ الذُّنُوبَ إِلَّا اللَّهُ وَلَمْ يُصِرُّوا عَلَىٰ مَا فَعَلُوا وَهُمْ يَعْلَمُونَ ﴿١٣٥﴾ أُولَٰئِكَ جَزَاؤُهُم مَّغْفِرَةٌ مِّن رَّبِّهِمْ وَجَنَّاتٌ تَجْرِي مِن تَحْتِهَا الْأَنْهَارُ خَالِدِينَ فِيهَا ۚ وَنِعْمَ أَجْرُ الْعَامِلِينَ ﴿١٣٦﴾',
-    transliteration: 'Wallazeena izaa fa\'aloo faahishatan aw zalamooo anfusahum zakarullaaha fastaghfaroo lizunoobihim wa man yaghfiruz-zunooba illallaahu wa lam yusirroo \'alaa maa fa\'aloo wa hum ya\'lamoon. Ulaaa\'ika jazaaa\'uhum maghfiratum-mir-Rabbihim wa jannaatun tajree min tahtihal-anhaaru khaalideena feehaa; wa ni\'ma ajrul-\'aamileen.',
-    translation: {
-      en: '(135) And those who, when they commit an immorality or wrong themselves [by transgression], remember Allah and seek forgiveness for their sins - and who can forgive sins except Allah ? - and [who] do not persist in what they have done while they know. (136) Those - their reward is forgiveness from their Lord and gardens beneath which rivers flow [in Paradise], wherein they will abide eternally; and excellent is the reward of the [righteous] workers. (Sura Ali Imran 3:135-136)',
-      dv: 'އަދި އެއުރެންނީ، ހުތުރުކަން ބޮޑުވެގެންވާ ފާފައެއް ކޮށްފިނަމަ، ނުވަތަ އެއުރެންގެ ނަފްސުތަކަށް އަނިޔާވެރިވެއްޖެނަމަ (އެބަހީ: ކުށެއް ކޮށްފިނަމަ) ﷲ ހަނދުމަކޮށް، އެއުރެންގެ ފާފަތަކަށް ފުއްސެވުން އެދި ދުޢާކޮށް އުޅޭ މީހުންނެވެ. ﷲ މެނުވީ ފާފަފުއްސަވާނީ ފަހެ، ކާކުހެއްޔެވެ؟ އަދި އެއުރެން ކުޅަ ކުށުގެ މަތީގައި، އެނގިތިބެ ދެމިއެއް ނުތިބެއެވެ.',
-    },
-    source: { type: 'hadith', reference: 'Sahih (Albani). Abu Dawud: 1521' },
     contentReview: {
       arabicVerified: false,
       transliterationVerified: false,

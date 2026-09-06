@@ -8,12 +8,12 @@ export const TOILET_DUAS: Dua[] = [
     id: 'masnun-161',
     type: 'dua',
     categoryId: 'toilet',
-    title: { en: 'Dua for Leaving the Toilet', dv: 'ރޯދަ ހިފާ މީހާ އިއްފުތާރު ކުރާއިރު ކިޔާ ދުޢާ' },
+    title: { en: 'Dua for Leaving the Toilet', dv: 'ފާޚާނާއިން ނުކުތުމުން ކިޔާ ދުޢާ' },
     arabic: 'غُفْرَانَكَ',
     transliteration: 'Gufraanak',
     translation: {
       en: 'I ask You (Allah) for forgiveness.\n\nAyesha (RA) said that Rasoolullah (ﷺ) used to say this dua when he came out of the toilet.',
-      dv: 'ކަރުހިއްކުން ފިލައިފިއެވެ. އަދި ނާރުތައް ތެތްވެއްޖެއެވެ. އަދި ﷲ އިރާދަކުރެއްވިއްޔާ އަޖުރު ސާބިތުވެއްޖެއެވެ.',
+      dv: 'އިބަރަސްކަލާނގެ ފުއްސެވުމަށް އެދެމެވެ.',
     },
     source: { type: 'hadith', reference: 'Sahih (Albani). Abu Dawud: 30' },
     contentReview: {
