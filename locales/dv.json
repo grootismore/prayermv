@@ -161,6 +161,9 @@
     "counterAccessibilityHint": "ގުނުން އެއް އިތުރުކުރޭ",
     "counterComplete": "ފުރިހަމަވެއްޖެ",
     "counterResetLabel": "ރީސެޓް",
-    "shareAttribution": "Noor+ އިން ޝެއަރ ކުރެވުނު"
+    "shareAttribution": "Noor+ އިން ޝެއަރ ކުރެވުނު",
+    "arabicTextSize": "ލިޔުމުގެ ސައިޒް",
+    "decreaseArabicTextSize": "عربى ލިޔުން ކުޑަކުރޭ",
+    "increaseArabicTextSize": "عربى ލިޔުން ބޮޑުކުރޭ"
   }
 }
