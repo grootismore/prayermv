@@ -8,7 +8,8 @@ import { getTodayHijri, getHijriMonthInfo, getHijriMonthName } from '../../lib/h
 import { getTodayGregorian, getGregorianMonthInfo, getGregorianMonthName } from '../../lib/gregorian';
 import { buildCalendarWeeks } from '../../lib/calendarGrid';
 import { getHijriEventsForMonth, getHijriEventForDate } from '../../lib/hijriEvents';
-import { colors, minTouchTarget, spacing, typography } from '../../lib/theme';
+import { minTouchTarget, spacing, typography, type ThemeColors } from '../../lib/theme';
+import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
@@ -18,6 +19,8 @@ import SunAccent from '../../components/SunAccent';
 
 export default function HijriScreen() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const { language, calendarMode } = useSettings();
   const numeralsReady = useNumeralFont();
   const numeralStyle = numeralsReady && { fontFamily: numeralFont.semibold };
@@ -175,7 +178,8 @@ export default function HijriScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.xs },
   todayCard: {
     alignItems: 'center',
@@ -228,7 +232,7 @@ const styles = StyleSheet.create({
   },
   dayCircleToday: { backgroundColor: colors.primary },
   dayText: { fontSize: typography.size.sm, color: colors.textPrimary },
-  dayTextToday: { color: colors.backgroundDeep, fontWeight: typography.weight.bold },
+  dayTextToday: { color: colors.onPrimary, fontWeight: typography.weight.bold },
   eventDot: {
     width: 4,
     height: 4,

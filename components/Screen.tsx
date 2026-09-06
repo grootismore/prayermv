@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
-import { colors, screenPadding } from '../lib/theme';
+import { screenPadding, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 
 interface Props {
   children: ReactNode;
@@ -15,7 +16,7 @@ interface Props {
   backgroundDecoration?: ReactNode;
 }
 
-/** Shared full-bleed screen shell: midnight-navy background + safe-area handling, with or without scrolling content. */
+/** Shared full-bleed screen shell: themed background + safe-area handling, with or without scrolling content. */
 export default function Screen({
   children,
   scroll = true,
@@ -24,6 +25,7 @@ export default function Screen({
   style,
   backgroundDecoration,
 }: Props) {
+  const styles = useThemedStyles(createStyles);
   return (
     <SafeAreaView style={[styles.root, style]} edges={edges}>
       {backgroundDecoration ? (
@@ -45,8 +47,9 @@ export default function Screen({
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { padding: screenPadding, paddingBottom: screenPadding * 2 },
-  flexContent: { flex: 1, padding: screenPadding },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    root: { flex: 1, backgroundColor: colors.background },
+    scrollContent: { padding: screenPadding, paddingBottom: screenPadding * 2 },
+    flexContent: { flex: 1, padding: screenPadding },
+  });

@@ -1,6 +1,6 @@
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 
-import { colors } from '../lib/theme';
+import { useTheme } from '../lib/useTheme';
 
 interface Props {
   size?: number;
@@ -13,6 +13,7 @@ interface Props {
  * cheap native blur), so it stays lightweight to render.
  */
 export default function SunAccent({ size = 36 }: Props) {
+  const { colors } = useTheme();
   const id = 'noorSunGlow';
   return (
     <Svg width={size * 2.2} height={size * 2.2} viewBox={`0 0 ${size * 2.2} ${size * 2.2}`}>

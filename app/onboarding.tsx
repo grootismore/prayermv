@@ -11,7 +11,8 @@ import SurfaceCard from '../components/SurfaceCard';
 import { useSettings } from '../context/SettingsContext';
 import { SUPPORTED_LANGUAGES, LANGUAGE_ENDONYMS } from '../lib/i18n';
 import type { AppLanguage } from '../lib/storage';
-import { colors, minTouchTarget, radius, shadow, spacing, typography } from '../lib/theme';
+import { minTouchTarget, radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useTheme, useThemedStyles } from '../lib/useTheme';
 import WaveDecoration from '../components/WaveDecoration';
 import SunAccent from '../components/SunAccent';
 
@@ -25,6 +26,8 @@ const FEATURES: { icon: keyof typeof Ionicons.glyphMap; key: string }[] = [
 
 export default function OnboardingScreen() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const { island, language, selectIsland, changeLanguage } = useSettings();
   const { skipIntro } = useLocalSearchParams<{ skipIntro?: string }>();
   // First run (no island yet) starts with picking a language, so the rest
@@ -62,7 +65,7 @@ export default function OnboardingScreen() {
           </SurfaceCard>
           <Pressable style={styles.welcomeButton} onPress={() => setStep('welcome')}>
             <Text style={styles.welcomeButtonText}>{t('common.continue')}</Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.backgroundDeep} />
+            <Ionicons name="arrow-forward" size={18} color={colors.onPrimary} />
           </Pressable>
         </View>
       </SafeAreaView>
@@ -93,7 +96,7 @@ export default function OnboardingScreen() {
 
           <Pressable style={styles.welcomeButton} onPress={() => setStep('island')}>
             <Text style={styles.welcomeButtonText}>{t('onboarding.getStarted')}</Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.backgroundDeep} />
+            <Ionicons name="arrow-forward" size={18} color={colors.onPrimary} />
           </Pressable>
         </SafeAreaView>
       </View>
@@ -111,7 +114,8 @@ export default function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -188,5 +192,5 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     ...shadow.floating,
   },
-  welcomeButtonText: { fontSize: typography.size.md, fontWeight: typography.weight.bold, color: colors.backgroundDeep },
+  welcomeButtonText: { fontSize: typography.size.md, fontWeight: typography.weight.bold, color: colors.onPrimary },
 });

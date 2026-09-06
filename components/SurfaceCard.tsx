@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { cardPadding, colors, minTouchTarget, radius, shadow } from '../lib/theme';
+import { cardPadding, minTouchTarget, radius, shadow, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 
 interface Props {
   children: ReactNode;
@@ -23,6 +24,7 @@ export default function SurfaceCard({
   accessibilityLabel,
   accessibilityRole,
 }: Props) {
+  const styles = useThemedStyles(createStyles);
   const base = [styles.card, elevated && styles.elevated, padded && styles.padded, style];
 
   if (onPress) {
@@ -46,23 +48,24 @@ export default function SurfaceCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-    minHeight: minTouchTarget,
-    ...shadow.card,
-  },
-  elevated: {
-    backgroundColor: colors.surfaceElevated,
-  },
-  padded: {
-    padding: cardPadding,
-  },
-  pressed: {
-    backgroundColor: colors.surfacePressed,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
+      minHeight: minTouchTarget,
+      ...shadow.card,
+    },
+    elevated: {
+      backgroundColor: colors.surfaceElevated,
+    },
+    padded: {
+      padding: cardPadding,
+    },
+    pressed: {
+      backgroundColor: colors.surfacePressed,
+    },
+  });

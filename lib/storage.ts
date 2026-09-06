@@ -5,6 +5,8 @@ export type AppLanguage = 'en' | 'dv' | 'ar';
 
 export type CalendarMode = 'hijri' | 'gregorian';
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 export type NotificationPrefs = Record<Exclude<PrayerName, 'sunrise'>, boolean>;
 
 export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
@@ -21,6 +23,7 @@ const KEYS = {
   notificationPrefs: 'prayermv.notificationPrefs',
   qiblaHapticsEnabled: 'prayermv.qiblaHapticsEnabled',
   calendarMode: 'prayermv.calendarMode',
+  themeMode: 'prayermv.themeMode',
 } as const;
 
 export async function loadSelectedIslandId(): Promise<number | null> {
@@ -72,4 +75,21 @@ export async function loadCalendarMode(): Promise<CalendarMode> {
 
 export async function saveCalendarMode(mode: CalendarMode): Promise<void> {
   await AsyncStorage.setItem(KEYS.calendarMode, mode);
+}
+
+/**
+ * Which appearance the app uses - defaults to 'dark' rather than 'system',
+ * since Noor+'s "Ocean Night" look has always been the only theme that
+ * existed until now; nobody should see a surprise appearance change on
+ * update just because their device happens to be in light mode. Users who
+ * want to follow the system (or force Light) can pick that explicitly in
+ * Settings > Appearance.
+ */
+export async function loadThemeMode(): Promise<ThemeMode> {
+  const raw = await AsyncStorage.getItem(KEYS.themeMode);
+  return raw === 'light' || raw === 'system' ? raw : 'dark';
+}
+
+export async function saveThemeMode(mode: ThemeMode): Promise<void> {
+  await AsyncStorage.setItem(KEYS.themeMode, mode);
 }

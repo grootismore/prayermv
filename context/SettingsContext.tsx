@@ -12,10 +12,13 @@ import {
   saveQiblaHapticsEnabled,
   loadCalendarMode,
   saveCalendarMode,
+  loadThemeMode,
+  saveThemeMode,
   DEFAULT_NOTIFICATION_PREFS,
   type AppLanguage,
   type NotificationPrefs,
   type CalendarMode,
+  type ThemeMode,
 } from '../lib/storage';
 import { initI18n } from '../lib/i18n';
 import i18n from '../lib/i18n';
@@ -29,11 +32,13 @@ interface SettingsContextValue {
   notificationPrefs: NotificationPrefs;
   qiblaHapticsEnabled: boolean;
   calendarMode: CalendarMode;
+  themeMode: ThemeMode;
   selectIsland: (islandId: number) => Promise<void>;
   changeLanguage: (language: AppLanguage) => Promise<void>;
   setNotificationEnabled: (prayer: keyof NotificationPrefs, enabled: boolean) => Promise<void>;
   setQiblaHapticsEnabled: (enabled: boolean) => Promise<void>;
   setCalendarMode: (mode: CalendarMode) => Promise<void>;
+  setThemeMode: (mode: ThemeMode) => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
@@ -45,16 +50,19 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPrefs>(DEFAULT_NOTIFICATION_PREFS);
   const [qiblaHapticsEnabled, setQiblaHapticsEnabledState] = useState(true);
   const [calendarMode, setCalendarModeState] = useState<CalendarMode>('hijri');
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('dark');
 
   useEffect(() => {
     (async () => {
-      const [islandId, storedLanguage, prefs, hapticsEnabled, storedCalendarMode] = await Promise.all([
-        loadSelectedIslandId(),
-        loadLanguage(),
-        loadNotificationPrefs(),
-        loadQiblaHapticsEnabled(),
-        loadCalendarMode(),
-      ]);
+      const [islandId, storedLanguage, prefs, hapticsEnabled, storedCalendarMode, storedThemeMode] =
+        await Promise.all([
+          loadSelectedIslandId(),
+          loadLanguage(),
+          loadNotificationPrefs(),
+          loadQiblaHapticsEnabled(),
+          loadCalendarMode(),
+          loadThemeMode(),
+        ]);
 
       const resolvedLanguage = storedLanguage ?? 'en';
       initI18n(resolvedLanguage);
@@ -69,6 +77,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       setNotificationPrefs(prefs);
       setQiblaHapticsEnabledState(hapticsEnabled);
       setCalendarModeState(storedCalendarMode);
+      setThemeModeState(storedThemeMode);
       setIsLoaded(true);
     })();
   }, []);
@@ -109,6 +118,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     await saveCalendarMode(mode);
   }, []);
 
+  const setThemeMode = useCallback(async (mode: ThemeMode) => {
+    setThemeModeState(mode);
+    await saveThemeMode(mode);
+  }, []);
+
   const value = useMemo(
     () => ({
       isLoaded,
@@ -117,11 +131,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       notificationPrefs,
       qiblaHapticsEnabled,
       calendarMode,
+      themeMode,
       selectIsland,
       changeLanguage,
       setNotificationEnabled,
       setQiblaHapticsEnabled,
       setCalendarMode,
+      setThemeMode,
     }),
     [
       isLoaded,
@@ -130,11 +146,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       notificationPrefs,
       qiblaHapticsEnabled,
       calendarMode,
+      themeMode,
       selectIsland,
       changeLanguage,
       setNotificationEnabled,
       setQiblaHapticsEnabled,
       setCalendarMode,
+      setThemeMode,
     ]
   );
 

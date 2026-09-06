@@ -7,13 +7,15 @@ import { useSettings } from '../../context/SettingsContext';
 import { useCompassHeading } from '../../lib/useCompassHeading';
 import { useQiblaAlignment } from '../../lib/useQiblaAlignment';
 import { getQiblaBearing } from '../../lib/qibla';
-import { colors, spacing, typography } from '../../lib/theme';
+import { spacing, typography, type ThemeColors } from '../../lib/theme';
+import { useThemedStyles } from '../../lib/useTheme';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
 import QiblaCompass from '../../components/QiblaCompass';
 
 export default function QiblaScreen() {
   const { t } = useTranslation();
+  const styles = useThemedStyles(createStyles);
   const { island, qiblaHapticsEnabled } = useSettings();
   const { heading, permission, accuracy } = useCompassHeading();
   const [coords, setCoords] = useState<{ lat: number; long: number } | null>(null);
@@ -99,8 +101,9 @@ export default function QiblaScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: { flexGrow: 1, alignItems: 'center', justifyContent: 'center' },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    content: { flexGrow: 1, alignItems: 'center', justifyContent: 'center' },
   title: {
     fontSize: typography.size.xl,
     fontWeight: typography.weight.bold,

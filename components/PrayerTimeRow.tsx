@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, spacing, typography } from '../lib/theme';
+import { spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 import { numeralFont } from '../lib/useNumeralFont';
 
 interface Props {
@@ -23,6 +24,7 @@ export default function PrayerTimeRow({
   numeralsReady = false,
   accessibilityLabel,
 }: Props) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View
       style={[styles.row, isCurrent && !isNext && styles.rowCurrent, isNext && styles.rowNext]}
@@ -44,48 +46,49 @@ export default function PrayerTimeRow({
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    // Not a touch target (this row has no onPress) - a bit shorter than
-    // minTouchTarget so all 6 rows fit on screen without scrolling.
-    minHeight: 40,
-    paddingHorizontal: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.separator,
-  },
-  rowCurrent: {
-    backgroundColor: colors.surfaceElevated,
-  },
-  rowNext: {
-    backgroundColor: colors.primarySoft,
-  },
-  indicator: {
-    width: 3,
-    height: 22,
-    borderRadius: 2,
-    marginRight: spacing.sm,
-    backgroundColor: 'transparent',
-  },
-  indicatorActive: {
-    backgroundColor: colors.primary,
-  },
-  label: {
-    flex: 1,
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.semibold,
-    color: colors.textPrimary,
-  },
-  labelActive: {
-    color: colors.primary,
-  },
-  time: {
-    fontSize: typography.size.md,
-    color: colors.textSecondary,
-  },
-  timeActive: {
-    color: colors.primary,
-    fontWeight: typography.weight.bold,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      // Not a touch target (this row has no onPress) - a bit shorter than
+      // minTouchTarget so all 6 rows fit on screen without scrolling.
+      minHeight: 40,
+      paddingHorizontal: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.separator,
+    },
+    rowCurrent: {
+      backgroundColor: colors.surfaceElevated,
+    },
+    rowNext: {
+      backgroundColor: colors.primarySoft,
+    },
+    indicator: {
+      width: 3,
+      height: 22,
+      borderRadius: 2,
+      marginRight: spacing.sm,
+      backgroundColor: 'transparent',
+    },
+    indicatorActive: {
+      backgroundColor: colors.primary,
+    },
+    label: {
+      flex: 1,
+      fontSize: typography.size.md,
+      fontWeight: typography.weight.semibold,
+      color: colors.textPrimary,
+    },
+    labelActive: {
+      color: colors.primary,
+    },
+    time: {
+      fontSize: typography.size.md,
+      color: colors.textSecondary,
+    },
+    timeActive: {
+      color: colors.primary,
+      fontWeight: typography.weight.bold,
+    },
+  });

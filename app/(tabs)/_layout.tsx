@@ -4,7 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-import { colors, radius, shadow, spacing, tabBarMetrics, typography } from '../../lib/theme';
+import { radius, shadow, spacing, tabBarMetrics, typography, type ThemeColors } from '../../lib/theme';
+import { useTheme, useThemedStyles } from '../../lib/useTheme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -14,6 +15,7 @@ type IconName = keyof typeof Ionicons.glyphMap;
 // on, rather than a hand-rolled one prone to clipping/truncating on
 // narrower devices.
 function TabIcon({ name, color, focused }: { name: IconName; color: ColorValue; focused: boolean }) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
       <Ionicons name={name} color={color} size={tabBarMetrics.iconSize} />
@@ -23,6 +25,8 @@ function TabIcon({ name, color, focused }: { name: IconName; color: ColorValue; 
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   // The tab bar's own height only covers its icon/label content - the
   // home-indicator safe area below it is added as real padding (not just
   // left for the OS to overlay), and its background color extends through
@@ -81,33 +85,34 @@ export default function TabsLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: colors.backgroundDeep,
-    borderTopWidth: 0,
-    borderTopLeftRadius: tabBarMetrics.topRadius,
-    borderTopRightRadius: tabBarMetrics.topRadius,
-    paddingTop: spacing.sm,
-    ...shadow.floating,
-  },
-  tabItem: {
-    paddingTop: 0,
-  },
-  iconWrap: {
-    width: 44,
-    height: 28,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconWrapActive: {
-    backgroundColor: colors.primarySoft,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  label: {
-    fontSize: typography.size.xs,
-    fontWeight: typography.weight.semibold,
-    marginTop: 2,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    tabBar: {
+      backgroundColor: colors.backgroundDeep,
+      borderTopWidth: 0,
+      borderTopLeftRadius: tabBarMetrics.topRadius,
+      borderTopRightRadius: tabBarMetrics.topRadius,
+      paddingTop: spacing.sm,
+      ...shadow.floating,
+    },
+    tabItem: {
+      paddingTop: 0,
+    },
+    iconWrap: {
+      width: 44,
+      height: 28,
+      borderRadius: radius.pill,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    iconWrapActive: {
+      backgroundColor: colors.primarySoft,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    label: {
+      fontSize: typography.size.xs,
+      fontWeight: typography.weight.semibold,
+      marginTop: 2,
+    },
+  });

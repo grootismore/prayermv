@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import Svg, { Line, Rect } from 'react-native-svg';
 
-import { colors, spacing } from '../lib/theme';
+import { spacing } from '../lib/theme';
+import { useTheme } from '../lib/useTheme';
 
 interface Props {
   /** Tighter vertical margin, for screens whose content needs to fit without scrolling (e.g. Home, Calendar). */
@@ -10,6 +11,7 @@ interface Props {
 
 /** A thin cyan hairline broken by a small centered diamond - the app's section divider, matching the Noor+ mockups. */
 export default function NoorDivider({ compact = false }: Props) {
+  const { colors } = useTheme();
   return (
     <View style={[styles.wrap, compact && styles.wrapCompact]} pointerEvents="none">
       <Svg width="100%" height={14} viewBox="0 0 100 14" preserveAspectRatio="none">

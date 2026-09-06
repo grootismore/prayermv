@@ -38,7 +38,12 @@ module.exports = {
     scheme: 'prayermv',
     orientation: 'portrait',
     icon: './assets/icon.png',
-    userInterfaceStyle: 'dark',
+    // 'automatic' rather than a fixed 'dark' now that the app itself has a
+    // real Light/Dark/System Appearance setting (Settings > Appearance) -
+    // this only affects native OS-level chrome (keyboard appearance,
+    // system alerts), not the app's own screens, which are themed
+    // independently by lib/useTheme.ts based on that setting.
+    userInterfaceStyle: 'automatic',
     ios: {
       bundleIdentifier: IOS_BUNDLE_IDENTIFIER,
       supportsTablet: true,

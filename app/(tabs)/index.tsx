@@ -7,7 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSettings } from '../../context/SettingsContext';
 import { useNextPrayer, formatCountdown } from '../../lib/useNextPrayer';
 import { getPrayerTimesForDate } from '../../lib/prayerTimes';
-import { colors, minTouchTarget, shadow, spacing, typography } from '../../lib/theme';
+import { minTouchTarget, shadow, spacing, typography, type ThemeColors } from '../../lib/theme';
+import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import { getTodayHijri, getHijriMonthName } from '../../lib/hijri';
 import { getTodayGregorian, getGregorianMonthName } from '../../lib/gregorian';
@@ -25,6 +26,8 @@ const SWIPE_THRESHOLD = 45;
 export default function HomeScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const { island, language } = useSettings();
   const state = useNextPrayer(island?.islandId ?? null);
   const numeralsReady = useNumeralFont();
@@ -166,7 +169,8 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
   sunSpot: { position: 'absolute', right: 8 },
   islandName: {
     fontSize: typography.size.xxl,
@@ -239,4 +243,5 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     letterSpacing: 0.5,
   },
-});
+  });
+

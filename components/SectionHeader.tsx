@@ -1,6 +1,7 @@
 import { StyleSheet, Text } from 'react-native';
 
-import { colors, spacing, typography } from '../lib/theme';
+import { spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 
 interface Props {
   title: string;
@@ -9,6 +10,7 @@ interface Props {
 
 /** A section label (e.g. "Island", "Language", "Prayer notifications") with an optional helper line beneath it. */
 export default function SectionHeader({ title, subtitle }: Props) {
+  const styles = useThemedStyles(createStyles);
   return (
     <>
       <Text style={styles.title} accessibilityRole="header">
@@ -19,18 +21,19 @@ export default function SectionHeader({ title, subtitle }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  title: {
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
-    color: colors.primary,
-    marginBottom: spacing.xxs,
-    marginTop: spacing.md,
-    letterSpacing: 0.3,
-  },
-  subtitle: {
-    fontSize: typography.size.sm,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    title: {
+      fontSize: typography.size.base,
+      fontWeight: typography.weight.bold,
+      color: colors.primary,
+      marginBottom: spacing.xxs,
+      marginTop: spacing.md,
+      letterSpacing: 0.3,
+    },
+    subtitle: {
+      fontSize: typography.size.sm,
+      color: colors.textSecondary,
+      marginBottom: spacing.xs,
+    },
+  });

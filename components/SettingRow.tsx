@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { colors, minTouchTarget, spacing, typography } from '../lib/theme';
+import { minTouchTarget, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useTheme, useThemedStyles } from '../lib/useTheme';
 
 interface Props {
   title: string;
@@ -14,6 +15,8 @@ interface Props {
 
 /** A generic settings row: title (+ optional cyan action line) with a trailing chevron, inside a pressable native-style row. */
 export default function SettingRow({ title, actionLabel, chevron = true, onPress, accessibilityLabel }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -30,30 +33,31 @@ export default function SettingRow({ title, actionLabel, chevron = true, onPress
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: minTouchTarget,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.md,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  textCol: {
-    flex: 1,
-    gap: 4,
-  },
-  title: {
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.semibold,
-    color: colors.textPrimary,
-  },
-  actionLabel: {
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.semibold,
-    color: colors.primary,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      minHeight: minTouchTarget,
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.md,
+    },
+    pressed: {
+      opacity: 0.7,
+    },
+    textCol: {
+      flex: 1,
+      gap: 4,
+    },
+    title: {
+      fontSize: typography.size.md,
+      fontWeight: typography.weight.semibold,
+      color: colors.textPrimary,
+    },
+    actionLabel: {
+      fontSize: typography.size.sm,
+      fontWeight: typography.weight.semibold,
+      color: colors.primary,
+    },
+  });

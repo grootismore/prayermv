@@ -6,7 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 
 import { SettingsProvider } from '../context/SettingsContext';
-import { colors } from '../lib/theme';
+import { useTheme } from '../lib/useTheme';
 import {
   ensureAdhanChannel,
   registerBackgroundRescheduleTask,
@@ -28,17 +28,26 @@ export default function RootLayout() {
   }, []);
 
   return (
+    <SafeAreaProvider>
+      <SettingsProvider>
+        <AppShell />
+      </SettingsProvider>
+    </SafeAreaProvider>
+  );
+}
+
+/** Split out from RootLayout so it can call useTheme(), which needs to be inside SettingsProvider. */
+function AppShell() {
+  const { colors, scheme } = useTheme();
+
+  return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaProvider>
-        <SettingsProvider>
-          <StatusBar style="light" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="onboarding" />
-            <Stack.Screen name="(tabs)" />
-          </Stack>
-        </SettingsProvider>
-      </SafeAreaProvider>
+      <StatusBar style={scheme === 'light' ? 'dark' : 'light'} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
     </GestureHandlerRootView>
   );
 }

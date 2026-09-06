@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { Animated, Easing, View, StyleSheet, Text } from 'react-native';
 import Svg, { Circle, Rect, Path, Line, Defs, LinearGradient, Stop } from 'react-native-svg';
 
-import { colors, shadow, typography } from '../lib/theme';
+import { shadow, typography, type ThemeColors } from '../lib/theme';
+import { useTheme, useThemedStyles } from '../lib/useTheme';
 
 interface Props {
   /** Degrees to rotate the arrow, or null while heading/bearing aren't known yet. */
@@ -26,6 +27,8 @@ const CARDINAL_LABELS: Record<number, string> = { 0: 'N', 90: 'E', 180: 'S', 270
  * moment the phone itself is facing the Qibla.
  */
 export default function QiblaCompass({ rotation, aligned = false, size = 240 }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const spin = useRef(new Animated.Value(rotation ?? 0)).current;
 
   useEffect(() => {
@@ -136,6 +139,7 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
 
 /** A small, respectful stylized Kaaba marker - a dark cube with a thin gold kiswah band - not a literal icon. */
 function KaabaMarker({ size }: { size: number }) {
+  const { colors } = useTheme();
   const band = size * 0.32;
   return (
     <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -146,6 +150,7 @@ function KaabaMarker({ size }: { size: number }) {
 }
 
 function QiblaArrow({ size, aligned }: { size: number; aligned: boolean }) {
+  const { colors } = useTheme();
   const cx = size / 2;
   return (
     <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -170,34 +175,35 @@ function QiblaArrow({ size, aligned }: { size: number; aligned: boolean }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 999,
-    ...shadow.floating,
-  },
-  cardinalLabel: {
-    position: 'absolute',
-    width: 20,
-    textAlign: 'center',
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.bold,
-    color: colors.textPrimary,
-  },
-  kaabaBadge: {
-    position: 'absolute',
-    width: 22,
-    height: 22,
-    borderRadius: 7,
-    backgroundColor: colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: colors.goldSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  arrowLayer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 999,
+      ...shadow.floating,
+    },
+    cardinalLabel: {
+      position: 'absolute',
+      width: 20,
+      textAlign: 'center',
+      fontSize: typography.size.sm,
+      fontWeight: typography.weight.bold,
+      color: colors.textPrimary,
+    },
+    kaabaBadge: {
+      position: 'absolute',
+      width: 22,
+      height: 22,
+      borderRadius: 7,
+      backgroundColor: colors.surfaceElevated,
+      borderWidth: 1,
+      borderColor: colors.goldSoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    arrowLayer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });

@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 import { getAtollGroups } from '../lib/prayerTimes';
-import { colors, minTouchTarget, radius, spacing, typography } from '../lib/theme';
+import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useTheme, useThemedStyles } from '../lib/useTheme';
 import { useSettings } from '../context/SettingsContext';
 import { localizedIslandName, localizedAtollName } from '../lib/islandNames';
 
@@ -16,6 +17,8 @@ interface Props {
 export default function IslandPicker({ currentIslandId, onSelect }: Props) {
   const { t } = useTranslation();
   const { language } = useSettings();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const [query, setQuery] = useState('');
 
   const sections = useMemo(() => {
@@ -80,56 +83,57 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  searchWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  searchIcon: { marginRight: spacing.xs },
-  searchInput: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    color: colors.textPrimary,
-    fontSize: typography.size.md,
-  },
-  sectionHeader: {
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xxs,
-  },
-  sectionHeaderText: {
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.bold,
-    color: colors.primary,
-    letterSpacing: 0.5,
-  },
-  row: {
-    minHeight: minTouchTarget,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  rowSelected: {
-    backgroundColor: colors.primarySoft,
-  },
-  rowPressed: {
-    backgroundColor: colors.surfacePressed,
-  },
-  rowText: {
-    fontSize: typography.size.md,
-    color: colors.textPrimary,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: spacing.lg,
-    color: colors.textMuted,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: { flex: 1 },
+    searchWrap: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginHorizontal: spacing.md,
+      marginBottom: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    searchIcon: { marginRight: spacing.xs },
+    searchInput: {
+      flex: 1,
+      paddingVertical: spacing.sm,
+      color: colors.textPrimary,
+      fontSize: typography.size.md,
+    },
+    sectionHeader: {
+      backgroundColor: colors.background,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xxs,
+    },
+    sectionHeaderText: {
+      fontSize: typography.size.sm,
+      fontWeight: typography.weight.bold,
+      color: colors.primary,
+      letterSpacing: 0.5,
+    },
+    row: {
+      minHeight: minTouchTarget,
+      justifyContent: 'center',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    rowSelected: {
+      backgroundColor: colors.primarySoft,
+    },
+    rowPressed: {
+      backgroundColor: colors.surfacePressed,
+    },
+    rowText: {
+      fontSize: typography.size.md,
+      color: colors.textPrimary,
+    },
+    emptyText: {
+      textAlign: 'center',
+      marginTop: spacing.lg,
+      color: colors.textMuted,
+    },
+  });

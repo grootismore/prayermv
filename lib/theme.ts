@@ -1,14 +1,43 @@
 import { Platform } from 'react-native';
 
 /**
- * Noor+ "Ocean Night" design tokens - a midnight-navy, lagoon-cyan and
- * sunrise-gold palette. Centralized here so no screen hardcodes a color,
- * spacing, radius, or type value directly.
+ * Noor+ design tokens - a lagoon-cyan and sunrise-gold palette over either
+ * a midnight-navy ("Ocean Night") or a pale sky/foam ("Ocean Day")
+ * background. Centralized here so no screen hardcodes a color, spacing,
+ * radius, or type value directly. Which palette is active is resolved by
+ * lib/useTheme.ts (from the user's Appearance setting + the system
+ * scheme) - screens/components should get `colors` from `useTheme()`,
+ * never import a fixed palette from here directly.
  */
-export const colors = {
-  // background/backgroundDeep are matched to the navy baked into the
-  // official Noor+ app icon/logo mark, so the icon, splash screen, and
-  // in-app screens all read as the same navy rather than three near-misses.
+export interface ThemeColors {
+  background: string;
+  backgroundDeep: string;
+  surface: string;
+  surfaceElevated: string;
+  surfacePressed: string;
+  primary: string;
+  primaryMuted: string;
+  primarySoft: string;
+  /** Text/icon color for content placed on top of a `primary`-filled surface (a filled button, a selected pill, a "today" marker). */
+  onPrimary: string;
+  gold: string;
+  goldMuted: string;
+  goldSoft: string;
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+  border: string;
+  separator: string;
+  overlay: string;
+  success: string;
+  warning: string;
+  danger: string;
+}
+
+// background/backgroundDeep are matched to the navy baked into the
+// official Noor+ app icon/logo mark, so the icon, splash screen, and
+// in-app screens all read as the same navy rather than three near-misses.
+export const darkColors: ThemeColors = {
   background: '#011C53',
   backgroundDeep: '#010F2E',
   surface: '#072952',
@@ -17,6 +46,7 @@ export const colors = {
   primary: '#13E2E6',
   primaryMuted: '#0AA8C6',
   primarySoft: 'rgba(19, 226, 230, 0.12)',
+  onPrimary: '#010F2E',
   gold: '#FFC83D',
   goldMuted: '#D8A82D',
   goldSoft: 'rgba(255, 200, 61, 0.12)',
@@ -29,6 +59,34 @@ export const colors = {
   success: '#13E2C5',
   warning: '#FFC83D',
   danger: '#FF6675',
+};
+
+// Not just an inversion of the dark palette - primary/gold are deepened a
+// step from their dark-mode values so they hold contrast against a light
+// background instead of washing out, the way the bright cyan/gold read
+// fine floating on midnight navy but wouldn't on white.
+export const lightColors: ThemeColors = {
+  background: '#F4F9FF',
+  backgroundDeep: '#E4EEFB',
+  surface: '#FFFFFF',
+  surfaceElevated: '#FFFFFF',
+  surfacePressed: '#E9F2FC',
+  primary: '#0A8CA6',
+  primaryMuted: '#0AA8C6',
+  primarySoft: 'rgba(10, 140, 166, 0.10)',
+  onPrimary: '#FFFFFF',
+  gold: '#B87A0A',
+  goldMuted: '#8F600A',
+  goldSoft: 'rgba(184, 122, 10, 0.12)',
+  textPrimary: '#0B1E3D',
+  textSecondary: '#48607F',
+  textMuted: '#7C8FA6',
+  border: 'rgba(10, 90, 140, 0.18)',
+  separator: 'rgba(10, 60, 110, 0.10)',
+  overlay: 'rgba(228, 238, 251, 0.85)',
+  success: '#0E8E77',
+  warning: '#B87A0A',
+  danger: '#D63B52',
 };
 
 /** 4/8pt spacing scale - use these instead of ad-hoc margin/padding numbers. */
@@ -93,14 +151,17 @@ export const tabBarMetrics = {
 
 // RN shadows need both the iOS shadow* properties and Android's `elevation`
 // - a single style object with both keeps every card consistent instead of
-// re-deriving these per screen. Tinted with the deep-navy background so
-// they read as depth rather than a generic grey drop shadow.
+// re-deriving these per screen. Plain black in both themes (rather than
+// tinted with the background) - a shadow represents light falling behind
+// the card, which reads as depth regardless of whether the page under it
+// is light or dark, the same way most native UIs keep shadows black-based
+// even in dark mode.
 export const shadow = {
   card: Platform.select({
     ios: {
-      shadowColor: colors.backgroundDeep,
+      shadowColor: '#000000',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.35,
+      shadowOpacity: 0.16,
       shadowRadius: 12,
     },
     android: { elevation: 3 },
@@ -108,9 +169,9 @@ export const shadow = {
   }),
   hero: Platform.select({
     ios: {
-      shadowColor: colors.backgroundDeep,
+      shadowColor: '#000000',
       shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.45,
+      shadowOpacity: 0.2,
       shadowRadius: 22,
     },
     android: { elevation: 8 },
@@ -118,9 +179,9 @@ export const shadow = {
   }),
   floating: Platform.select({
     ios: {
-      shadowColor: colors.backgroundDeep,
+      shadowColor: '#000000',
       shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.18,
       shadowRadius: 16,
     },
     android: { elevation: 10 },

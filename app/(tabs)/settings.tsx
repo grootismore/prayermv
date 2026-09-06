@@ -9,8 +9,9 @@ import { useSettings } from '../../context/SettingsContext';
 import { NOTIFIABLE_PRAYERS } from '../../lib/prayerTimes';
 import { requestNotificationPermissions, sendTestAdhanNotification } from '../../lib/notifications';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
-import type { AppLanguage, CalendarMode, NotificationPrefs } from '../../lib/storage';
-import { colors, spacing, typography } from '../../lib/theme';
+import type { AppLanguage, CalendarMode, NotificationPrefs, ThemeMode } from '../../lib/storage';
+import { spacing, typography, type ThemeColors } from '../../lib/theme';
+import { useThemedStyles } from '../../lib/useTheme';
 import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
@@ -26,16 +27,19 @@ import SunAccent from '../../components/SunAccent';
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const styles = useThemedStyles(createStyles);
   const {
     island,
     language,
     notificationPrefs,
     qiblaHapticsEnabled,
     calendarMode,
+    themeMode,
     changeLanguage,
     setNotificationEnabled,
     setQiblaHapticsEnabled,
     setCalendarMode,
+    setThemeMode,
   } = useSettings();
 
   async function handleToggle(prayer: Exclude<(typeof NOTIFIABLE_PRAYERS)[number], 'sunrise'>, value: boolean) {
@@ -114,6 +118,17 @@ export default function SettingsScreen() {
         onChange={(key) => setCalendarMode(key as CalendarMode)}
       />
 
+      <SectionHeader title={t('settings.appearance')} subtitle={t('settings.appearanceSubtitle')} />
+      <SegmentedControl
+        segments={[
+          { key: 'light', label: t('settings.appearanceLight') },
+          { key: 'dark', label: t('settings.appearanceDark') },
+          { key: 'system', label: t('settings.appearanceSystem') },
+        ]}
+        selectedKey={themeMode}
+        onChange={(key) => setThemeMode(key as ThemeMode)}
+      />
+
       <SectionHeader title={t('settings.notifications')} subtitle={t('settings.notificationsSubtitle')} />
       <SurfaceCard padded={false}>
         {NOTIFIABLE_PRAYERS.map((prayer) => (
@@ -157,15 +172,16 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  sunSpot: { position: 'absolute', right: 8 },
-  title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
-  rowCard: { marginTop: spacing.md },
-  silentModeNote: {
-    fontSize: typography.size.xs,
-    color: colors.textMuted,
-    marginTop: spacing.xs,
-    paddingHorizontal: spacing.xxs,
-  },
-  aboutText: { fontSize: typography.size.md, color: colors.textPrimary },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    sunSpot: { position: 'absolute', right: 8 },
+    title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
+    rowCard: { marginTop: spacing.md },
+    silentModeNote: {
+      fontSize: typography.size.xs,
+      color: colors.textMuted,
+      marginTop: spacing.xs,
+      paddingHorizontal: spacing.xxs,
+    },
+    aboutText: { fontSize: typography.size.md, color: colors.textPrimary },
+  });
