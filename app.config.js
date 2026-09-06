@@ -68,6 +68,10 @@ module.exports = {
         monochromeImage: './assets/android-icon-monochrome.png',
       },
       predictiveBackGestureEnabled: false,
+      // Required for React Native's Vibration API (lib/useQiblaAlignment.ts's
+      // Qibla-aligned buzz). Declared explicitly rather than relying on it
+      // coming along transitively via another package's own manifest.
+      permissions: ['android.permission.VIBRATE'],
     },
     web: {
       favicon: './assets/favicon.png',

@@ -1,42 +1,60 @@
 import { useEffect, useRef, useState } from 'react';
-import * as Haptics from 'expo-haptics';
+import { Vibration } from 'react-native';
 
-const ENTER_THRESHOLD_DEG = 5;
-const EXIT_THRESHOLD_DEG = 8;
-const REPEAT_INTERVAL_MS = 1200;
+// Tolerance for "aligned" is intentionally asymmetric (hysteresis): the
+// enter threshold is tight (±3°, a real "you're on it" bearing), but once
+// aligned the phone has to drift further out (>5°) before it's considered
+// no longer aligned. Without that gap, a heading sitting almost exactly on
+// the 3° boundary would flicker in and out of "aligned" on ordinary
+// compass jitter, each flicker re-triggering the vibration below.
+const ENTER_THRESHOLD_DEG = 3;
+const EXIT_THRESHOLD_DEG = 5;
+
+// Belt-and-suspenders alongside the hysteresis above: even a genuine
+// exit-then-re-entry (the user's hand wavering right at the edge, not just
+// sensor noise) won't re-buzz more often than this. Vibration.vibrate()
+// itself doesn't return a promise (nothing to catch), but it's wrapped
+// defensively anyway - this is best-effort feedback, never something a
+// platform quirk should be allowed to crash the compass screen over.
+const COOLDOWN_MS = 2500;
+const VIBRATE_DURATION_MS = 400;
 
 function angleDistance(deg: number): number {
   const normalized = ((deg % 360) + 360) % 360;
   return Math.min(normalized, 360 - normalized);
 }
 
-// A plain notificationAsync(Success) alone can be too subtle to notice
-// while the phone is actively being turned in hand - pairing it with an
-// immediate heavy impact gives a more physically obvious "you're there"
-// thump. Wrapped defensively: haptics are best-effort feedback, never
-// something a missing/failed native call should be allowed to crash the
-// compass over.
-function fireAlignmentHaptic() {
-  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+function fireAlignmentVibration() {
+  try {
+    // A plain number (rather than a pattern array) is what actually gives
+    // the classic iOS AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+    // buzz via RN's Vibration module - that call fires regardless of the
+    // device's System Haptics setting, unlike UIFeedbackGenerator-based
+    // APIs (e.g. expo-haptics), which is why this hook uses Vibration
+    // directly instead. iOS ignores the duration and plays its fixed
+    // system buzz; Android actually vibrates for this many ms.
+    Vibration.vibrate(VIBRATE_DURATION_MS);
+  } catch {
+    // no-op - see comment above
+  }
 }
 
 /**
  * Tracks whether the compass arrow is currently aligned with the Qibla
- * (rotation ~ 0). Enter/exit thresholds are deliberately different
- * (hysteresis) so it doesn't flicker in and out of "aligned" while held
- * steady right at the edge of the tolerance.
+ * (rotation ~ 0), and fires a single vibration the moment it *enters* that
+ * aligned zone - not a repeating buzz for as long as it stays aligned,
+ * since that would spam the phone while the user just holds it still.
  *
  * `hapticsEnabled` is this app's own in-app preference (Settings -> Qibla),
  * not an attempt to read the device's system haptics setting - there's no
- * public API for that, and iOS's UIFeedbackGenerator calls are largely
- * independent of it by design anyway. Alignment detection itself (and the
- * "Facing the Qibla" label that depends on the return value) is unaffected
- * either way - only whether that alignment actually buzzes.
+ * public API for that. Alignment detection itself (and the "Facing the
+ * Qibla" label that depends on the return value) is unaffected either way
+ * - only whether that alignment actually buzzes.
  */
 export function useQiblaAlignment(rotation: number | null, hapticsEnabled = true): boolean {
   const [isAligned, setIsAligned] = useState(false);
   const alignedRef = useRef(false);
+  const lastVibrateAtRef = useRef(0);
 
   useEffect(() => {
     const distance = rotation == null ? null : angleDistance(rotation);
@@ -58,16 +76,16 @@ export function useQiblaAlignment(rotation: number | null, hapticsEnabled = true
     }
   }, [rotation]);
 
-  // Pulse repeatedly for as long as the phone stays aligned, not just once
-  // the instant it enters alignment - a single pulse is easy to miss since
-  // the user is typically watching the screen for the "Facing the Qibla"
-  // label to appear, not paying attention to their hand at that exact
-  // instant, so a one-shot haptic can come and go unnoticed.
+  // Runs once per false->true transition of `isAligned` (not on every
+  // render while it stays true, since there's nothing re-triggering this
+  // effect in between) - the cooldown guard on top of that only matters
+  // for a *second* transition arriving too soon after the last buzz.
   useEffect(() => {
     if (!isAligned || !hapticsEnabled) return;
-    fireAlignmentHaptic();
-    const interval = setInterval(fireAlignmentHaptic, REPEAT_INTERVAL_MS);
-    return () => clearInterval(interval);
+    const now = Date.now();
+    if (now - lastVibrateAtRef.current < COOLDOWN_MS) return;
+    lastVibrateAtRef.current = now;
+    fireAlignmentVibration();
   }, [isAligned, hapticsEnabled]);
 
   return isAligned;
