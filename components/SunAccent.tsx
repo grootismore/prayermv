@@ -1,4 +1,4 @@
-import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, Mask, Path, RadialGradient, Stop } from 'react-native-svg';
 
 import { useTheme } from '../lib/useTheme';
 
@@ -12,42 +12,61 @@ interface Props {
  * solid glyph, built from SVG gradients rather than a blur filter (RN has
  * no cheap native blur), so it stays lightweight to render.
  *
- * A warm gold sun disc in dark mode ("Ocean Night") reads as a glimpse of
- * dawn breaking through the midnight navy. That same sun on the light
- * "Ocean Day" background isn't a glimpse of anything - the page is
- * already daylight - so it swaps to a cyan sparkle instead: the same
- * small diamond-twinkle glyph already sitting in the app's own icon/logo
- * mark, just given room to be its own accent here.
+ * Both glyphs are drawn as custom vector paths (never the literal ✨/🌙
+ * Unicode characters, which would pull in emoji-font rendering the app
+ * doesn't otherwise use): a crisp four-point twinkle with a small
+ * companion sparkle for the light "Ocean Day" background, and a proper
+ * crescent (an SVG mask cutting one circle out of another, not just a
+ * flat disc) for dark "Ocean Night", reading as a glimpse of moonlight
+ * against the midnight navy.
  */
 export default function SunAccent({ size = 36 }: Props) {
   const { colors, scheme } = useTheme();
-  const id = 'noorAccentGlow';
+  const glowId = 'noorAccentGlow';
+  const maskId = 'noorAccentMoonMask';
   const cx = size * 1.1;
   const cy = size * 1.1;
   const glowColor = scheme === 'light' ? colors.primary : colors.gold;
 
+  const moonR = size * 0.44;
+  const biteR = size * 0.38;
+  const biteOffset = size * 0.22;
+
   return (
     <Svg width={size * 2.2} height={size * 2.2} viewBox={`0 0 ${size * 2.2} ${size * 2.2}`}>
       <Defs>
-        <RadialGradient id={id} cx="50%" cy="50%" r="50%">
+        <RadialGradient id={glowId} cx="50%" cy="50%" r="50%">
           <Stop offset="0%" stopColor={glowColor} stopOpacity={0.55} />
           <Stop offset="100%" stopColor={glowColor} stopOpacity={0} />
         </RadialGradient>
+        <Mask id={maskId}>
+          <Circle cx={cx} cy={cy} r={moonR} fill="white" />
+          <Circle cx={cx + biteOffset} cy={cy - biteOffset * 0.35} r={biteR} fill="black" />
+        </Mask>
       </Defs>
-      <Circle cx={cx} cy={cy} r={size * 1.1} fill={`url(#${id})`} />
+      <Circle cx={cx} cy={cy} r={size * 1.1} fill={`url(#${glowId})`} />
       {scheme === 'light' ? (
-        <Path
-          d={sparklePath(cx, cy, size * 0.52, size * 0.16)}
-          fill={colors.primary}
-        />
+        <>
+          <Path d={sparklePath(cx, cy, size * 0.5, size * 0.09)} fill={colors.primary} />
+          <Path
+            d={sparklePath(cx + size * 0.62, cy + size * 0.5, size * 0.16, size * 0.035)}
+            fill={colors.primary}
+            opacity={0.8}
+          />
+        </>
       ) : (
-        <Circle cx={cx} cy={cy} r={size * 0.42} fill={colors.gold} />
+        <Circle cx={cx} cy={cy} r={moonR} fill={colors.gold} mask={`url(#${maskId})`} />
       )}
     </Svg>
   );
 }
 
-/** A slender 4-point sparkle/twinkle, tips at radius `r`, pinched waist at `w`. */
+/**
+ * A crisp four-point twinkle - tips at radius `r`, pulled in sharply to a
+ * narrow waist `w` so each point reads as its own spike (the classic
+ * "sparkle" glyph shape) rather than the softer, more diamond-like curve
+ * this used before.
+ */
 function sparklePath(cx: number, cy: number, r: number, w: number): string {
   return [
     `M ${cx} ${cy - r}`,
