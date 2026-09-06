@@ -164,6 +164,7 @@
     "shareAttribution": "Shared from Noor+",
     "arabicTextSize": "Text size",
     "decreaseArabicTextSize": "Decrease Arabic text size",
-    "increaseArabicTextSize": "Increase Arabic text size"
+    "increaseArabicTextSize": "Increase Arabic text size",
+    "phraseOf": "Phrase {{index}} of {{count}}"
   }
 }

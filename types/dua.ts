@@ -43,19 +43,41 @@ export interface DuaContentReview {
   notes?: string;
 }
 
+/**
+ * One phrase within a multi-phrase dhikr (e.g. the "Subhanallah / Alhamdu
+ * lillah / Allahu Akbar / closing tahlil" sequence said after each
+ * prayer), each repeated its own number of times. Drives the reading
+ * screen's one-phrase-per-card, auto-advancing counter flow - see
+ * Dua.segments.
+ */
+export interface DuaSegment {
+  arabic: string;
+  transliteration: string;
+  translation: LocalizedDuaText;
+  repetitions: number;
+}
+
 export interface Dua {
   id: string;
   type: DuaType;
   categoryId: string;
   title: LocalizedDuaText;
-  /** Full Arabic text with complete harakat - never bare/unvowelled text. */
+  /** Full Arabic text with complete harakat - never bare/unvowelled text. For a multi-phrase dhikr (see `segments`) this is the complete combined text, used for search/sharing/preview. */
   arabic: string;
   /** Manually authored Latin transliteration - never derived from lib/arabicTransliterate.ts, which is a place-name phonetic approximator, not a religious-text transliterator. */
   transliteration: string;
   translation: LocalizedDuaText;
   source: DuaSource;
-  /** Number of times a zikr should be repeated. Only set when the source itself specifies a count. */
+  /** Number of times a single-phrase zikr should be repeated. Only set when the source itself specifies a count, and only for a dhikr that's one uniform phrase - a multi-phrase dhikr uses `segments` instead, not this. */
   repetitions?: number;
+  /**
+   * For a dhikr made of several distinct phrases each repeated its own
+   * number of times (e.g. the 33/33/33/1 post-prayer tasbih) - the reading
+   * screen shows one segment at a time, full-screen, and auto-advances to
+   * the next once the current one's target is reached. Omit for a plain
+   * dua or a single-phrase zikr (use `repetitions` for the latter).
+   */
+  segments?: DuaSegment[];
   /** A benefit/virtue - only included when directly supported by the cited source, not general folklore. */
   benefits?: LocalizedDuaText;
   /** Extra plain-text search hints (e.g. alternate spellings) beyond title/arabic/transliteration/translation, which are always searched. */

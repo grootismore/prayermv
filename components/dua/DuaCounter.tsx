@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { AccessibilityInfo, Alert, Animated, Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
+import { AccessibilityInfo, Alert, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
@@ -14,8 +14,10 @@ interface Props {
   onReset: () => void;
   /** The dua's title, used only to build the accessibility label/hint - never rendered visibly here. */
   duaTitle: string;
-  /** 'ring' (default): the large standalone counter shown on its own. 'bar': a compact horizontal counter meant to sit in a screen header. */
-  variant?: 'ring' | 'bar';
+  /** Called once, on the tap that brings count up to target - lets the caller decide what happens next (e.g. DuaZikrFlow fires the completion vibration on the last phrase, or auto-advances to the next one otherwise). DuaCounter itself only ever gives a light haptic, on every tap. */
+  onTargetReached?: () => void;
+  /** Hides the built-in reset button - for DuaZikrFlow, which resets the whole multi-phrase sequence itself rather than one segment at a time. */
+  hideReset?: boolean;
 }
 
 const RING_SIZE = 176;
@@ -23,31 +25,13 @@ const RING_STROKE = 10;
 const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
-// The same completion-moment feedback as the Qibla compass's alignment
-// buzz (lib/useQiblaAlignment.ts) - a plain-number Vibration.vibrate()
-// call, not expo-haptics, because that's what actually fires the classic
-// system buzz on iOS regardless of the device's System Haptics setting.
-const COMPLETE_VIBRATE_DURATION_MS = 400;
-
-function fireCompleteVibration() {
-  try {
-    Vibration.vibrate(COMPLETE_VIBRATE_DURATION_MS);
-  } catch {
-    // best-effort feedback only - never worth crashing the counter over
-  }
-}
-
 /**
- * The interactive zikr repeat counter. Two layouts sharing the same
- * increment/reset/haptics logic: a large ring for standalone use, and a
- * compact horizontal bar meant to sit fixed in the reading screen's header
- * so it never scrolls out of reach while counting. A light haptic fires on
- * every tap; reaching the target fires the compass's own vibration instead
- * of a generic success haptic. Skips the tap animation when the OS
- * reduce-motion setting is on; the haptics/vibration stay either way since
- * they're feedback, not decoration.
+ * The interactive zikr repeat counter: a large ring, tap to count, a light
+ * haptic on every tap, disabled once complete. Skips the tap animation
+ * when the OS reduce-motion setting is on; the haptic stays either way
+ * since it's feedback, not decoration.
  */
-export default function DuaCounter({ count, target, onIncrement, onReset, duaTitle, variant = 'ring' }: Props) {
+export default function DuaCounter({ count, target, onIncrement, onReset, duaTitle, onTargetReached, hideReset }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
@@ -58,12 +42,7 @@ export default function DuaCounter({ count, target, onIncrement, onReset, duaTit
     if (isComplete) return;
     const willComplete = target !== undefined && count + 1 >= target;
     onIncrement();
-
-    if (willComplete) {
-      fireCompleteVibration();
-    } else {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const reduceMotion = await AccessibilityInfo.isReduceMotionEnabled();
     if (!reduceMotion) {
@@ -72,7 +51,11 @@ export default function DuaCounter({ count, target, onIncrement, onReset, duaTit
         Animated.timing(scale, { toValue: 1, duration: 120, useNativeDriver: true }),
       ]).start();
     }
-  }, [count, target, isComplete, onIncrement, scale]);
+
+    if (willComplete) {
+      onTargetReached?.();
+    }
+  }, [count, target, isComplete, onIncrement, onTargetReached, scale]);
 
   const handleResetPress = useCallback(() => {
     if (count === 0) return;
@@ -84,50 +67,6 @@ export default function DuaCounter({ count, target, onIncrement, onReset, duaTit
 
   const progress = target ? Math.min(count / target, 1) : 0;
   const valueText = target !== undefined ? `${count} / ${target}` : String(count);
-  const accessibilityLabel = t('duas.counterAccessibilityLabel', { title: duaTitle });
-  const accessibilityValue =
-    target !== undefined ? { min: 0, max: target, now: count, text: valueText } : { now: count, text: valueText };
-
-  if (variant === 'bar') {
-    const barProgress = target ? Math.min(count / target, 1) : 0;
-    return (
-      <View style={styles.barRow}>
-        <Pressable
-          onPress={handlePress}
-          disabled={isComplete}
-          accessibilityRole="button"
-          accessibilityLabel={accessibilityLabel}
-          accessibilityHint={isComplete ? undefined : t('duas.counterAccessibilityHint')}
-          accessibilityValue={accessibilityValue}
-          accessibilityState={{ disabled: isComplete }}
-          style={styles.barPressArea}
-        >
-          <Animated.View style={[styles.barPill, { transform: [{ scale }] }]}>
-            <View style={[styles.barTrack, { backgroundColor: colors.surfaceElevated }]}>
-              <View
-                style={[
-                  styles.barFill,
-                  { width: `${barProgress * 100}%`, backgroundColor: isComplete ? colors.success : colors.primary },
-                ]}
-              />
-            </View>
-            <Text style={styles.barCount}>{valueText}</Text>
-            {isComplete ? <Text style={styles.barComplete}>{t('duas.counterComplete')}</Text> : null}
-          </Animated.View>
-        </Pressable>
-        <Pressable
-          onPress={handleResetPress}
-          disabled={count === 0}
-          style={({ pressed }) => [styles.barResetButton, (pressed || count === 0) && styles.resetButtonDisabled]}
-          accessibilityRole="button"
-          accessibilityLabel={t('duas.counterResetLabel')}
-          hitSlop={8}
-        >
-          <Text style={styles.resetText}>{t('duas.counterResetLabel')}</Text>
-        </Pressable>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -135,9 +74,11 @@ export default function DuaCounter({ count, target, onIncrement, onReset, duaTit
         onPress={handlePress}
         disabled={isComplete}
         accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
+        accessibilityLabel={t('duas.counterAccessibilityLabel', { title: duaTitle })}
         accessibilityHint={isComplete ? undefined : t('duas.counterAccessibilityHint')}
-        accessibilityValue={accessibilityValue}
+        accessibilityValue={
+          target !== undefined ? { min: 0, max: target, now: count, text: valueText } : { now: count, text: valueText }
+        }
         accessibilityState={{ disabled: isComplete }}
         style={styles.pressArea}
       >
@@ -178,16 +119,18 @@ export default function DuaCounter({ count, target, onIncrement, onReset, duaTit
         </Text>
       ) : null}
 
-      <Pressable
-        onPress={handleResetPress}
-        disabled={count === 0}
-        style={({ pressed }) => [styles.resetButton, (pressed || count === 0) && styles.resetButtonDisabled]}
-        accessibilityRole="button"
-        accessibilityLabel={t('duas.counterResetLabel')}
-        hitSlop={8}
-      >
-        <Text style={styles.resetText}>{t('duas.counterResetLabel')}</Text>
-      </Pressable>
+      {hideReset ? null : (
+        <Pressable
+          onPress={handleResetPress}
+          disabled={count === 0}
+          style={({ pressed }) => [styles.resetButton, (pressed || count === 0) && styles.resetButtonDisabled]}
+          accessibilityRole="button"
+          accessibilityLabel={t('duas.counterResetLabel')}
+          hitSlop={8}
+        >
+          <Text style={styles.resetText}>{t('duas.counterResetLabel')}</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -241,61 +184,5 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.textSecondary,
       fontWeight: typography.weight.semibold,
       fontSize: typography.size.sm,
-    },
-    // --- bar variant (header) ---
-    barRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.xs,
-      paddingHorizontal: spacing.md,
-      paddingBottom: spacing.sm,
-    },
-    barPressArea: {
-      flex: 1,
-      minHeight: minTouchTarget,
-    },
-    barPill: {
-      flex: 1,
-      minHeight: minTouchTarget,
-      borderRadius: radius.pill,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: spacing.md,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      overflow: 'hidden',
-    },
-    barTrack: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      height: 4,
-    },
-    barFill: {
-      height: 4,
-    },
-    barCount: {
-      fontSize: typography.size.xl,
-      fontWeight: typography.weight.heavy,
-      color: colors.textPrimary,
-      fontVariant: ['tabular-nums'],
-    },
-    barComplete: {
-      fontSize: typography.size.sm,
-      fontWeight: typography.weight.bold,
-      color: colors.success,
-    },
-    barResetButton: {
-      minHeight: minTouchTarget,
-      minWidth: minTouchTarget,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: spacing.sm,
-      borderRadius: radius.pill,
-      borderWidth: 1,
-      borderColor: colors.border,
     },
   });

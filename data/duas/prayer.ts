@@ -51,7 +51,7 @@ export const AFTER_SALAH_DUAS: Dua[] = [
   },
   {
     id: 'prayer-tasbih-hundred',
-    type: 'dua',
+    type: 'zikr',
     categoryId: 'afterSalah',
     title: { en: 'Tasbih, Tahmid, Takbir, Completing a Hundred', dv: 'ތަސްބީޙް، ތަޙްމީދު، ތަކްބީރު، ސަތޭކަ ފުރިހަމަކުރުން' },
     arabic:
@@ -68,11 +68,45 @@ export const AFTER_SALAH_DUAS: Dua[] = [
       dv: 'ކޮންމެ ނަމާދަކަށްފަހު މިގޮތަށް ކިޔައިފި މީހެއްގެ ފާފަތައް، ކަނޑުގެ ފޮނުތަކާ އެއްވަރު ވިޔަސް ފުއްސަވާދެއްވާނެއެވެ.',
     },
     searchTerms: ['tasbih tahmid takbir', 'subhanallah 33', 'after prayer dhikr'],
+    // One phrase per card on the reading screen (see components/dua/DuaZikrFlow.tsx) -
+    // the `arabic`/`transliteration`/`translation` fields above stay as the
+    // complete combined text for search/sharing/preview.
+    segments: [
+      {
+        arabic: 'سُبْحَانَ اللَّهِ',
+        transliteration: 'Subhanallah.',
+        translation: { en: 'Glory be to Allah.', dv: 'اللهގެ سبحان ވަންތަކަން ބަޔާންކުރަމެވެ.' },
+        repetitions: 33,
+      },
+      {
+        arabic: 'وَالْحَمْدُ لِلَّهِ',
+        transliteration: 'Walhamdu lillah.',
+        translation: { en: 'Praise be to Allah.', dv: 'ހަމްދު ސަނާ ވަނީ اللهއަށެވެ.' },
+        repetitions: 33,
+      },
+      {
+        arabic: 'وَاللَّهُ أَكْبَرُ',
+        transliteration: 'Wallahu akbar.',
+        translation: { en: 'Allah is the Greatest.', dv: 'اللهއީ އެންމެ ބޮޑުވަންތަ ރަސްކަލާނގެއެވެ.' },
+        repetitions: 33,
+      },
+      {
+        arabic:
+          'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
+        transliteration:
+          "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadeer.",
+        translation: {
+          en: 'None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent.',
+          dv: 'اللهމެނުވީ حق ގޮތުގައި އަޅުކަން ވެވޭ إلـه އެއް ނުވެއެވެ. އެކަލާނގެ އެއްކައުވަންތަ ރަސްކަލާނގެއެވެ، شريك އަކާ ނުލައި. ވެރިކަމާއި ހަމްދު ވަނީ އެކަލާނގެއަށެވެ. އަދި އެކަލާނގެއީ ކޮންމެ ކަމެއްގެ މައްޗަށް ކުޅަދުންވަންތަ ރަސްކަލާނގެއެވެ.',
+        },
+        repetitions: 1,
+      },
+    ],
     contentReview: {
       arabicVerified: false,
       transliterationVerified: false,
       translationVerified: { en: false, dv: false },
-      notes: 'Confirm exact Sahih Muslim numbering (Abu Hurairah narration) - distinct from the unrelated "Tasbih of Fatimah" (33/33/34, before sleep), which this collection does not include, to avoid conflating the two hadiths.',
+      notes: 'Confirm exact Sahih Muslim numbering (Abu Hurairah narration) - distinct from the unrelated "Tasbih of Fatimah" (33/33/34, before sleep), which this collection does not include, to avoid conflating the two hadiths. The per-segment breakdown needs the same Arabic/transliteration/translation review as the combined text.',
     },
   },
 ];

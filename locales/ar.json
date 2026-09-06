@@ -164,6 +164,7 @@
     "shareAttribution": "تمت المشاركة من Noor+",
     "arabicTextSize": "حجم النص",
     "decreaseArabicTextSize": "تصغير النص العربي",
-    "increaseArabicTextSize": "تكبير النص العربي"
+    "increaseArabicTextSize": "تكبير النص العربي",
+    "phraseOf": "الجملة {{index}} من {{count}}"
   }
 }
