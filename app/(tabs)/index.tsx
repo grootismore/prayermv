@@ -89,7 +89,7 @@ export default function HomeScreen() {
         <>
           <WaveDecoration variant="header" />
           <View style={[styles.sunSpot, { top: insets.top + 4 }]}>
-            <SunAccent size={26} />
+            <SunAccent size={24} />
           </View>
         </>
       }

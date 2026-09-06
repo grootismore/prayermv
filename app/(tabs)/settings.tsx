@@ -104,7 +104,7 @@ export default function SettingsScreen() {
         <>
           <WaveDecoration variant="header" />
           <View style={[styles.sunSpot, { top: insets.top + 4 }]}>
-            <SunAccent size={22} />
+            <SunAccent size={24} />
           </View>
         </>
       }
