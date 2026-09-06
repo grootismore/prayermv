@@ -64,13 +64,18 @@ export const darkColors: ThemeColors = {
 // Not just an inversion of the dark palette - primary/gold are deepened a
 // step from their dark-mode values so they hold contrast against a light
 // background instead of washing out, the way the bright cyan/gold read
-// fine floating on midnight navy but wouldn't on white.
+// fine floating on midnight navy but wouldn't on white. The neutrals
+// (background/surface/etc.) are a lagoon-turquoise tinted scale rather
+// than white/blue-white - plain white would abandon the "Ocean" identity
+// the dark theme carries; this keeps that same lagoon cast, just very
+// pale, at every step from backgroundDeep down to the barely-there
+// surfaceElevated.
 export const lightColors: ThemeColors = {
-  background: '#F4F9FF',
-  backgroundDeep: '#E4EEFB',
-  surface: '#FFFFFF',
-  surfaceElevated: '#FFFFFF',
-  surfacePressed: '#E9F2FC',
+  background: '#E4F4F6',
+  backgroundDeep: '#D0EDF1',
+  surface: '#F2F9FA',
+  surfaceElevated: '#F8FBFC',
+  surfacePressed: '#CCECF0',
   primary: '#0A8CA6',
   primaryMuted: '#0AA8C6',
   primarySoft: 'rgba(10, 140, 166, 0.10)',
@@ -83,7 +88,7 @@ export const lightColors: ThemeColors = {
   textMuted: '#7C8FA6',
   border: 'rgba(10, 90, 140, 0.18)',
   separator: 'rgba(10, 60, 110, 0.10)',
-  overlay: 'rgba(228, 238, 251, 0.85)',
+  overlay: 'rgba(228, 244, 246, 0.85)',
   success: '#0E8E77',
   warning: '#B87A0A',
   danger: '#D63B52',
