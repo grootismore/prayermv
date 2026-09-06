@@ -21,6 +21,8 @@
     "settings": "الإعدادات"
   },
   "onboarding": {
+    "chooseLanguageTitle": "اختر لغتك",
+    "chooseLanguageSubtitle": "يمكنك دائمًا تغيير هذا لاحقًا من الإعدادات.",
     "title": "اختر جزيرتك",
     "subtitle": "تُنشر أوقات الصلاة لكل جزيرة في المالديف على حدة. اختر جزيرتك للبدء.",
     "searchPlaceholder": "ابحث عن أتول أو جزيرة",

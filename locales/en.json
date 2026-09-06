@@ -21,6 +21,8 @@
     "settings": "Settings"
   },
   "onboarding": {
+    "chooseLanguageTitle": "Choose your language",
+    "chooseLanguageSubtitle": "You can always change this later in Settings.",
     "title": "Select your island",
     "subtitle": "Prayer times are published per island in the Maldives. Pick yours to get started.",
     "searchPlaceholder": "Search atoll or island",
