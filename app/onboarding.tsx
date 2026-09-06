@@ -13,6 +13,7 @@ import { SUPPORTED_LANGUAGES, LANGUAGE_ENDONYMS } from '../lib/i18n';
 import type { AppLanguage } from '../lib/storage';
 import { minTouchTarget, radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
+import { showToast } from '../lib/toast';
 import WaveDecoration from '../components/WaveDecoration';
 import SunAccent from '../components/SunAccent';
 
@@ -38,6 +39,12 @@ export default function OnboardingScreen() {
 
   async function handleSelect(islandId: number) {
     await selectIsland(islandId);
+    // Only toast when this is the "change island" flow launched from
+    // Settings (?skipIntro=1) - during first-run onboarding, finishing
+    // setup and landing on Home is feedback enough on its own.
+    if (skipIntro === '1') {
+      showToast(t('settings.toastIslandChanged'));
+    }
     if (router.canGoBack()) {
       router.back();
     } else {

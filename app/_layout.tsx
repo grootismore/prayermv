@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { SettingsProvider } from '../context/SettingsContext';
 import { useTheme } from '../lib/useTheme';
+import ToastHost from '../components/ToastHost';
 import {
   ensureAdhanChannel,
   registerBackgroundRescheduleTask,
@@ -48,6 +49,7 @@ function AppShell() {
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="(tabs)" />
       </Stack>
+      <ToastHost />
     </GestureHandlerRootView>
   );
 }

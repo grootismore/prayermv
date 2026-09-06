@@ -12,6 +12,7 @@ import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
 import type { AppLanguage, CalendarMode, NotificationPrefs, ThemeMode } from '../../lib/storage';
 import { spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useThemedStyles } from '../../lib/useTheme';
+import { showToast } from '../../lib/toast';
 import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
@@ -51,6 +52,29 @@ export default function SettingsScreen() {
       }
     }
     await setNotificationEnabled(prayer as keyof NotificationPrefs, value);
+    showToast(
+      t(value ? 'settings.toastNotificationOn' : 'settings.toastNotificationOff', { prayer: t(`prayers.${prayer}`) })
+    );
+  }
+
+  async function handleLanguageChange(lang: AppLanguage) {
+    await changeLanguage(lang);
+    showToast(t('settings.toastLanguageChanged'));
+  }
+
+  async function handleCalendarModeChange(mode: CalendarMode) {
+    await setCalendarMode(mode);
+    showToast(t('settings.toastCalendarChanged'));
+  }
+
+  async function handleThemeModeChange(mode: ThemeMode) {
+    await setThemeMode(mode);
+    showToast(t('settings.toastAppearanceChanged'));
+  }
+
+  async function handleQiblaHapticsChange(enabled: boolean) {
+    await setQiblaHapticsEnabled(enabled);
+    showToast(t(enabled ? 'settings.toastQiblaHapticsOn' : 'settings.toastQiblaHapticsOff'));
   }
 
   async function handlePreviewSound() {
@@ -103,7 +127,7 @@ export default function SettingsScreen() {
             key={lang}
             label={t(`languages.${lang}`)}
             selected={language === lang}
-            onPress={() => changeLanguage(lang as AppLanguage)}
+            onPress={() => handleLanguageChange(lang as AppLanguage)}
           />
         ))}
       </SurfaceCard>
@@ -115,7 +139,7 @@ export default function SettingsScreen() {
           { key: 'gregorian', label: t('hijri.gregorianMode') },
         ]}
         selectedKey={calendarMode}
-        onChange={(key) => setCalendarMode(key as CalendarMode)}
+        onChange={(key) => handleCalendarModeChange(key as CalendarMode)}
       />
 
       <SectionHeader title={t('settings.appearance')} subtitle={t('settings.appearanceSubtitle')} />
@@ -126,7 +150,7 @@ export default function SettingsScreen() {
           { key: 'system', label: t('settings.appearanceSystem') },
         ]}
         selectedKey={themeMode}
-        onChange={(key) => setThemeMode(key as ThemeMode)}
+        onChange={(key) => handleThemeModeChange(key as ThemeMode)}
       />
 
       <SectionHeader title={t('settings.notifications')} subtitle={t('settings.notificationsSubtitle')} />
@@ -151,7 +175,7 @@ export default function SettingsScreen() {
         <NotificationSwitchRow
           label={t('settings.qiblaHapticsLabel')}
           value={qiblaHapticsEnabled}
-          onValueChange={setQiblaHapticsEnabled}
+          onValueChange={handleQiblaHapticsChange}
         />
       </SurfaceCard>
 
