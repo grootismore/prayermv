@@ -1,9 +1,11 @@
-import { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef } from 'react';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 import { useSettings } from '../../../context/SettingsContext';
 import { useDuaPreferences } from '../../../hooks/useDuaPreferences';
@@ -48,6 +50,25 @@ export default function DuaReadingScreen() {
     (dua?.repetitions
       ? [{ arabic: dua.arabic, transliteration: dua.transliteration, translation: dua.translation, repetitions: dua.repetitions }]
       : undefined);
+
+  const contentOpacity = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    contentOpacity.setValue(0);
+    Animated.timing(contentOpacity, { toValue: 1, duration: 180, useNativeDriver: true }).start();
+  }, [duaId, contentOpacity]);
+
+  const swipeGesture = Gesture.Pan()
+    .activeOffsetX([-20, 20])
+    .failOffsetY([-15, 15])
+    .onEnd((e) => {
+      if (e.translationX <= -60 && nextDua) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        navigateTo(nextDua.id);
+      } else if (e.translationX >= 60 && previousDua) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        navigateTo(previousDua.id);
+      }
+    });
 
   if (!dua) {
     return (
@@ -159,44 +180,48 @@ export default function DuaReadingScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
-        {segments ? (
-          <DuaZikrFlow
-            duaId={dua.id}
-            duaTitle={titleText}
-            segments={segments}
-            resolvedLanguage={resolvedLanguage}
-            showTransliteration={preferences.showTransliteration}
-            arabicFontSize={preferences.arabicFontSize}
-          />
-        ) : (
-          <SurfaceCard elevated style={styles.arabicCard}>
-            <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} align="center" />
+      <GestureDetector gesture={swipeGesture}>
+        <Animated.View style={{ flex: 1, opacity: contentOpacity }}>
+          <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
+            {segments ? (
+              <DuaZikrFlow
+                duaId={dua.id}
+                duaTitle={titleText}
+                segments={segments}
+                resolvedLanguage={resolvedLanguage}
+                showTransliteration={preferences.showTransliteration}
+                arabicFontSize={preferences.arabicFontSize}
+              />
+            ) : (
+              <SurfaceCard elevated style={styles.arabicCard}>
+                <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} align="center" />
 
-            {preferences.showTransliteration ? (
-              <Text style={styles.transliteration}>{dua.transliteration}</Text>
+                {preferences.showTransliteration ? (
+                  <Text style={styles.transliteration}>{dua.transliteration}</Text>
+                ) : null}
+
+                <Text style={styles.translation}>{translationText}</Text>
+
+                <View style={styles.sourceRow}>
+                  <View style={styles.sourceAccent} />
+                  <Text style={styles.sourceText}>
+                    {dua.source.reference}
+                    {dua.source.grading ? ` · ${dua.source.grading}` : ''}
+                  </Text>
+                </View>
+              </SurfaceCard>
+            )}
+
+            {benefitsText ? (
+              <>
+                <NoorDivider compact />
+                <Text style={styles.sectionLabel}>{t('duas.benefits')}</Text>
+                <Text style={styles.benefitsText}>{benefitsText}</Text>
+              </>
             ) : null}
-
-            <Text style={styles.translation}>{translationText}</Text>
-
-            <View style={styles.sourceRow}>
-              <View style={styles.sourceAccent} />
-              <Text style={styles.sourceText}>
-                {dua.source.reference}
-                {dua.source.grading ? ` · ${dua.source.grading}` : ''}
-              </Text>
-            </View>
-          </SurfaceCard>
-        )}
-
-        {benefitsText ? (
-          <>
-            <NoorDivider compact />
-            <Text style={styles.sectionLabel}>{t('duas.benefits')}</Text>
-            <Text style={styles.benefitsText}>{benefitsText}</Text>
-          </>
-        ) : null}
-      </ScrollView>
+          </ScrollView>
+        </Animated.View>
+      </GestureDetector>
 
       <View style={[styles.navRow, { paddingBottom: insets.bottom + spacing.sm }]}>
         <Pressable
