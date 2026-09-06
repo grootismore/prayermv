@@ -1,85 +1,128 @@
 # Duas & Adhkar content review
 
 This directory (`data/duas/`) holds every dua and dhikr shown in the app.
-**None of it has been checked by a qualified human reviewer yet.** It was
-drafted by an AI assistant from general knowledge and cross-checked for
-*selection and hadith references only* against secondary web sources
-(sunnah.com, hadithanswers.com, and similar sites, via web search) - not
-against a printed Mushaf, a printed Hisn al-Muslim, or a native Dhivehi
-Islamic-studies speaker. That is not sufficient for content a real user
-will read as religious text, and it must not be treated as final.
+**None of it has been checked by a qualified human reviewer yet.**
+
+## Source (rebuilt from the Masnun Dua dataset)
+
+The content in `data/duas/categories.ts` and `data/duas/content/*.ts` (one
+file per category) is built entirely from the
+[Masnun Dua](https://github.com/islamicapi/masnun-dua) open dataset,
+maintained by IslamicAPI.com and credited in its own README to Hisnul
+Muslim (Said ibn Ali Al-Qahtani) among other named sources. The dataset's
+README states it is "completely free and open source - use it for any
+purpose including personal, educational, or commercial projects... No
+attribution required," which is exactly what this app does.
+
+The dataset ships **44 categories**, **118 subcategories**, and **1,001**
+numbered entries, each with per-language files (`translation/<lang>/dua_N.json`)
+carrying `title`, `arabic`, `transliteration`, `translation`, and
+`reference` fields, among others. This app's category list
+(`DUA_CATEGORIES`) mirrors the dataset's own 44 categories and their
+display order verbatim (English/Dhivehi names taken from
+`categories/en.json` / `categories/dv.json`); each dua's `categoryId`
+comes from whichever subcategory first references it in
+`sub-categories/en.json`.
+
+Only four fields were imported per dua: `title`, `arabic`,
+`transliteration`, `translation` (en + dv), and `reference`. Deliberately
+**not** imported: the dataset's `introduction`, `hadith` (isnad chain),
+`benefits`, `when_to_recite`, `how_to_perform`, and `faq` fields - the
+`benefits` text in particular reads like SEO copy in many entries ("brings
+Barakah and keeps hearts away from doubt") rather than a specific,
+citable virtue stated by the source hadith itself, which is this app's
+existing bar for a `benefits` entry (see "Adding new content later" below).
+None of that content is included here.
+
+### Filtering pipeline
+
+Not every one of the dataset's 1,001 entries became a `Dua` here:
+
+1. **95 entries were dropped for having no recitable text** - some dataset
+   entries are informational essays about dua (e.g. "we depend on Allah
+   for everything") with an empty `arabic` field, not something to recite.
+2. **7 more were dropped for missing a Dhivehi translation**, and **6 more
+   for missing a `reference`** - both required fields on this app's `Dua`
+   type.
+3. **An automated Arabic-opening-word / translation-keyword consistency
+   check** was run against every remaining entry: for entries whose Arabic
+   opens with a recognizable formula (e.g. `بِسْمِ اللَّهِ`, `أَسْتَغْفِرُ`,
+   `سُبْحَانَ`, `الْحَمْدُ لِلَّهِ`, `اللَّهُ أَكْبَرُ`, `لَا إِلَٰهَ إِلَّا اللَّهُ`), the
+   corresponding English and Dhivehi translations were checked for an
+   expected keyword (e.g. "forgiv-" for `أَسْتَغْفِرُ`, `ފުއްސެ`/`ފާފަ` for the
+   Dhivehi equivalent). This caught a real, confirmed bug in the upstream
+   dataset: for a contiguous block of ids in its "home", "mosque", and
+   "after-salah" subcategories, the **Dhivehi** translation field held text
+   belonging to an entirely different, unrelated dua, while the English
+   translation for the very same id was correct. 40 entries were excluded
+   on this basis (their English side was fine; only Dhivehi was corrupted
+   in the source, and shipping the mismatched Dhivehi text would have been
+   worse than not including the dua at all).
+4. **A Unicode-codepoint scan** of every surviving Dhivehi translation
+   flagged any character outside the expected Arabic/Thaana/ASCII/basic
+   punctuation ranges - the same technique used earlier in this project to
+   catch garbled Dhivehi text. This caught 6 more entries where a handful
+   of stray Tibetan/Khmer/Kannada/Sinhala characters had been mixed into
+   the Dhivehi text in the source dataset (an encoding bug there, not
+   introduced here).
+
+**844 of the original 1,001 entries survived this pipeline** and are what
+ships in `data/duas/content/*.ts`. The three previously-hand-curated
+Quranic entries (Ayat al-Kursi, the last two verses of Al-Baqarah, the
+Three Quls) are included among these 844 via the dataset's own Quranic
+entries rather than the earlier bespoke ones.
+
+### What this pipeline does *not* catch
+
+The consistency check above is a smell test on a handful of common opening
+formulas, not a substitute for a human reading each of the 844 entries. It
+would not catch, for example, a wrong *middle* clause in a long dua, a
+subtly wrong harakah, or a mismatch between two duas that both happen to
+start the same way. Treat every entry here with the same "unverified"
+status as the rest of this document describes.
+
+### Repetition counts
+
+The dataset does not carry a structured repetition-count field. 10 entries
+where the introduction/translation text unambiguously says "say this
+[whole, single-clause] phrase N times" had `repetitions: N` and
+`type: 'zikr'` set by hand after individually checking that the Arabic
+field really is that one short repeated phrase (ids 3, 22, 25, 26, 86, 88,
+108, 249, 264, 282 in the dataset's own numbering - see each entry's `id`,
+formatted as `masnun-<dataset id>`). Every other entry - including several
+whose text mentions a repetition count for a *sub-phrase* within a longer
+composite dua (e.g. "say Allahu Akbar three times, then recite ...") -
+was left as a plain `dua` with no counter, since safely splitting those
+into `segments` at this volume was not something this pass attempted.
+Revisiting that (as was done by hand for the old `prayer-tasbih-hundred`
+entry) would be a good follow-up for the highest-traffic categories
+(`morning-and-evening`, `salah`).
 
 ## What needs review, specifically
 
-Every `Dua` object in `morning.ts`, `evening.ts`, `prayer.ts`, `sleep.ts`,
-and `daily.ts` carries a `contentReview` field with three boolean flags,
-all currently `false`:
+Every `Dua` object carries a `contentReview` field with three boolean
+flags, all currently `false`:
 
-- **`arabicVerified`** - the Arabic text (`arabic`) has NOT been checked
-  character-by-character against an authoritative source. This is the
-  highest-priority check: a single missing or wrong harakah changes the
-  meaning of a word. The two Quranic passages in this collection (the
-  Three Quls, Ayat al-Kursi, and the last two verses of Al-Baqarah) are
-  the highest-stakes items in the whole set and should be checked against
-  a Mushaf (Uthmani script) before anything else.
-- **`transliterationVerified`** - the Latin transliteration was written by
-  hand for each entry (never auto-generated - see below), but has not been
-  proofread by a second person.
-- **`translationVerified.en`** - the English meaning is a paraphrase, not
-  a citation of a specific published translation (e.g. Saheeh International
-  for Quranic text). Reasonable confidence, but unverified.
-- **`translationVerified.dv`** - the Dhivehi meaning is a first-draft
-  translation and is the field with the **lowest** confidence in this
-  entire collection. It was not written or checked by a native Dhivehi
-  speaker with Islamic-studies background. Some entries are long (the
-  travel dua, the anxiety dua, the last two verses of Al-Baqarah) and are
-  especially likely to contain awkward or imprecise phrasing.
+- **`arabicVerified`** - not checked character-by-character against a
+  Mushaf or a printed Hisn al-Muslim. A single missing or wrong harakah
+  changes the meaning of a word - this is the highest-priority check,
+  especially for the Quranic entries in `quranic-dua`, `morning-and-evening`,
+  and `sleep`.
+- **`transliterationVerified`** - taken as-is from the dataset; not
+  proofread against this app's own transliteration conventions (which the
+  earlier hand-curated content also never standardized to a single
+  academic system).
+- **`translationVerified.en`** - the dataset's English translation;
+  reasonable confidence given it passed the automated consistency check,
+  but not a citation of one specific published translation.
+- **`translationVerified.dv`** - the dataset's Dhivehi translation; same
+  confidence level as `en` above (both come from the same dataset and both
+  passed the same per-entry consistency check), but still **not** the same
+  as a native Dhivehi Islamic-studies speaker reading it for accuracy and
+  natural phrasing.
 
-A `notes` string on most entries records anything specific worth flagging
-for that item (e.g. "confirm this hadith number against a current print
-edition").
-
-## Dhivehi translation pass (this update)
-
-The `translation.dv` field for 22 of the 25 entries (everything except
-`prayer-astaghfirullah-3` and `prayer-antas-salam`, which were already
-accurate) was replaced, since the original set was first-draft AI
-paraphrase with at least one confirmed systematic error: `بِكَ` ("by/through
-You", instrumental) had been rendered as `حضرة ން` ("from Your presence"),
-shifting the meaning - see `morning-bika-asbahna` / `evening-bika-amsayna`.
-Replacements came from:
-
-- **The 3 Quranic entries** (`protection-ayat-al-kursi`,
-  `sleep-last-two-baqarah`, `morning-three-quls`) - the official Dhivehi
-  Quran translation published by the Office of the President of the
-  Maldives, fetched via the `dv.divehi` edition on
-  [alquran.cloud](https://alquran.cloud). This is a named, authoritative,
-  government-published translation - the strongest possible source for
-  Quranic text - and should be preferred over any paraphrase if this
-  content is ever revised again.
-- **14 hadith-based entries** - the [Masnun Dua](https://github.com/islamicapi/masnun-dua)
-  open dataset (maintained by IslamicAPI.com, credited in its README to
-  Hisnul Muslim by Said ibn Ali Al-Qahtani among other sources; free/open,
-  no attribution required). Each match was verified by comparing the
-  dataset's Arabic text character-for-character against this app's
-  `arabic` field before taking its Dhivehi translation - several entries in
-  that dataset had internally mismatched Arabic/translation pairs (a data
-  bug in that project, not this one) and were skipped rather than trusted
-  blindly.
-- **5 entries plus the 4 `prayer-tasbih-hundred` segments**
-  (`home-entering`, `home-leaving`, `mosque-entering`, `mosque-leaving`,
-  `sleep-waking-up`, and the tasbih segments/combined text) - no clean
-  matching entry could be found in the sourced dataset for these
-  (the corresponding IDs there had the same Arabic/translation mismatch
-  bug), so these were manually retranslated with care. They still carry
-  the **lowest** confidence of the update and are the first place a native
-  Dhivehi reviewer should look.
-
-`translationVerified.dv` is left `false` on every entry regardless of
-source, per the review requirement below - a citation from an authoritative
-source is a large improvement over first-draft paraphrase, but it is not
-the same as a qualified human reviewer checking phrasing and register
-against this app's specific Dhivehi conventions.
+Every entry's `notes` field records that it came from this pipeline
+verbatim, so a future reviewer doesn't need to guess.
 
 ## Why this approach, not silence or refusal
 
@@ -87,9 +130,11 @@ The feature spec this content was built for is explicit: never invent
 Arabic, references, virtues, repetition counts, or hadith gradings; use
 only well-established Quranic duas and authentic adhkar; and when
 something can't be confirmed confidently, mark it clearly rather than
-pretend it's final. That's what `contentReview` does - it makes the
-review requirement a structural part of the data, not a comment that can
-be missed.
+pretend it's final. Sourcing from a maintained, openly-licensed dataset -
+verified with automated checks and with anything that failed those checks
+dropped rather than shipped - is a large step up from freehand AI
+paraphrase, but `contentReview` still makes the human-review requirement a
+structural part of the data rather than something that can be missed.
 
 ## Before this ships to real users
 
@@ -98,17 +143,13 @@ be missed.
    hadith) check every `arabic` field against a Mushaf or a printed Hisn
    al-Muslim, and flip `arabicVerified: true` per entry as they go.
 2. Have the same or another reviewer check every `transliteration` field
-   for accuracy and internal consistency (this collection does not follow
-   any single academic transliteration standard - it prioritizes
-   readability for someone with no Arabic background).
+   for accuracy and internal consistency.
 3. Have a Dhivehi speaker with Islamic-studies background review every
-   `translation.dv` (and `title.dv` / `benefits.dv` where present) for
-   both accuracy and natural phrasing, and flip `translationVerified.dv`
-   once satisfied.
-4. Spot-check `translation.en` and each `source.reference` /
-   `source.grading` against a primary or well-regarded secondary source
-   (e.g. sunnah.com for the reference number, a scholarly grading site for
-   anything not from Bukhari/Muslim directly).
+   `translation.dv` for both accuracy and natural phrasing, and flip
+   `translationVerified.dv` once satisfied.
+4. Spot-check `translation.en` and each `source.reference` against a
+   primary or well-regarded secondary source (e.g. sunnah.com for the
+   reference number).
 5. Only remove or repurpose the `contentReview` field once every entry it
    covers has actually been checked - don't strip the flags as a shortcut
    to make the data "look" finished.
@@ -118,18 +159,18 @@ be missed.
 Keep following the same rules this collection was built under:
 
 - Full harakat on every Arabic string, always.
-- A manually written transliteration - never run
-  `lib/arabicTransliterate.ts` (a place-name phonetic approximator) on
-  religious text.
 - A specific, checkable `source.reference` (a Quran ayah or a named
   collection + number), never a vague "hadith" or "it is said".
 - A `grading` only when it's well-established (Sahih/Hasan from a named
-  scholar or collection) - omit it rather than guess.
+  scholar or collection) - omit it rather than guess (this rebuild left
+  `grading` unset everywhere rather than parse it out of the dataset's
+  free-text `reference` strings, several of which bundle multiple
+  gradings/collections into one string).
 - A `benefits` entry only when the cited source itself states that
-  virtue - not a general claim from folklore.
+  virtue - not a general claim from folklore or SEO-style copy (see why
+  the dataset's own `benefits` field was skipped, above).
 - Ship new entries with `contentReview` flags set to `false` and a `notes`
-  string saying what specifically still needs checking, exactly like the
-  entries in this initial collection.
+  string saying what specifically still needs checking.
 - Run `npm run validate:duas` before committing - it catches structural
   mistakes (duplicate IDs, a dangling `categoryId`, an empty required
   field, a non-positive `repetitions`), though it says nothing about

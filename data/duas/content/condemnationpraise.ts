@@ -1,0 +1,178 @@
+import type { Dua } from '../../../types/dua';
+
+// Sourced from the Masnun Dua open dataset (github.com/islamicapi/masnun-dua)
+// - see data/duas/CONTENT_REVIEW.md for the sourcing/verification pipeline
+// and the human-review requirement that still applies to every item here.
+export const CONDEMNATIONPRAISE_DUAS: Dua[] = [
+  {
+    id: 'masnun-450',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Prophet\'s Dua After Insulting Someone (Masnun Dua)', dv: 'މީހަކަށް އެއްޗެހި ކިޔުނުނަމަ ކުރާ ދުޢާ' },
+    arabic: 'اَللَّهُمَّ فَأَيُّمَا مُؤْمِنٍ سَبَبْتُهُ فَاجْعَلْ ذَلِكَ لَهُ قُرْبَةً إِلَيْكَ يَوْمَ الْقِيَامَةِ',
+    transliteration: 'Allaahumma fa\'ayyumaa mu\'minin sababtuhu faj\'al dhaalika lahu qurbatan \'ilayka yawmal-qiyaamah',
+    translation: {
+      en: 'O Allah, whomever of the believers I have abused, make it a means of gaining nearness to you on the Day of Resurrection.',
+      dv: 'އޭ ﷲ! މިއަޅާއަށް މުއުމިނަކަށް އެއްޗެހި ކިޔުނުނަމަ، ޤިޔާމަތް ދުވަހުން އެކަމަކީ އެމީހާ އިބަރަސްކަލާނގެ ޙަޟްރަތަށް ކުއްތަންވުމުގެ ސަބަބެއް ކަމުގައި ލައްވާނދޭވެ!',
+    },
+    source: { type: 'hadith', reference: 'Bukhari: 6361' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+  {
+    id: 'masnun-451',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Dua Etiquette of praising a fellow Muslim', dv: 'މުސްލިމް އަޚަކަށް ތަޢުރީފު ކުރުމުގެ އަދަބު' },
+    arabic: 'أَحْسِبُ فُلَانًا وَاللَّهُ حَسِيبُهُ وَلَا أُزَكِّي عَلَى اللَّهِ أَحَدًا أَحْسِبُهُ كَذَا وَكَذَا',
+    transliteration: 'Ahsibu fulaanan wAllaahu haseebuhu wa laa \'uzakkee \'alAllaahi \'ahadan ahsibuhu kadha wa kadha',
+    translation: {
+      en: 'I think that he is so and so, and Allah knows exactly the truth, and I do not confirm anybody\'s good conduct before Allah, but I think him so and so.\n\nIt is to be said when you must ensure you have knowledge that the certain characteristic is present in that person.',
+      dv: 'އަހަރެން ހީކުރާ ގޮތުގައި އެވެނި މީހަކީ (މިވެނި ސިފަތަކެއް ލިބިގެންވާ) މީހެކެވެ. އޭނާގެ ޙިސާބު ބެއްލެވުން ވަނީ ﷲ ގެ ޙަޟްރަތަށެވެ. ﷲ އަށްވުރެ ބޮޑަށް އެއްވެސް މީހަކު (ރަނގަޅު ކަމަށް) އަހަރެން ނުބުނަމެވެ. އަހަރެން ހީކުރާ ގޮތުގައި އޭނާއަކީ މިވެނި މިވެނި ކަންތައްތަކެއް ކުރާ މީހެކެވެ. (މިހެން ބުނަންވާނީ އެކަންކަން އެމީހެއްގެ ކިބައިގައި ހުރިކަން ޔަޤީންވާނަމައެވެ.)',
+    },
+    source: { type: 'hadith', reference: 'Bukhari: 2662' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+  {
+    id: 'masnun-452',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Dua to praise Allah', dv: 'ﷲ އަށް ޙަމްދުކޮށް ކުރާ ދުޢާ (ތަޢުރީފު ލިބުމުން)' },
+    arabic: 'اَللَّهُمَّ لَا تُؤَاخِذْنِي بِمَا يَقُولُونَ، وَاغْفِرْ لِي مَا لَا يَعْلَمُونَ، وَاجْعَلْنِي خَيْرًا مِمَّا يَظُّنُّونَ',
+    transliteration: 'Allaahumma laa tu\'aakhidhnee bimaa yaqooloon, waghfir lee maa laa ya\'lamoon waj\'alnee khayram-mimmaa yadhunnoon',
+    translation: {
+      en: 'O Allah, do not call me to account for what they say and forgive me for what they have no knowledge of and make me better than they imagine.',
+      dv: 'އޭ ﷲ! އެއުރެން އެ ބުނާ ބަސްތަކަށް (ތަޢުރީފުގެ ބަސްތަކަށް) މިއަޅާއަށް ޢަޛާބު ނުދެއްވާނދޭވެ! އަދި އެއުރެންނަށް ނޭނގޭ ކަންތައްތައް (މިއަޅާގެ ކުށްތައް) މިއަޅާއަށް ފުއްސަވާނދޭވެ! އަދި އެއުރެން އެ ހީކުރާ ވަރަށްވުރެ މިއަޅާ ހެޔޮ މީހެއް ކަމުގައި ލައްވާނދޭވެ!',
+    },
+    source: { type: 'hadith', reference: 'Sahih. Adabul Mufrad: 589' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+  {
+    id: 'masnun-453',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Dua for asking Forgiveness from Allah', dv: 'ފާފަ ފުއްސެވުން އެދި ކުރާ ދުޢާ (ޣަފަރަﷲ ލަކަ)' },
+    arabic: 'غَفَرَ اللَّهُ لَكَ',
+    transliteration: 'Ghafar-Allahu lak',
+    translation: {
+      en: 'May Allah forgive you.\n\nIn response, The Messenger of Allah (ﷺ) said:',
+      dv: 'ﷲ ކަލޭގެފާނަށް ފާފަ ފުއްސަވާށިއެވެ!"',
+    },
+    source: { type: 'hadith', reference: '[1] Riyadus Salehin: 1843 [2] Muslim: 2346' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+  {
+    id: 'masnun-454',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Power of Saying Jazakallahu Khairan', dv: 'ޖަޒާކަﷲ ޚައިރަން ކިޔުމުގެ މާތްކަން' },
+    arabic: 'جَزَاكَ اللَّهُ خَيْرًا',
+    transliteration: 'JazaakAllahu khayran',
+    translation: {
+      en: 'May Allah reward you with good.\n\nThen he has done the most that he can of praise.',
+      dv: 'ﷲ ތިބާއަށް ހެޔޮ ޖަޒާ ދެއްވާށިއެވެ!',
+    },
+    source: { type: 'hadith', reference: 'Sahih. Tirmidhi: 2035' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+  {
+    id: 'masnun-457',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Dua for Love for the Sake of Allah', dv: 'ﷲ އަށްޓަކައި ލޯބިވާކަން ހާމަކުރުމަށްޓަކައި ބުނާ ބަސް' },
+    arabic: 'أُحِبُّكَ فِي اللَّهِ',
+    transliteration: 'U\'hibbuka fill-aah',
+    translation: {
+      en: 'I love you for the sake of Allah.\n\nHe will respond by saying:',
+      dv: 'ﷲ އަށްޓަކައި އަހަރެން ތިބާދެކެ ލޯބިވަމެވެ.',
+    },
+    source: { type: 'hadith', reference: 'Hasan (Albani). Abu Dawud: 5125' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+  {
+    id: 'masnun-460',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Dua When Someone Says Barakallahu Feekum', dv: 'ބާރަކަﷲ ފީކުމް ބުނުމުން ދޭނެ ޖަވާބު' },
+    arabic: 'بَارَكَ اللَّهُ فِيكُمْ',
+    transliteration: 'BaarakAllahu feekum',
+    translation: {
+      en: 'May Allah bless you all.\n\nAaishah (RA) then said:',
+      dv: 'އަދި އެބައިމީހުންނަށްވެސް ﷲ ބަރަކާތް ލައްވާށިއެވެ!',
+    },
+    source: { type: 'hadith', reference: 'Ibn As-Sunni (Page 138 , Hadith no. 278). Also see, Ibnul Qaiyyum\'s Al Wabilus Sayyeb Page 304. Tahkeek, Bashir Muhammad Uyun' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+  {
+    id: 'masnun-461',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Dua for Good Fortune & Tawakkul', dv: 'ނަޞީބާއި ޠިޔަރައާ ގުޅޭގޮތުން ކުރާ ދުޢާ' },
+    arabic: 'اَللَّهُمَّ لَا طَيْرَ إِلَّا طَيْرُكَ وَلَا خَيْرَ إِلَّا خَيْرُكَ وَلَا إِلَهَ غَيْرُكَ',
+    transliteration: 'Allaahumma laa tayra \'illaa tayruka, wa laa khayra \'illaa khayruka, wa laa \'ilaaha ghayruk',
+    translation: {
+      en: 'O Allah there is no portent other than Your portent, no goodness other than Your goodness, and none worthy of worship other than You.',
+      dv: 'އޭ ﷲ! އިބަރަސްކަލާނގެ މިންވަރުފުޅު ނޫން އެހެން ކަމެއް ނުވެއެވެ. (އެބަހީ: ދޫނި އުދުއްސައިގެން ބަދު ނަޞީބު ބެލުމަކީ ބާޠިލު ކަމެކެވެ.) އަދި އިބަރަސްކަލާނގެ ހެޔޮކަން ނޫން އެހެން ހެޔޮ ކަމެއް ނުވެއެވެ. އަދި އިބަރަސްކަލާނގެ ފިޔަވައި ޙައްޤުވެގެންވާ އެހެން އިލާހަކު ނުވެއެވެ.',
+    },
+    source: { type: 'hadith', reference: 'Sahih (Albani). Silsila Sahiha: 1065, Musnad Ahmad: 7045' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+  {
+    id: 'masnun-898',
+    type: 'dua',
+    categoryId: 'condemnationpraise',
+    title: { en: 'Prophetic Dua when seeing someone smile', dv: 'މީހަކު ހީލާތަން ފެނުމުން ކިޔާ ދުޢާ' },
+    arabic: 'أَضْحَكَ اللَّهُ سِنَّكَ',
+    transliteration: 'Adh’haka allahu sinnak',
+    translation: {
+      en: 'May Allah keep you happy always.',
+      dv: 'ﷲ ތިބާގެ ދަތްތައް ހުއްޓައި (އުފަލުގައި) ލަހައްޓަވާށިއެވެ!',
+    },
+    source: { type: 'hadith', reference: 'Bukhari: 3294' },
+    contentReview: {
+      arabicVerified: false,
+      transliterationVerified: false,
+      translationVerified: { en: false, dv: false },
+      notes: 'Sourced from the Masnun Dua dataset (islamicapi/masnun-dua); passed automated Arabic/EN/DV consistency checks but not yet checked by a qualified human reviewer - see CONTENT_REVIEW.md.',
+    },
+  },
+];
