@@ -73,6 +73,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="duas"
+        options={{
+          title: t('tabs.duas'),
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon name={focused ? 'book' : 'book-outline'} color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: t('tabs.settings'),
