@@ -94,7 +94,16 @@
     "testAdhanButton": "Send test adhan in 5s",
     "testAdhanScheduled": "Scheduled - lock your phone or switch apps to hear it.",
     "testAdhanTitle": "Test adhan",
-    "testAdhanBody": "This is a test notification using the adhan sound."
+    "testAdhanBody": "This is a test notification using the adhan sound.",
+    "endingReminder": "Ending-soon reminder",
+    "endingReminderSubtitle": "Get notified a few minutes before each enabled prayer's time runs out",
+    "endingReminderLabel": "Remind me before time ends",
+    "endingReminderMinutesOption": "{{count}} min",
+    "endingSoonTitle": "{{prayer}} ending soon",
+    "endingSoonBody": "{{minutes}} minutes left to pray {{prayer}}",
+    "toastEndingReminderOn": "Ending-soon reminders turned on",
+    "toastEndingReminderOff": "Ending-soon reminders turned off",
+    "toastEndingReminderMinutesChanged": "Reminder set to {{minutes}} min before"
   },
   "languages": {
     "en": "English",

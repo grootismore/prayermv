@@ -9,6 +9,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { NOTIFIABLE_PRAYERS } from '../../lib/prayerTimes';
 import { requestNotificationPermissions, sendTestAdhanNotification } from '../../lib/notifications';
 import { SUPPORTED_LANGUAGES } from '../../lib/i18n';
+import { ENDING_REMINDER_MINUTES_OPTIONS } from '../../lib/storage';
 import type { AppLanguage, CalendarMode, NotificationPrefs, ThemeMode } from '../../lib/storage';
 import { spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useThemedStyles } from '../../lib/useTheme';
@@ -33,11 +34,14 @@ export default function SettingsScreen() {
     island,
     language,
     notificationPrefs,
+    endingReminderPrefs,
     qiblaHapticsEnabled,
     calendarMode,
     themeMode,
     changeLanguage,
     setNotificationEnabled,
+    setEndingReminderEnabled,
+    setEndingReminderMinutes,
     setQiblaHapticsEnabled,
     setCalendarMode,
     setThemeMode,
@@ -70,6 +74,23 @@ export default function SettingsScreen() {
   async function handleThemeModeChange(mode: ThemeMode) {
     await setThemeMode(mode);
     showToast(t('settings.toastAppearanceChanged'));
+  }
+
+  async function handleEndingReminderToggle(enabled: boolean) {
+    if (enabled) {
+      const granted = await requestNotificationPermissions();
+      if (!granted) {
+        Alert.alert(t('qibla.permissionDenied'));
+        return;
+      }
+    }
+    await setEndingReminderEnabled(enabled);
+    showToast(t(enabled ? 'settings.toastEndingReminderOn' : 'settings.toastEndingReminderOff'));
+  }
+
+  async function handleEndingReminderMinutesChange(minutes: number) {
+    await setEndingReminderMinutes(minutes);
+    showToast(t('settings.toastEndingReminderMinutesChanged', { minutes }));
   }
 
   async function handleQiblaHapticsChange(enabled: boolean) {
@@ -169,6 +190,25 @@ export default function SettingsScreen() {
       <SurfaceCard style={styles.rowCard} padded={false}>
         <SettingRow title={t('settings.soundPreview')} onPress={handlePreviewSound} />
       </SurfaceCard>
+
+      <SectionHeader title={t('settings.endingReminder')} subtitle={t('settings.endingReminderSubtitle')} />
+      <SurfaceCard padded={false}>
+        <NotificationSwitchRow
+          label={t('settings.endingReminderLabel')}
+          value={endingReminderPrefs.enabled}
+          onValueChange={handleEndingReminderToggle}
+        />
+      </SurfaceCard>
+      {endingReminderPrefs.enabled && (
+        <SegmentedControl
+          segments={ENDING_REMINDER_MINUTES_OPTIONS.map((minutes) => ({
+            key: String(minutes),
+            label: t('settings.endingReminderMinutesOption', { count: minutes }),
+          }))}
+          selectedKey={String(endingReminderPrefs.minutesBefore)}
+          onChange={(key) => handleEndingReminderMinutesChange(Number(key))}
+        />
+      )}
 
       <SectionHeader title={t('settings.qibla')} subtitle={t('settings.qiblaHapticsSubtitle')} />
       <SurfaceCard padded={false}>

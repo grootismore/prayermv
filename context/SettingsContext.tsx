@@ -8,6 +8,8 @@ import {
   saveLanguage,
   loadNotificationPrefs,
   saveNotificationPrefs,
+  loadEndingReminderPrefs,
+  saveEndingReminderPrefs,
   loadQiblaHapticsEnabled,
   saveQiblaHapticsEnabled,
   loadCalendarMode,
@@ -15,8 +17,10 @@ import {
   loadThemeMode,
   saveThemeMode,
   DEFAULT_NOTIFICATION_PREFS,
+  DEFAULT_ENDING_REMINDER_PREFS,
   type AppLanguage,
   type NotificationPrefs,
+  type EndingReminderPrefs,
   type CalendarMode,
   type ThemeMode,
 } from '../lib/storage';
@@ -30,12 +34,15 @@ interface SettingsContextValue {
   island: Island | null;
   language: AppLanguage;
   notificationPrefs: NotificationPrefs;
+  endingReminderPrefs: EndingReminderPrefs;
   qiblaHapticsEnabled: boolean;
   calendarMode: CalendarMode;
   themeMode: ThemeMode;
   selectIsland: (islandId: number) => Promise<void>;
   changeLanguage: (language: AppLanguage) => Promise<void>;
   setNotificationEnabled: (prayer: keyof NotificationPrefs, enabled: boolean) => Promise<void>;
+  setEndingReminderEnabled: (enabled: boolean) => Promise<void>;
+  setEndingReminderMinutes: (minutes: number) => Promise<void>;
   setQiblaHapticsEnabled: (enabled: boolean) => Promise<void>;
   setCalendarMode: (mode: CalendarMode) => Promise<void>;
   setThemeMode: (mode: ThemeMode) => Promise<void>;
@@ -48,17 +55,19 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [island, setIsland] = useState<Island | null>(null);
   const [language, setLanguage] = useState<AppLanguage>('en');
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPrefs>(DEFAULT_NOTIFICATION_PREFS);
+  const [endingReminderPrefs, setEndingReminderPrefs] = useState<EndingReminderPrefs>(DEFAULT_ENDING_REMINDER_PREFS);
   const [qiblaHapticsEnabled, setQiblaHapticsEnabledState] = useState(true);
   const [calendarMode, setCalendarModeState] = useState<CalendarMode>('hijri');
   const [themeMode, setThemeModeState] = useState<ThemeMode>('dark');
 
   useEffect(() => {
     (async () => {
-      const [islandId, storedLanguage, prefs, hapticsEnabled, storedCalendarMode, storedThemeMode] =
+      const [islandId, storedLanguage, prefs, storedEndingReminderPrefs, hapticsEnabled, storedCalendarMode, storedThemeMode] =
         await Promise.all([
           loadSelectedIslandId(),
           loadLanguage(),
           loadNotificationPrefs(),
+          loadEndingReminderPrefs(),
           loadQiblaHapticsEnabled(),
           loadCalendarMode(),
           loadThemeMode(),
@@ -75,6 +84,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       }
       setLanguage(resolvedLanguage);
       setNotificationPrefs(prefs);
+      setEndingReminderPrefs(storedEndingReminderPrefs);
       setQiblaHapticsEnabledState(hapticsEnabled);
       setCalendarModeState(storedCalendarMode);
       setThemeModeState(storedThemeMode);
@@ -108,6 +118,24 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const setEndingReminderEnabled = useCallback(async (enabled: boolean) => {
+    setEndingReminderPrefs((prev) => {
+      const next = { ...prev, enabled };
+      saveEndingReminderPrefs(next);
+      return next;
+    });
+    await rescheduleTodayNotifications();
+  }, []);
+
+  const setEndingReminderMinutes = useCallback(async (minutes: number) => {
+    setEndingReminderPrefs((prev) => {
+      const next = { ...prev, minutesBefore: minutes };
+      saveEndingReminderPrefs(next);
+      return next;
+    });
+    await rescheduleTodayNotifications();
+  }, []);
+
   const setQiblaHapticsEnabled = useCallback(async (enabled: boolean) => {
     setQiblaHapticsEnabledState(enabled);
     await saveQiblaHapticsEnabled(enabled);
@@ -129,12 +157,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       island,
       language,
       notificationPrefs,
+      endingReminderPrefs,
       qiblaHapticsEnabled,
       calendarMode,
       themeMode,
       selectIsland,
       changeLanguage,
       setNotificationEnabled,
+      setEndingReminderEnabled,
+      setEndingReminderMinutes,
       setQiblaHapticsEnabled,
       setCalendarMode,
       setThemeMode,
@@ -144,12 +175,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       island,
       language,
       notificationPrefs,
+      endingReminderPrefs,
       qiblaHapticsEnabled,
       calendarMode,
       themeMode,
       selectIsland,
       changeLanguage,
       setNotificationEnabled,
+      setEndingReminderEnabled,
+      setEndingReminderMinutes,
       setQiblaHapticsEnabled,
       setCalendarMode,
       setThemeMode,
