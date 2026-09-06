@@ -102,6 +102,11 @@ module.exports = {
         },
       ],
       '@bacons/apple-targets',
+      // Must come after Expo's own icon generation (a base mod that always
+      // runs before anything in this array) - see the plugin's own comment
+      // for why it's needed: fixes the notification icon on unsigned
+      // sideload builds.
+      './plugins/withFullAppIconSet',
     ],
     experiments: {
       typedRoutes: true,
