@@ -19,21 +19,30 @@ export default function QiblaScreen() {
   const [coords, setCoords] = useState<{ lat: number; long: number } | null>(null);
 
   useEffect(() => {
+    // Show a working Qibla direction immediately from the island's own
+    // known location - Qibla bearing barely changes across a few km
+    // within the same island, so this is already accurate enough on its
+    // own, not just an error fallback. Previously this only ran *after*
+    // awaiting getCurrentPositionAsync, so a real device with a slow or
+    // stalled GPS fix (common indoors) left the screen with no coords at
+    // all - no arrow, no bearing, no error - for as long as that request
+    // hung. Setting this synchronously up front means the compass always
+    // has something to show right away, then silently upgrades to a more
+    // precise GPS fix in the background if one arrives.
+    if (island?.location.lat != null && island?.location.long != null) {
+      setCoords({ lat: island.location.lat, long: island.location.long });
+    }
+
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        try {
-          const position = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-          });
-          setCoords({ lat: position.coords.latitude, long: position.coords.longitude });
-          return;
-        } catch {
-          // fall through to island fallback below
-        }
-      }
-      if (island?.location.lat != null && island?.location.long != null) {
-        setCoords({ lat: island.location.lat, long: island.location.long });
+      if (status !== 'granted') return;
+      try {
+        const position = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+        setCoords({ lat: position.coords.latitude, long: position.coords.longitude });
+      } catch {
+        // Keep whatever coords are already set (the island fallback, if any).
       }
     })();
   }, [island]);
