@@ -12,6 +12,7 @@ import { useDuaCounter } from '../../../hooks/useDuaCounter';
 import { getDuaById, getDuasByCategory } from '../../../data/duas';
 import { resolveDuaTranslationLanguage, getDuaTitleText, getDuaTranslationText, getDuaBenefitsText } from '../../../lib/duaTranslation';
 import { shareDua } from '../../../lib/duaShare';
+import type { DuaArabicFontSize } from '../../../types/dua';
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../../lib/theme';
 import { useTheme, useThemedStyles } from '../../../lib/useTheme';
 import DuaArabicText from '../../../components/dua/DuaArabicText';
@@ -20,13 +21,15 @@ import FavouriteButton from '../../../components/dua/FavouriteButton';
 import SurfaceCard from '../../../components/SurfaceCard';
 import NoorDivider from '../../../components/NoorDivider';
 
+const ARABIC_FONT_SIZES: DuaArabicFontSize[] = ['small', 'medium', 'large'];
+
 export default function DuaReadingScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   const { language } = useSettings();
-  const { preferences } = useDuaPreferences();
+  const { preferences, setArabicFontSize } = useDuaPreferences();
   const { isFavourite, toggleFavourite } = useDuaFavourites();
   const { duaId, categoryId } = useLocalSearchParams<{ duaId: string; categoryId?: string }>();
 
@@ -76,6 +79,15 @@ export default function DuaReadingScreen() {
     toggleFavourite(dua!.id);
   }
 
+  function stepArabicFontSize(delta: 1 | -1) {
+    const currentIndex = ARABIC_FONT_SIZES.indexOf(preferences.arabicFontSize);
+    const nextIndex = Math.min(ARABIC_FONT_SIZES.length - 1, Math.max(0, currentIndex + delta));
+    setArabicFontSize(ARABIC_FONT_SIZES[nextIndex]);
+  }
+
+  const canShrinkFont = preferences.arabicFontSize !== ARABIC_FONT_SIZES[0];
+  const canGrowFont = preferences.arabicFontSize !== ARABIC_FONT_SIZES[ARABIC_FONT_SIZES.length - 1];
+
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <View style={styles.header}>
@@ -110,6 +122,44 @@ export default function DuaReadingScreen() {
         </View>
       </View>
 
+      <View style={styles.fontSizeRow}>
+        <Text style={styles.fontSizeLabel}>{t('duas.arabicTextSize')}</Text>
+        <View style={styles.fontSizeButtons}>
+          <Pressable
+            onPress={() => stepArabicFontSize(-1)}
+            disabled={!canShrinkFont}
+            hitSlop={8}
+            style={[styles.fontSizeButton, !canShrinkFont && styles.fontSizeButtonDisabled]}
+            accessibilityRole="button"
+            accessibilityLabel={t('duas.decreaseArabicTextSize')}
+          >
+            <Ionicons name="remove" size={18} color={canShrinkFont ? colors.primary : colors.textMuted} />
+          </Pressable>
+          <Text style={styles.fontSizeGlyph}>Aa</Text>
+          <Pressable
+            onPress={() => stepArabicFontSize(1)}
+            disabled={!canGrowFont}
+            hitSlop={8}
+            style={[styles.fontSizeButton, !canGrowFont && styles.fontSizeButtonDisabled]}
+            accessibilityRole="button"
+            accessibilityLabel={t('duas.increaseArabicTextSize')}
+          >
+            <Ionicons name="add" size={18} color={canGrowFont ? colors.primary : colors.textMuted} />
+          </Pressable>
+        </View>
+      </View>
+
+      {dua.repetitions ? (
+        <DuaCounter
+          variant="bar"
+          count={counter.count}
+          target={counter.target}
+          onIncrement={counter.increment}
+          onReset={counter.reset}
+          duaTitle={titleText}
+        />
+      ) : null}
+
       <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
         <SurfaceCard elevated style={styles.arabicCard}>
           <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} />
@@ -143,19 +193,6 @@ export default function DuaReadingScreen() {
           </Text>
         </View>
 
-        {dua.repetitions ? (
-          <>
-            <NoorDivider compact />
-            <Text style={styles.sectionLabel}>{t('duas.counterSectionTitle')}</Text>
-            <DuaCounter
-              count={counter.count}
-              target={counter.target}
-              onIncrement={counter.increment}
-              onReset={counter.reset}
-              duaTitle={titleText}
-            />
-          </>
-        ) : null}
       </ScrollView>
 
       <View style={[styles.navRow, { paddingBottom: insets.bottom + spacing.sm }]}>
@@ -217,6 +254,42 @@ const createStyles = (colors: ThemeColors) =>
     },
     arabicCard: {
       paddingVertical: spacing.lg,
+    },
+    fontSizeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing.xs,
+    },
+    fontSizeLabel: {
+      fontSize: typography.size.xs,
+      color: colors.textMuted,
+      fontWeight: typography.weight.semibold,
+    },
+    fontSizeButtons: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    fontSizeButton: {
+      width: minTouchTarget,
+      height: minTouchTarget,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: radius.pill,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    fontSizeButtonDisabled: {
+      opacity: 0.4,
+    },
+    fontSizeGlyph: {
+      fontSize: typography.size.md,
+      fontWeight: typography.weight.bold,
+      color: colors.textSecondary,
+      minWidth: 28,
+      textAlign: 'center',
     },
     transliteration: {
       marginTop: spacing.sm,

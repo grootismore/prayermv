@@ -161,6 +161,9 @@
     "counterAccessibilityHint": "Increases the count by one",
     "counterComplete": "Completed",
     "counterResetLabel": "Reset",
-    "shareAttribution": "Shared from Noor+"
+    "shareAttribution": "Shared from Noor+",
+    "arabicTextSize": "Text size",
+    "decreaseArabicTextSize": "Decrease Arabic text size",
+    "increaseArabicTextSize": "Increase Arabic text size"
   }
 }

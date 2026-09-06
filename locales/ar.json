@@ -161,6 +161,9 @@
     "counterAccessibilityHint": "يزيد العدد بمقدار واحد",
     "counterComplete": "اكتمل",
     "counterResetLabel": "إعادة الضبط",
-    "shareAttribution": "تمت المشاركة من Noor+"
+    "shareAttribution": "تمت المشاركة من Noor+",
+    "arabicTextSize": "حجم النص",
+    "decreaseArabicTextSize": "تصغير النص العربي",
+    "increaseArabicTextSize": "تكبير النص العربي"
   }
 }
