@@ -61,6 +61,28 @@ export function validateDuaContent(categories: DuaCategory[], duas: Dua[]): DuaV
     if (dua.repetitions !== undefined && (!Number.isInteger(dua.repetitions) || dua.repetitions <= 0)) {
       issues.push({ duaId: dua.id, message: `repetitions must be a positive integer, got ${dua.repetitions}` });
     }
+
+    if (dua.segments !== undefined) {
+      if (dua.segments.length === 0) {
+        issues.push({ duaId: dua.id, message: 'segments, when present, must have at least one entry' });
+      }
+      dua.segments.forEach((segment, index) => {
+        const label = `segments[${index}]`;
+        if (!segment.arabic.trim()) issues.push({ duaId: dua.id, message: `${label}.arabic must be non-empty` });
+        if (!segment.transliteration.trim()) {
+          issues.push({ duaId: dua.id, message: `${label}.transliteration must be non-empty` });
+        }
+        if (!segment.translation.en.trim() || !segment.translation.dv.trim()) {
+          issues.push({ duaId: dua.id, message: `${label}.translation.en and .dv must both be non-empty` });
+        }
+        if (!Number.isInteger(segment.repetitions) || segment.repetitions <= 0) {
+          issues.push({
+            duaId: dua.id,
+            message: `${label}.repetitions must be a positive integer, got ${segment.repetitions}`,
+          });
+        }
+      });
+    }
   }
 
   return issues;

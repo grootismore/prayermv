@@ -8,15 +8,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSettings } from '../../../context/SettingsContext';
 import { useDuaPreferences } from '../../../hooks/useDuaPreferences';
 import { useDuaFavourites } from '../../../hooks/useDuaFavourites';
-import { useDuaCounter } from '../../../hooks/useDuaCounter';
 import { getDuaById, getDuasByCategory } from '../../../data/duas';
 import { resolveDuaTranslationLanguage, getDuaTitleText, getDuaTranslationText, getDuaBenefitsText } from '../../../lib/duaTranslation';
 import { shareDua } from '../../../lib/duaShare';
-import type { DuaArabicFontSize } from '../../../types/dua';
+import type { DuaArabicFontSize, DuaSegment } from '../../../types/dua';
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../../lib/theme';
 import { useTheme, useThemedStyles } from '../../../lib/useTheme';
 import DuaArabicText from '../../../components/dua/DuaArabicText';
-import DuaCounter from '../../../components/dua/DuaCounter';
+import DuaZikrFlow from '../../../components/dua/DuaZikrFlow';
 import FavouriteButton from '../../../components/dua/FavouriteButton';
 import SurfaceCard from '../../../components/SurfaceCard';
 import NoorDivider from '../../../components/NoorDivider';
@@ -44,7 +43,11 @@ export default function DuaReadingScreen() {
   const previousDua = currentIndex > 0 ? siblings[currentIndex - 1] : undefined;
   const nextDua = currentIndex >= 0 && currentIndex < siblings.length - 1 ? siblings[currentIndex + 1] : undefined;
 
-  const counter = useDuaCounter(dua?.id ?? '', dua?.repetitions);
+  const segments: DuaSegment[] | undefined =
+    dua?.segments ??
+    (dua?.repetitions
+      ? [{ arabic: dua.arabic, transliteration: dua.transliteration, translation: dua.translation, repetitions: dua.repetitions }]
+      : undefined);
 
   if (!dua) {
     return (
@@ -149,25 +152,27 @@ export default function DuaReadingScreen() {
         </View>
       </View>
 
-      {dua.repetitions ? (
-        <DuaCounter
-          variant="bar"
-          count={counter.count}
-          target={counter.target}
-          onIncrement={counter.increment}
-          onReset={counter.reset}
-          duaTitle={titleText}
-        />
-      ) : null}
-
       <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
-        <SurfaceCard elevated style={styles.arabicCard}>
-          <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} />
-        </SurfaceCard>
+        {segments ? (
+          <DuaZikrFlow
+            duaId={dua.id}
+            duaTitle={titleText}
+            segments={segments}
+            resolvedLanguage={resolvedLanguage}
+            showTransliteration={preferences.showTransliteration}
+            arabicFontSize={preferences.arabicFontSize}
+          />
+        ) : (
+          <>
+            <SurfaceCard elevated style={styles.arabicCard}>
+              <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} />
+            </SurfaceCard>
 
-        {preferences.showTransliteration ? (
-          <Text style={styles.transliteration}>{dua.transliteration}</Text>
-        ) : null}
+            {preferences.showTransliteration ? (
+              <Text style={styles.transliteration}>{dua.transliteration}</Text>
+            ) : null}
+          </>
+        )}
 
         <NoorDivider compact />
 
