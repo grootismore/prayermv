@@ -1,0 +1,73 @@
+name: EAS iOS preview build (ad-hoc device testing)
+
+# On-demand alternative to ios-build.yml's unsigned SideStore archive: this
+# one hands the build off to EAS Build's cloud infra using the "preview"
+# profile in eas.json (distribution: internal, ios.simulator: false), then
+# posts the resulting expo.dev build page link to this run's step summary
+# so it's a single tap away on your phone - open it there and hand the IPA
+# link to SideStore.
+#
+# Required repo secret (Settings -> Secrets and variables -> Actions ->
+# Secrets tab):
+#   EAS_TOKEN   an Expo access token - see the bottom of this file's
+#               companion note in the PR/commit description for how to
+#               generate one if this workflow fails with an auth error.
+#
+# This workflow does not touch ios-build.yml or any other existing
+# workflow - it's a separate, additive path you can ignore entirely if you
+# only ever use the unsigned-archive one.
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - device-test
+
+concurrency:
+  group: eas-preview-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Setup Expo & EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EAS_TOKEN }}
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Run EAS Build (iOS, preview profile)
+        run: eas build --platform ios --profile preview --non-interactive | tee eas-build.log
+
+      - name: Post build link to step summary
+        if: always()
+        run: |
+          set -euo pipefail
+          URL=$(grep -Eo 'https://expo\.dev/accounts/[^ ]+/builds/[a-zA-Z0-9-]+' eas-build.log | tail -n1 || true)
+
+          {
+            echo "## EAS iOS preview build"
+            echo
+            if [ -n "$URL" ]; then
+              echo "**Build page:** $URL"
+              echo
+              echo "Open this on your phone and hand it to SideStore."
+            else
+              echo "Couldn't find a build URL in the EAS CLI output above - the build step's log (or \`eas build:list --platform ios --limit 1\`) has the details."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
