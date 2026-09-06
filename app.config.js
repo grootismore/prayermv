@@ -57,6 +57,9 @@ module.exports = {
       infoPlist: {
         NSLocationWhenInUseUsageDescription:
           'Used only to improve Qibla compass accuracy. Location is never sent anywhere.',
+        // No custom/proprietary encryption beyond standard HTTPS (TLS), which
+        // is exempt from export compliance documentation requirements.
+        ITSAppUsesNonExemptEncryption: false,
       },
     },
     android: {
