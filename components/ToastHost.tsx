@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text } from 'react-native';
+import { Animated, Easing, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -34,9 +34,25 @@ export default function ToastHost() {
       if (dismissTimer.current) clearTimeout(dismissTimer.current);
       setMessage(next);
       progress.setValue(0);
-      Animated.timing(progress, { toValue: 1, duration: ANIM_MS, useNativeDriver: true }).start();
+      // Explicit curves rather than Animated's default ease-in-out: a
+      // fast-start/slow-settle entrance (out-cubic) reads as the toast
+      // arriving with a bit of momentum, and a mirrored slow-start/fast-exit
+      // (in-cubic) makes the dismiss feel like it's actually leaving rather
+      // than just fading in place - the default symmetric ease looked flat
+      // on both ends by comparison.
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: ANIM_MS,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
       dismissTimer.current = setTimeout(() => {
-        Animated.timing(progress, { toValue: 0, duration: ANIM_MS, useNativeDriver: true }).start(() => {
+        Animated.timing(progress, {
+          toValue: 0,
+          duration: ANIM_MS,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }).start(() => {
           setMessage(null);
         });
       }, VISIBLE_MS);

@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
-import { PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Easing, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -45,8 +45,48 @@ export default function HomeScreen() {
   // exactly as before); any other offset computes a plain, unhighlighted
   // list for that date.
   const [dayOffset, setDayOffset] = useState(0);
-  const goToPreviousDay = () => setDayOffset((o) => o - 1);
-  const goToNextDay = () => setDayOffset((o) => o + 1);
+  // Which way the day just changed (-1 back, 1 forward) - read by the fade
+  // effect below to slide the incoming list in from the matching side,
+  // rather than picking a direction at random each time.
+  const dayChangeDirection = useRef<1 | -1>(1);
+  const goToPreviousDay = () => {
+    dayChangeDirection.current = -1;
+    setDayOffset((o) => o - 1);
+  };
+  const goToNextDay = () => {
+    dayChangeDirection.current = 1;
+    setDayOffset((o) => o + 1);
+  };
+
+  // The day list previously swapped instantly on every swipe/arrow tap,
+  // which reads as a jump-cut rather than a transition. Crossfading in
+  // (opacity 0->1) with a small slide from the direction the user just
+  // navigated makes it read as one list replacing another instead.
+  const dayFade = useRef(new Animated.Value(1)).current;
+  const daySlide = useRef(new Animated.Value(0)).current;
+  const isFirstDayRender = useRef(true);
+  useEffect(() => {
+    if (isFirstDayRender.current) {
+      isFirstDayRender.current = false;
+      return;
+    }
+    dayFade.setValue(0);
+    daySlide.setValue(dayChangeDirection.current * 14);
+    Animated.parallel([
+      Animated.timing(dayFade, {
+        toValue: 1,
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(daySlide, {
+        toValue: 0,
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [dayOffset, dayFade, daySlide]);
 
   const viewDate = useMemo(() => {
     const d = new Date();
@@ -147,7 +187,10 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      <View {...panResponder.panHandlers}>
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={{ opacity: dayFade, transform: [{ translateX: daySlide }] }}
+      >
         <SurfaceCard padded={false}>
           {dayEntries.map((entry) => {
             const isNext = dayOffset === 0 && state.next?.call === entry.call;
@@ -164,7 +207,7 @@ export default function HomeScreen() {
             );
           })}
         </SurfaceCard>
-      </View>
+      </Animated.View>
     </Screen>
   );
 }

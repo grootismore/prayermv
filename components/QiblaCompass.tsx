@@ -33,10 +33,18 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
 
   useEffect(() => {
     if (rotation == null) return;
+    // Linear, not eased: `rotation` already arrives pre-smoothed (see
+    // useCompassHeading's exponential moving average) and updates faster
+    // than this tween's duration, so each new reading restarts the
+    // animation from wherever the last one got to. An ease-out curve
+    // decelerates hard toward the end of every one of those short hops,
+    // which - restarted every ~100ms - reads as a stutter-step rather than
+    // a continuous sweep. A constant-speed tween blends into the next
+    // restart smoothly instead.
     Animated.timing(spin, {
       toValue: rotation,
-      duration: 150,
-      easing: Easing.out(Easing.quad),
+      duration: 120,
+      easing: Easing.linear,
       useNativeDriver: true,
     }).start();
   }, [rotation, spin]);
