@@ -6,17 +6,25 @@ import { useTranslation } from 'react-i18next';
 import { duaSegmentCounterId, loadDuaSegmentsProgress, resetDuaSegmentsProgress, useDuaCounter } from '../../hooks/useDuaCounter';
 import type { DuaArabicFontSize, DuaSegment } from '../../types/dua';
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../lib/theme';
-import { useTheme, useThemedStyles } from '../../lib/useTheme';
+import { useThemedStyles } from '../../lib/useTheme';
 import DuaArabicText from './DuaArabicText';
-import DuaCounter from './DuaCounter';
+import SurfaceCard from '../SurfaceCard';
+
+export interface DuaZikrProgress {
+  count: number;
+  target: number;
+  segmentIndex: number;
+  segmentCount: number;
+}
 
 interface Props {
   duaId: string;
-  duaTitle: string;
   segments: DuaSegment[];
   resolvedLanguage: 'en' | 'dv';
   showTransliteration: boolean;
   arabicFontSize: DuaArabicFontSize;
+  /** Reports the active segment's live count/target so the reading screen's header can show a small counter badge instead of a big on-card one - see [duaId].tsx. */
+  onProgressChange?: (progress: DuaZikrProgress) => void;
 }
 
 // Auto-advance pause after a phrase's target is reached - long enough to
@@ -44,27 +52,32 @@ function fireCompleteVibration() {
 /**
  * One-phrase-per-card reading flow for a multi-phrase dhikr (e.g. the
  * post-prayer Subhanallah/Alhamdulillah/Allahu Akbar/tahlil sequence):
- * shows the active segment full-size with its own tap-to-count ring, and
- * auto-advances to the next segment once the current one's target is
- * reached - the last segment's completion fires the Qibla-style
- * vibration instead. Resumes at the first not-yet-complete segment on
- * mount rather than always restarting at the first. Also used for a
- * single-phrase zikr (segments.length === 1), where there's simply
- * nothing to advance to.
+ * shows the active segment in the same card used for a plain (non-zikr)
+ * dua - tapping the card counts a repetition, same gesture as tapping a
+ * plain dua's card to move on - and auto-advances to the next segment
+ * once the current one's target is reached; the last segment's
+ * completion fires the Qibla-style vibration instead. The live
+ * count/target itself is not shown on the card - it's reported via
+ * onProgressChange for the reading screen's header badge, keeping this
+ * card visually identical to a plain dua's. Resumes at the first
+ * not-yet-complete segment on mount rather than always restarting at the
+ * first. Also used for a single-phrase zikr (segments.length === 1),
+ * where there's simply nothing to advance to.
  */
 export default function DuaZikrFlow({
   duaId,
-  duaTitle,
   segments,
   resolvedLanguage,
   showTransliteration,
   arabicFontSize,
+  onProgressChange,
 }: Props) {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyles);
   const [activeIndex, setActiveIndex] = useState(0);
   const [resumeChecked, setResumeChecked] = useState(false);
   const fade = useRef(new Animated.Value(1)).current;
+  const scale = useRef(new Animated.Value(1)).current;
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeSegment = segments[activeIndex];
@@ -92,6 +105,17 @@ export default function DuaZikrFlow({
       if (advanceTimer.current) clearTimeout(advanceTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!resumeChecked) return;
+    onProgressChange?.({
+      count: counter.count,
+      target: counter.target ?? activeSegment.repetitions,
+      segmentIndex: activeIndex,
+      segmentCount: segments.length,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resumeChecked, counter.count, counter.target, activeIndex, segments.length]);
 
   const runFadeTransition = useCallback(
     async (advance: () => void) => {
@@ -147,6 +171,25 @@ export default function DuaZikrFlow({
     ]);
   }, [activeIndex, counter, duaId, segments.length, t]);
 
+  const handleCardPress = useCallback(async () => {
+    if (counter.isComplete) return;
+    const willComplete = counter.target !== undefined && counter.count + 1 >= counter.target;
+    counter.increment();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const reduceMotion = await AccessibilityInfo.isReduceMotionEnabled();
+    if (!reduceMotion) {
+      Animated.sequence([
+        Animated.timing(scale, { toValue: 0.98, duration: 70, useNativeDriver: true }),
+        Animated.timing(scale, { toValue: 1, duration: 110, useNativeDriver: true }),
+      ]).start();
+    }
+
+    if (willComplete) {
+      handleTargetReached();
+    }
+  }, [counter, handleTargetReached, scale]);
+
   if (!resumeChecked) return null;
 
   return (
@@ -173,23 +216,29 @@ export default function DuaZikrFlow({
         </View>
       ) : null}
 
-      <Animated.View style={{ opacity: fade }}>
-        <Text style={styles.phraseLabel}>
-          {segments.length > 1 ? t('duas.phraseOf', { index: activeIndex + 1, count: segments.length }) : null}
-        </Text>
-        <DuaArabicText text={activeSegment.arabic} fontSize={arabicFontSize} align="center" style={styles.arabicText} />
-        {showTransliteration ? <Text style={styles.transliteration}>{activeSegment.transliteration}</Text> : null}
-        <Text style={styles.translation}>{activeSegment.translation[resolvedLanguage]}</Text>
+      <Animated.View style={{ opacity: fade, transform: [{ scale }] }}>
+        <SurfaceCard
+          elevated
+          onPress={handleCardPress}
+          style={styles.card}
+          accessibilityHint={counter.isComplete ? undefined : t('duas.counterAccessibilityHint')}
+        >
+          {activeSegment.repetitions > 1 ? (
+            <View style={styles.repeatBadge}>
+              <Text style={styles.repeatBadgeText}>×{activeSegment.repetitions}</Text>
+            </View>
+          ) : null}
 
-        <DuaCounter
-          count={counter.count}
-          target={counter.target}
-          onIncrement={counter.increment}
-          onReset={counter.reset}
-          duaTitle={duaTitle}
-          onTargetReached={handleTargetReached}
-          hideReset
-        />
+          <DuaArabicText text={activeSegment.arabic} fontSize={arabicFontSize} align="center" />
+          {showTransliteration ? <Text style={styles.transliteration}>{activeSegment.transliteration}</Text> : null}
+          <Text style={styles.translation}>{activeSegment.translation[resolvedLanguage]}</Text>
+
+          {counter.isComplete ? (
+            <Text style={styles.completeLabel} accessibilityLiveRegion="polite">
+              {t('duas.counterComplete')}
+            </Text>
+          ) : null}
+        </SurfaceCard>
       </Animated.View>
 
       <Pressable
@@ -211,7 +260,7 @@ export default function DuaZikrFlow({
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    container: { alignItems: 'center', paddingTop: spacing.sm },
+    container: { alignItems: 'center' },
     dotsRow: {
       flexDirection: 'row',
       gap: spacing.xs,
@@ -240,17 +289,27 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: colors.success,
       borderColor: colors.success,
     },
-    phraseLabel: {
-      textAlign: 'center',
+    card: {
+      width: '100%',
+      paddingVertical: spacing.xl,
+      paddingHorizontal: spacing.lg,
+    },
+    repeatBadge: {
+      position: 'absolute',
+      top: spacing.sm,
+      right: spacing.sm,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+      borderRadius: radius.pill,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    repeatBadgeText: {
       fontSize: typography.size.xs,
       fontWeight: typography.weight.bold,
-      color: colors.textMuted,
-      letterSpacing: 0.3,
-      marginBottom: spacing.xs,
-      minHeight: typography.size.xs,
-    },
-    arabicText: {
-      paddingHorizontal: spacing.md,
+      color: colors.textSecondary,
+      fontVariant: ['tabular-nums'],
     },
     transliteration: {
       marginTop: spacing.md,
@@ -259,7 +318,6 @@ const createStyles = (colors: ThemeColors) =>
       fontStyle: 'italic',
       color: colors.textSecondary,
       lineHeight: typography.size.md * 1.5,
-      paddingHorizontal: spacing.lg,
     },
     translation: {
       marginTop: spacing.xs,
@@ -267,10 +325,16 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: typography.size.base,
       color: colors.textPrimary,
       lineHeight: typography.size.base * 1.5,
-      paddingHorizontal: spacing.lg,
+    },
+    completeLabel: {
+      marginTop: spacing.md,
+      textAlign: 'center',
+      color: colors.success,
+      fontWeight: typography.weight.bold,
+      fontSize: typography.size.md,
     },
     resetButton: {
-      marginTop: spacing.xs,
+      marginTop: spacing.md,
       minHeight: minTouchTarget,
       minWidth: minTouchTarget,
       alignItems: 'center',

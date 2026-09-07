@@ -165,6 +165,7 @@
     "arabicTextSize": "حجم النص",
     "decreaseArabicTextSize": "تصغير النص العربي",
     "increaseArabicTextSize": "تكبير النص العربي",
-    "phraseOf": "الجملة {{index}} من {{count}}"
+    "phraseOf": "الجملة {{index}} من {{count}}",
+    "tapToContinue": "اضغط للانتقال إلى الدعاء التالي"
   }
 }
