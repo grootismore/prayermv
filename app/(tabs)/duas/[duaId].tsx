@@ -63,13 +63,18 @@ export default function DuaReadingScreen() {
   }, [duaId]);
 
   const swipeGesture = Gesture.Pan()
-    .activeOffsetX([-20, 20])
-    .failOffsetY([-15, 15])
+    .activeOffsetX([-16, 16])
+    .failOffsetY([-20, 20])
     .onEnd((e) => {
-      if (e.translationX <= -60 && nextDua) {
+      // A short, fast flick counts the same as a longer slower drag - pure
+      // distance alone missed quick flicks that never travelled far enough
+      // to feel "accurate" to a real swipe gesture.
+      const isSwipeLeft = e.translationX <= -60 || (e.translationX <= -24 && e.velocityX <= -800);
+      const isSwipeRight = e.translationX >= 60 || (e.translationX >= 24 && e.velocityX >= 800);
+      if (isSwipeLeft && nextDua) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         navigateTo(nextDua.id);
-      } else if (e.translationX >= 60 && previousDua) {
+      } else if (isSwipeRight && previousDua) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         navigateTo(previousDua.id);
       }
@@ -204,6 +209,7 @@ export default function DuaReadingScreen() {
                 showTransliteration={preferences.showTransliteration}
                 arabicFontSize={preferences.arabicFontSize}
                 onProgressChange={setZikrProgress}
+                swipeGesture={swipeGesture}
               />
             ) : (
               <SurfaceCard
@@ -211,6 +217,7 @@ export default function DuaReadingScreen() {
                 onPress={nextDua ? () => navigateTo(nextDua.id) : undefined}
                 style={styles.arabicCard}
                 accessibilityHint={nextDua ? t('duas.tapToContinue') : undefined}
+                simultaneousWithExternalGesture={swipeGesture}
               >
                 <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} align="center" />
 
