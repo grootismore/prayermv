@@ -47,8 +47,17 @@ import { WITR_AND_OTHER_DUAS } from './content/witr-and-other';
 
 export { DUA_CATEGORIES };
 
-/** Every dua/dhikr in the app, grouped by the Masnun Dua dataset's own category order. */
-export const ALL_DUAS: Dua[] = [
+/**
+ * Every dua/dhikr known to the app, grouped by the Masnun Dua dataset's own
+ * category order, including anything a content reviewer has flagged as
+ * wrong - see ALL_DUAS below for what actually ships. Exported (rather
+ * than kept private) only so scripts/validateDuas.ts and
+ * scripts/exportDuasForReview.ts can see flagged entries too - a flagged
+ * dua still needs its structure checked and still needs to appear in the
+ * review tool so a reviewer can revisit it later. Runtime app code should
+ * import ALL_DUAS, never this.
+ */
+export const EVERY_DUA: Dua[] = [
   ...DUAS_IMPORTANCE_DUAS,
   ...DUAS_EXCELLENCE_DUAS,
   ...TIME_OF_DUA_DUAS,
@@ -94,6 +103,17 @@ export const ALL_DUAS: Dua[] = [
   ...EID_DUAS,
   ...CAT_40_RABBANA_DUAS_DUAS,
 ];
+
+/**
+ * Every dua/dhikr actually shown in the app - EVERY_DUA with anything a
+ * human content reviewer has flagged as wrong removed entirely, so a
+ * flagged entry can't leak into search, favourites, or category counts
+ * while it's unresolved (see DuaContentReview.flagged in types/dua.ts and
+ * the review-tool workflow in data/duas/CONTENT_REVIEW.md). This is
+ * strictly opt-out - everything not yet reviewed still shows - never a
+ * "hide until approved" gate.
+ */
+export const ALL_DUAS: Dua[] = EVERY_DUA.filter((dua) => !dua.contentReview?.flagged);
 
 const categoriesById = new Map<string, DuaCategory>(DUA_CATEGORIES.map((c) => [c.id, c]));
 const duasById = new Map<string, Dua>(ALL_DUAS.map((d) => [d.id, d]));

@@ -44,7 +44,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "validate:duas": "tsx scripts/validateDuas.ts"
+    "validate:duas": "tsx scripts/validateDuas.ts",
+    "export:duas-review": "tsx scripts/exportDuasForReview.ts"
   },
   "private": true
 }
