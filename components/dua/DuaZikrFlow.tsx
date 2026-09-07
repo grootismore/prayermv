@@ -235,7 +235,9 @@ export default function DuaZikrFlow({
           ) : null}
 
           <DuaArabicText text={activeSegment.arabic} fontSize={arabicFontSize} align="center" />
-          {showTransliteration ? <Text style={styles.transliteration}>{activeSegment.transliteration}</Text> : null}
+          {showTransliteration && activeSegment.transliteration ? (
+            <Text style={styles.transliteration}>{activeSegment.transliteration}</Text>
+          ) : null}
           <Text style={styles.translation}>{activeSegment.translation[resolvedLanguage]}</Text>
 
           {counter.isComplete ? (

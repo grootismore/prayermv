@@ -221,7 +221,7 @@ export default function DuaReadingScreen() {
               >
                 <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} align="center" />
 
-                {preferences.showTransliteration ? (
+                {preferences.showTransliteration && dua.transliteration ? (
                   <Text style={styles.transliteration}>{dua.transliteration}</Text>
                 ) : null}
 

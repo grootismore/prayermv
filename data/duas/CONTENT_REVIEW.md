@@ -3,7 +3,105 @@
 This directory (`data/duas/`) holds every dua and dhikr shown in the app.
 **None of it has been checked by a qualified human reviewer yet.**
 
-## Source (rebuilt from the Masnun Dua dataset)
+## Full replacement: Hisn al-Muslim only, 22 categories (Sept 2026)
+
+At the user's explicit request ("use only duas from hisnul muslim...
+Categorize them nicely"), the entire 778-dua, 44-category Masnun Dua
+dataset described in the rest of this document was **removed and replaced
+outright** with content derived solely from
+[Hisn-Muslim-Json](https://github.com/wafaaelmaandy/Hisn-Muslim-Json), a
+JSON rendering of Said ibn Ali Al-Qahtani's *Hisn al-Muslim* (132 chapters,
+266 numbered entries, fields `TITLE`/`ARABIC_TEXT`/`TRANSLATED_TEXT`/`REPEAT`
+per entry). Everything below this section describes the previous dataset
+and its history for the record; none of that content ships anymore. The
+app now ships **243 duas across 22 categories** (`data/duas/categories.ts`,
+`data/duas/content/*.ts`), each id in the form `hisn-<N>` where `<N>` is
+that entry's own numbering in the source JSON.
+
+**Licensing note**: Hisn-Muslim-Json ships **no LICENSE file**, the same
+situation as the Kind-Unes repository used in the earlier backfill below -
+under default copyright this means "all rights reserved" despite being
+public. The user was told this explicitly and chose to proceed anyway.
+However, the *Arabic text* itself (Quran verses and hadith wording) is
+ancient religious source material, not the dataset author's own
+copyrightable expression - using it verbatim, as any Islamic app must, is
+not the same risk as reusing the dataset's own specific English prose.
+
+**Translation methodology - the specific mitigation for the above**: the
+dataset's own `TRANSLATED_TEXT` (English translation) was **never copied**.
+Every `translation.en` and `translation.dv` in the new dataset is either:
+
+1. An **original translation written directly from the Arabic**, in this
+   session, for entries with no equivalent already in this app - the large
+   majority of entries.
+2. **Reused verbatim from this app's own pre-existing, already-shipped
+   dataset** when the exact same dua already existed here (detected via
+   Arabic-text fuzzy matching - diacritic-stripped, alef/ya/hamza-normalized
+   substring comparison against the outgoing 778-entry set) - 96 of the 243
+   entries, each `contentReview.notes` naming the original id (`masnun-*`
+   or `hisnul-*`) it was reused from. This is the strong preference: this
+   app's existing text was already independently written and, in the
+   `hisnul-*` case, already cross-checked against two other sources.
+3. For a small number of entries reciting well-known, extended Quranic
+   passages (Ayat al-Kursi, the three Quls), the **Arabic is reproduced in
+   full** (unproblematic - it's scripture) but the translation deliberately
+   reuses this app's own prior verified translation of that same passage
+   rather than being re-derived from memory, to avoid inadvertently
+   reciting a specific well-known published English translation.
+
+**What was left out**: of the source's 266 entries, **21 were excluded**
+for being purely informational/narrative hadith excerpts with no distinct
+recitable phrase of their own (e.g. "one should send prayers on the Prophet
+after answering the mu'adhin", "the reward for visiting the sick", several
+"excellence of sending blessings on the Prophet" narrations that state a
+virtue but no new formula beyond what's already covered elsewhere). Where a
+longer hadith mixed a short recitable phrase with a stated virtue (e.g. the
+Black Stone takbir, the Day of Arafat dua), the phrase became `arabic`/
+`translation` and the virtue became `benefits` - the same extraction
+pattern used throughout this project. A handful of entries needed narrative
+scene-setting ("he would place his hand on the painful spot and say...")
+stripped out of `arabic` into `benefits` so the field holds only the
+recited phrase - see individual `contentReview.notes`.
+
+**Multi-phrase dhikr sequences** (the post-prayer tasbih, the takbir/tahmid/
+tasbih series before sleep after Isha, Fatimah's tasbih, and the pain-relief
+dua that's said differently on its two halves) use the existing `segments`
+mechanism (`types/dua.ts`) rather than a single flattened phrase, so the
+reading screen's one-phrase-per-card auto-advancing counter works correctly
+for each - the same pattern already built for the old `tasbih-hundred`
+entry.
+
+**Category taxonomy**: the source book's own 132 chapters were consolidated
+into **22 topic categories** (`data/duas/categories.ts`) - down from the
+outgoing dataset's 44 - ordered around a typical day and life's common
+moments (morning/evening, sleep, prayer, home, food, travel, family and
+social life, hardship, remembrance, then occasional-occasion categories
+like Hajj and weather) rather than the source's own chapter sequence. Each
+category also got a short one-line `description` shown under its title on
+the categories screen, which the outgoing dataset's categories never had.
+
+**Transliteration is now optional** (`types/dua.ts` - `Dua.transliteration`
+and `DuaSegment.transliteration` changed from required to optional):
+Hisn-Muslim-Json carries no transliteration field, and none was
+independently authored for the newly-translated entries, so most of the
+243 entries have no transliteration; the 96 reused entries keep whichever
+transliteration they already had. The reading screen, share text, and
+search all handle a missing transliteration gracefully (falls out of the
+UI/search fields entirely rather than showing an empty string) - see
+`app/(tabs)/duas/[duaId].tsx`, `components/dua/DuaZikrFlow.tsx`,
+`lib/duaShare.ts`, and `lib/duaSearch.ts`.
+
+Every entry ships with the same unverified `contentReview` flags described
+in the rest of this document (all `false`) and a `notes` field explaining
+its specific provenance (reused-verbatim vs. freshly translated, and from
+which chapter). The review tool described below still applies and should
+be re-exported/republished against this new dataset before relying on it.
+
+## Source (rebuilt from the Masnun Dua dataset) — historical, superseded above
+
+**Everything from here to the "Full replacement" section above describes
+the dataset that shipped before Sept 2026 and no longer ships.** Kept for
+the historical record of what was tried, what broke, and why.
 
 The content in `data/duas/categories.ts` and `data/duas/content/*.ts` (one
 file per category) is built entirely from the
@@ -248,7 +346,7 @@ verbatim, so a future reviewer doesn't need to guess.
 
 ## The review tool, and how flagging actually hides an entry
 
-Reading 778 entries in this repo isn't practical, so `contentReview` is
+Reading every entry in this repo by hand isn't practical, so `contentReview` is
 reviewed through a standalone web tool instead of by editing these files
 by hand. The current live copy: https://claude.ai/code/artifact/4d2f1178-5a27-4584-8f39-7a7fcca7f21c
 (private to the owner's account; re-export and republish it whenever the

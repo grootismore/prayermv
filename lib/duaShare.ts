@@ -21,7 +21,7 @@ export interface DuaShareTextOptions {
 export function buildDuaShareText(dua: Dua, options: DuaShareTextOptions): string {
   const lines: string[] = [options.titleText, '', dua.arabic];
 
-  if (options.showTransliteration) {
+  if (options.showTransliteration && dua.transliteration) {
     lines.push('', dua.transliteration);
   }
 
