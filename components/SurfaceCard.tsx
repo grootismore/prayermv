@@ -11,6 +11,8 @@ interface Props {
   elevated?: boolean;
   style?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
+  /** A short "what happens on tap" hint, read after the card's own content rather than replacing it - unlike accessibilityLabel, which overrides it. Prefer this for a card whose children are already meaningful text (e.g. a dua's Arabic/translation). */
+  accessibilityHint?: string;
   accessibilityRole?: 'button';
 }
 
@@ -22,6 +24,7 @@ export default function SurfaceCard({
   elevated = false,
   style,
   accessibilityLabel,
+  accessibilityHint,
   accessibilityRole,
 }: Props) {
   const styles = useThemedStyles(createStyles);
@@ -34,6 +37,7 @@ export default function SurfaceCard({
         style={({ pressed }) => [...base, pressed && styles.pressed]}
         accessibilityRole={accessibilityRole ?? 'button'}
         accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
         hitSlop={4}
       >
         {children}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,7 +17,7 @@ import type { DuaArabicFontSize, DuaSegment } from '../../../types/dua';
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../../lib/theme';
 import { useTheme, useThemedStyles } from '../../../lib/useTheme';
 import DuaArabicText from '../../../components/dua/DuaArabicText';
-import DuaZikrFlow from '../../../components/dua/DuaZikrFlow';
+import DuaZikrFlow, { type DuaZikrProgress } from '../../../components/dua/DuaZikrFlow';
 import FavouriteButton from '../../../components/dua/FavouriteButton';
 import SurfaceCard from '../../../components/SurfaceCard';
 import NoorDivider from '../../../components/NoorDivider';
@@ -56,6 +56,11 @@ export default function DuaReadingScreen() {
     contentOpacity.setValue(0);
     Animated.timing(contentOpacity, { toValue: 1, duration: 180, useNativeDriver: true }).start();
   }, [duaId, contentOpacity]);
+
+  const [zikrProgress, setZikrProgress] = useState<DuaZikrProgress | null>(null);
+  useEffect(() => {
+    setZikrProgress(null);
+  }, [duaId]);
 
   const swipeGesture = Gesture.Pan()
     .activeOffsetX([-20, 20])
@@ -131,6 +136,14 @@ export default function DuaReadingScreen() {
             </Text>
           </View>
         ) : null}
+        {zikrProgress ? (
+          <View style={styles.counterPill}>
+            <Ionicons name="repeat" size={12} color={colors.onPrimary} />
+            <Text style={styles.counterPillText}>
+              {zikrProgress.count} / {zikrProgress.target}
+            </Text>
+          </View>
+        ) : null}
         <Text style={styles.headerTitle} numberOfLines={1}>
           {titleText}
         </Text>
@@ -186,14 +199,19 @@ export default function DuaReadingScreen() {
             {segments ? (
               <DuaZikrFlow
                 duaId={dua.id}
-                duaTitle={titleText}
                 segments={segments}
                 resolvedLanguage={resolvedLanguage}
                 showTransliteration={preferences.showTransliteration}
                 arabicFontSize={preferences.arabicFontSize}
+                onProgressChange={setZikrProgress}
               />
             ) : (
-              <SurfaceCard elevated style={styles.arabicCard}>
+              <SurfaceCard
+                elevated
+                onPress={nextDua ? () => navigateTo(nextDua.id) : undefined}
+                style={styles.arabicCard}
+                accessibilityHint={nextDua ? t('duas.tapToContinue') : undefined}
+              >
                 <DuaArabicText text={dua.arabic} fontSize={preferences.arabicFontSize} align="center" />
 
                 {preferences.showTransliteration ? (
@@ -292,6 +310,21 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: typography.size.xs,
       fontWeight: typography.weight.bold,
       color: colors.textSecondary,
+      fontVariant: ['tabular-nums'],
+    },
+    counterPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 3,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 3,
+      borderRadius: radius.pill,
+      backgroundColor: colors.primary,
+    },
+    counterPillText: {
+      fontSize: typography.size.xs,
+      fontWeight: typography.weight.bold,
+      color: colors.onPrimary,
       fontVariant: ['tabular-nums'],
     },
     arabicCard: {
