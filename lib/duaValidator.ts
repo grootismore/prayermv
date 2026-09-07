@@ -50,7 +50,9 @@ export function validateDuaContent(categories: DuaCategory[], duas: Dua[]): DuaV
       issues.push({ duaId: dua.id, message: 'title.en and title.dv must both be non-empty' });
     }
     if (!dua.arabic.trim()) issues.push({ duaId: dua.id, message: 'arabic must be non-empty' });
-    if (!dua.transliteration.trim()) issues.push({ duaId: dua.id, message: 'transliteration must be non-empty' });
+    if (dua.transliteration !== undefined && !dua.transliteration.trim()) {
+      issues.push({ duaId: dua.id, message: 'transliteration, when present, must be non-empty' });
+    }
     if (!dua.translation.en.trim() || !dua.translation.dv.trim()) {
       issues.push({ duaId: dua.id, message: 'translation.en and translation.dv must both be non-empty' });
     }
@@ -73,8 +75,8 @@ export function validateDuaContent(categories: DuaCategory[], duas: Dua[]): DuaV
       dua.segments.forEach((segment, index) => {
         const label = `segments[${index}]`;
         if (!segment.arabic.trim()) issues.push({ duaId: dua.id, message: `${label}.arabic must be non-empty` });
-        if (!segment.transliteration.trim()) {
-          issues.push({ duaId: dua.id, message: `${label}.transliteration must be non-empty` });
+        if (segment.transliteration !== undefined && !segment.transliteration.trim()) {
+          issues.push({ duaId: dua.id, message: `${label}.transliteration, when present, must be non-empty` });
         }
         if (!segment.translation.en.trim() || !segment.translation.dv.trim()) {
           issues.push({ duaId: dua.id, message: `${label}.translation.en and .dv must both be non-empty` });

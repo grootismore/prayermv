@@ -67,7 +67,8 @@ export interface DuaContentReview {
  */
 export interface DuaSegment {
   arabic: string;
-  transliteration: string;
+  /** Omitted when no manually authored transliteration exists for this source (e.g. Hisn al-Muslim content). */
+  transliteration?: string;
   translation: LocalizedDuaText;
   repetitions: number;
 }
@@ -79,8 +80,15 @@ export interface Dua {
   title: LocalizedDuaText;
   /** Full Arabic text with complete harakat - never bare/unvowelled text. For a multi-phrase dhikr (see `segments`) this is the complete combined text, used for search/sharing/preview. */
   arabic: string;
-  /** Manually authored Latin transliteration - never derived from lib/arabicTransliterate.ts, which is a place-name phonetic approximator, not a religious-text transliterator. */
-  transliteration: string;
+  /**
+   * Manually authored Latin transliteration - never derived from
+   * lib/arabicTransliterate.ts, which is a place-name phonetic
+   * approximator, not a religious-text transliterator. Omitted for
+   * sources that don't supply one (e.g. Hisn al-Muslim content) - the UI
+   * hides the transliteration row/toggle for such entries rather than
+   * showing it empty.
+   */
+  transliteration?: string;
   translation: LocalizedDuaText;
   source: DuaSource;
   /** Number of times a single-phrase zikr should be repeated. Only set when the source itself specifies a count, and only for a dhikr that's one uniform phrase - a multi-phrase dhikr uses `segments` instead, not this. */

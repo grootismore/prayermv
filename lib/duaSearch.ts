@@ -42,7 +42,7 @@ export function getDuaSearchableFields(dua: Dua): string[] {
     dua.title.en,
     dua.title.dv,
     dua.arabic,
-    dua.transliteration,
+    ...(dua.transliteration ? [dua.transliteration] : []),
     dua.translation.en,
     dua.translation.dv,
     ...(dua.searchTerms ?? []),
