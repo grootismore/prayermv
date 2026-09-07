@@ -17,7 +17,12 @@ export default function DuasLayout() {
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="category/[categoryId]" />
-      <Stack.Screen name="[duaId]" />
+      {/* The reading screen owns left/right swipe itself (prev/next dua in
+          the category) - the native edge-swipe-to-go-back gesture would
+          otherwise race it and could pop all the way to the category list
+          on what was meant as a "previous dua" swipe. The header's back
+          button still exits to the category list. */}
+      <Stack.Screen name="[duaId]" options={{ gestureEnabled: false }} />
     </Stack>
   );
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Alert, Animated, Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
+import { AccessibilityInfo, Alert, Animated, StyleSheet, Text, Vibration, View } from 'react-native';
+import { Pressable, type PanGesture } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +26,8 @@ interface Props {
   arabicFontSize: DuaArabicFontSize;
   /** Reports the active segment's live count/target so the reading screen's header can show a small counter badge instead of a big on-card one - see [duaId].tsx. */
   onProgressChange?: (progress: DuaZikrProgress) => void;
+  /** The reading screen's swipe-to-navigate gesture, passed through to this card's own tap-to-count Pressable so the two are recognized simultaneously instead of the tap starving the swipe of its move events - see SurfaceCard's simultaneousWithExternalGesture. */
+  swipeGesture?: PanGesture;
 }
 
 // Auto-advance pause after a phrase's target is reached - long enough to
@@ -71,6 +74,7 @@ export default function DuaZikrFlow({
   showTransliteration,
   arabicFontSize,
   onProgressChange,
+  swipeGesture,
 }: Props) {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyles);
@@ -222,6 +226,7 @@ export default function DuaZikrFlow({
           onPress={handleCardPress}
           style={styles.card}
           accessibilityHint={counter.isComplete ? undefined : t('duas.counterAccessibilityHint')}
+          simultaneousWithExternalGesture={swipeGesture}
         >
           {activeSegment.repetitions > 1 ? (
             <View style={styles.repeatBadge}>
