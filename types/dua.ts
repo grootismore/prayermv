@@ -41,6 +41,21 @@ export interface DuaContentReview {
     dv: boolean;
   };
   notes?: string;
+  /**
+   * Set by the human content-review pass (see data/duas/CONTENT_REVIEW.md's
+   * review-tool workflow) when a reviewer has found a real problem with
+   * this entry - a wrong translation, mismatched Arabic, anything a user
+   * shouldn't see. A flagged entry is excluded from ALL_DUAS entirely (see
+   * data/duas/index.ts) rather than merely marked, so it can't leak into
+   * search, favourites, or category counts while it's unresolved. Omit or
+   * `false` for everything not yet reviewed or reviewed clean - this is
+   * strictly opt-out (block the bad ones), never opt-in, since requiring
+   * explicit approval before anything shows would empty the whole feature
+   * until review is complete.
+   */
+  flagged?: boolean;
+  /** Why a flagged entry was flagged - required whenever `flagged` is true, so a future reviewer doesn't have to rediscover the problem from scratch. */
+  flagNotes?: string;
 }
 
 /**

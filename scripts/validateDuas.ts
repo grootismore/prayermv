@@ -3,13 +3,20 @@
  * Structural checks only (see lib/duaValidator.ts); does not check
  * religious accuracy.
  */
-import { DUA_CATEGORIES, ALL_DUAS } from '../data/duas';
+import { DUA_CATEGORIES, ALL_DUAS, EVERY_DUA } from '../data/duas';
 import { validateDuaContent } from '../lib/duaValidator';
 
-const issues = validateDuaContent(DUA_CATEGORIES, ALL_DUAS);
+// EVERY_DUA, not ALL_DUAS - a flagged entry still needs its structure
+// checked, and still needs to be well-formed for the review tool to show
+// it, even though the app itself never displays it (see data/duas/index.ts).
+const issues = validateDuaContent(DUA_CATEGORIES, EVERY_DUA);
+const flaggedCount = EVERY_DUA.length - ALL_DUAS.length;
 
 if (issues.length === 0) {
-  console.log(`Duas content OK - ${ALL_DUAS.length} duas across ${DUA_CATEGORIES.length} categories, 0 issues.`);
+  console.log(
+    `Duas content OK - ${ALL_DUAS.length} duas shown across ${DUA_CATEGORIES.length} categories ` +
+      `(${flaggedCount} flagged and hidden), 0 issues.`
+  );
   process.exit(0);
 }
 

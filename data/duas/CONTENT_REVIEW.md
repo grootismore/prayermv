@@ -246,6 +246,47 @@ flags, all currently `false`:
 Every entry's `notes` field records that it came from this pipeline
 verbatim, so a future reviewer doesn't need to guess.
 
+## The review tool, and how flagging actually hides an entry
+
+Reading 778 entries in this repo isn't practical, so `contentReview` is
+reviewed through a standalone web tool instead of by editing these files
+by hand. The current live copy: https://claude.ai/code/artifact/4d2f1178-5a27-4584-8f39-7a7fcca7f21c
+(private to the owner's account; re-export and republish it whenever the
+dataset changes enough to matter - it embeds a point-in-time snapshot,
+not a live query against this repo).
+
+1. `npm run export:duas-review` (`scripts/exportDuasForReview.ts`) dumps
+   every category and dua - including anything already flagged, via
+   `EVERY_DUA` in `data/duas/index.ts` - to a JSON file.
+2. That JSON is embedded into a self-contained review page: every entry's
+   Arabic, transliteration, English, Dhivehi, source, and sourcing notes,
+   with per-entry Approve / Flag buttons. Flagging requires a short reason.
+   Review decisions are stored in the page's own shared database
+   (collection `reviews`, one document per dua id: `{status, notes,
+   reviewer, updatedAt}`), so progress persists across sessions and
+   multiple people can review at once.
+3. A dua flagged in the tool doesn't take effect by itself - the review
+   tool has no access to this repository. Reading back the `reviews`
+   collection and applying it here (setting `contentReview.flagged: true`
+   and `contentReview.flagNotes` on the matching entry in its
+   `data/duas/content/*.ts` file, or flipping the relevant
+   `*Verified` flag to `true` on an approval) is a normal code change,
+   done the same way as any other content fix in this file, then
+   validated and shipped through the usual PR flow.
+
+**This is deliberately opt-out, not opt-in**: `ALL_DUAS` (what the app
+actually shows - see `data/duas/index.ts`) is `EVERY_DUA` with anything
+`contentReview.flagged: true` removed. Everything not yet reviewed, or
+reviewed and left clean, still ships. Requiring explicit approval before
+anything shows was considered and rejected - with zero entries currently
+verified, that would empty the entire Duas & Adhkar feature the moment it
+shipped, for however long the review takes. A flagged entry is excluded
+from `ALL_DUAS` entirely, not merely marked, so it can't leak into
+search, favourites, or category/dua counts while it's unresolved -
+`getDuaById`/`getDuasByCategory` treat it exactly like an id that was
+never in the dataset, the same graceful-miss handling already built for
+a stale favourite (see `hooks/useDuaFavourites.ts`).
+
 ## Why this approach, not silence or refusal
 
 The feature spec this content was built for is explicit: never invent

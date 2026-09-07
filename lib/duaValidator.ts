@@ -58,6 +58,10 @@ export function validateDuaContent(categories: DuaCategory[], duas: Dua[]): DuaV
       issues.push({ duaId: dua.id, message: 'source.reference must be non-empty' });
     }
 
+    if (dua.contentReview?.flagged && !dua.contentReview.flagNotes?.trim()) {
+      issues.push({ duaId: dua.id, message: 'contentReview.flagNotes must be non-empty when contentReview.flagged is true' });
+    }
+
     if (dua.repetitions !== undefined && (!Number.isInteger(dua.repetitions) || dua.repetitions <= 0)) {
       issues.push({ duaId: dua.id, message: `repetitions must be a positive integer, got ${dua.repetitions}` });
     }
