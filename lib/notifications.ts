@@ -64,8 +64,27 @@ export async function ensureAdhanChannel(): Promise<void> {
  * ones for today's remaining, enabled prayers. Safe to call anytime (app
  * open, settings change, or from the background task) - it always reads
  * the latest island + prefs from storage rather than trusting caller state.
+ *
+ * This is called from several independent triggers (app launch, the
+ * background reschedule task, and every settings change) that can fire
+ * close together with no coordination between them. Since the underlying
+ * work is cancel-then-schedule, two overlapping calls used to both see an
+ * empty queue and both schedule the full day's notifications, doubling
+ * every entry (see the "prayer reminders fire twice" bug report). Routing
+ * every call through one serial queue guarantees a call only ever starts
+ * once the previous one has fully finished cancelling and rescheduling.
  */
-export async function rescheduleTodayNotifications(): Promise<void> {
+let rescheduleQueue: Promise<void> = Promise.resolve();
+
+export function rescheduleTodayNotifications(): Promise<void> {
+  const run = rescheduleQueue.then(() => performReschedule());
+  // Keep the queue alive even if this run fails, so a later call isn't
+  // permanently blocked behind a rejected promise.
+  rescheduleQueue = run.catch(() => undefined);
+  return run;
+}
+
+async function performReschedule(): Promise<void> {
   const islandId = await loadSelectedIslandId();
   if (islandId == null) return;
 
