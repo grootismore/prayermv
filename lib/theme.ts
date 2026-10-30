@@ -1,13 +1,13 @@
 import { Platform } from 'react-native';
 
 /**
- * Noor+ design tokens - the "Liyelaa" world, after Maldivian lacquerwork
- * (liyelaa jehun): vermilion and ochre incised on lacquer-black ("Lacquer
- * Night") or on pale coral-stone limewash ("Limewash Day"). Centralized here so no screen hardcodes a color, spacing,
- * radius, or type value directly. Which palette is active is resolved by
- * lib/useTheme.ts (from the user's Appearance setting + the system
- * scheme) - screens/components should get `colors` from `useTheme()`,
- * never import a fixed palette from here directly.
+ * Noor+ design tokens - emerald and mint over deep forest green ("Forest
+ * Night") or a pale mint wash ("Mint Day"), meant to sit under iOS liquid
+ * glass and Material surfaces. Centralized here so no screen hardcodes a
+ * color, spacing, radius, or type value directly. Which palette is active
+ * is resolved by lib/useTheme.ts (from the user's Appearance setting + the
+ * system scheme) - screens/components should get `colors` from
+ * `useTheme()`, never import a fixed palette from here directly.
  */
 export interface ThemeColors {
   background: string;
@@ -32,73 +32,90 @@ export interface ThemeColors {
   success: string;
   warning: string;
   danger: string;
-  /** The hero vessel (Home's next-prayer card): one committed vermilion field used the same way in both themes. */
-  heroBackground: string;
-  /** Text on `heroBackground`. */
+  /** Mint fill for filled controls (primary button, selected segment, today marker) - the same bright mint in both themes. */
+  fill: string;
+  /** Text/icon on a `fill` surface. */
+  onFill: string;
+  /** Ambient screen-background gradient stops (top -> bottom). */
+  bgFrom: string;
+  bgTo: string;
+  /** Translucent card fill used where real glass isn't available (Android, iOS < 26, Reduce Transparency). */
+  glassFill: string;
+  /** Hero card gradient (Home's next prayer) and its text colours. */
+  heroFrom: string;
+  heroTo: string;
   heroText: string;
-  /** Secondary text on `heroBackground` - tinted from the field, not gray. */
   heroTextMuted: string;
 }
 
-// Lacquer-black is warm (a hint of oxblood), never blue - vermilion is the
-// one committed colour, ochre the quiet accent. Every text/surface pair
-// below was picked for >=4.5:1 (textMuted on background is ~5.4:1).
+// Forest Night: a deep, slightly blue-green ground (never black) so mint
+// reads as light, not neon. Every text/surface pair is >= 4.5:1.
 export const darkColors: ThemeColors = {
-  background: '#150E0B',
-  backgroundDeep: '#0E0807',
-  surface: '#21150F',
-  surfaceElevated: '#2C1C14',
-  surfacePressed: '#38241A',
-  primary: '#FF7355',
-  primaryMuted: '#E85A3C',
-  primarySoft: 'rgba(255, 115, 85, 0.14)',
-  onPrimary: '#150E0B',
-  gold: '#F5B83D',
-  goldMuted: '#C99528',
-  goldSoft: 'rgba(245, 184, 61, 0.14)',
-  textPrimary: '#F6EEE2',
-  textSecondary: '#CBBBA9',
-  textMuted: '#9C8978',
-  border: 'rgba(246, 238, 226, 0.16)',
-  separator: 'rgba(246, 238, 226, 0.10)',
-  overlay: 'rgba(14, 8, 7, 0.82)',
-  success: '#6FCF8E',
-  warning: '#F5B83D',
-  danger: '#FF6B7A',
-  heroBackground: '#FF6040',
-  heroText: '#150E0B',
-  heroTextMuted: '#4A1D12',
+  background: '#07241E',
+  backgroundDeep: '#041A15',
+  surface: '#0F342B',
+  surfaceElevated: '#154338',
+  surfacePressed: '#1B5244',
+  primary: '#5CF39A',
+  primaryMuted: '#35D67B',
+  primarySoft: 'rgba(92, 243, 154, 0.16)',
+  onPrimary: '#04261A',
+  gold: '#FFD166',
+  goldMuted: '#D9AA3A',
+  goldSoft: 'rgba(255, 209, 102, 0.16)',
+  textPrimary: '#F2FBF6',
+  textSecondary: '#B6D3C5',
+  textMuted: '#92B5A5',
+  border: 'rgba(255, 255, 255, 0.14)',
+  separator: 'rgba(255, 255, 255, 0.09)',
+  overlay: 'rgba(4, 26, 21, 0.8)',
+  success: '#5CF39A',
+  warning: '#FFD166',
+  danger: '#FF7A85',
+  fill: '#4EF08F',
+  onFill: '#04261A',
+  bgFrom: '#0E3D33',
+  bgTo: '#051D17',
+  glassFill: 'rgba(255, 255, 255, 0.08)',
+  heroFrom: '#8CF7BC',
+  heroTo: '#3FDC85',
+  heroText: '#04261A',
+  heroTextMuted: '#0B5A38',
 };
 
-// Day is limewash coral-stone (a cool, slightly green grey - the walls of
-// Hukuru Miskiy), not cream: outdoors in tropical glare a flat pale ground
-// with deep ink reads best. primary/gold are deepened a step so they hold
-// contrast on it.
+// Mint Day: a pale mint wash with white cards. primary (text/icons) is a
+// deep green so it holds contrast; the bright mint lives only in `fill`.
 export const lightColors: ThemeColors = {
-  background: '#ECEFEA',
-  backgroundDeep: '#DEE3DC',
-  surface: '#F7F8F4',
+  background: '#EAF8F0',
+  backgroundDeep: '#DCF1E6',
+  surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  surfacePressed: '#E1E6DE',
-  primary: '#B5301A',
-  primaryMuted: '#C8341B',
-  primarySoft: 'rgba(181, 48, 26, 0.10)',
+  surfacePressed: '#E4F4EB',
+  primary: '#0A7640',
+  primaryMuted: '#16A05B',
+  primarySoft: 'rgba(11, 127, 67, 0.10)',
   onPrimary: '#FFFFFF',
   gold: '#8A5A00',
   goldMuted: '#6E4700',
   goldSoft: 'rgba(138, 90, 0, 0.12)',
-  textPrimary: '#1B120E',
-  textSecondary: '#55473E',
-  textMuted: '#76675C',
-  border: 'rgba(27, 18, 14, 0.16)',
-  separator: 'rgba(27, 18, 14, 0.09)',
-  overlay: 'rgba(236, 239, 234, 0.88)',
-  success: '#1F7A45',
+  textPrimary: '#0A2A1F',
+  textSecondary: '#33564A',
+  textMuted: '#4F6B5E',
+  border: 'rgba(10, 42, 31, 0.12)',
+  separator: 'rgba(10, 42, 31, 0.08)',
+  overlay: 'rgba(234, 248, 240, 0.9)',
+  success: '#0B7F43',
   warning: '#8A5A00',
-  danger: '#B3261E',
-  heroBackground: '#C8341B',
-  heroText: '#FFFFFF',
-  heroTextMuted: '#FFF0EB',
+  danger: '#C62828',
+  fill: '#4EF08F',
+  onFill: '#04261A',
+  bgFrom: '#D4F5E4',
+  bgTo: '#F4FBF7',
+  glassFill: 'rgba(255, 255, 255, 0.72)',
+  heroFrom: '#8CF7BC',
+  heroTo: '#3FDC85',
+  heroText: '#04261A',
+  heroTextMuted: '#0B5A38',
 };
 
 /** 4/8pt spacing scale - use these instead of ad-hoc margin/padding numbers. */
@@ -113,10 +130,10 @@ export const spacing = {
 };
 
 export const radius = {
-  sm: 10,
-  md: 14,
-  lg: 16,
-  xl: 24,
+  sm: 12,
+  md: 18,
+  lg: 24,
+  xl: 32,
   pill: 999,
 };
 
@@ -169,16 +186,11 @@ export const tabBarMetrics = {
 // is light or dark, the same way most native UIs keep shadows black-based
 // even in dark mode.
 export const shadow = {
-  card: Platform.select({
-    ios: {
-      shadowColor: '#000000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.16,
-      shadowRadius: 12,
-    },
-    android: { elevation: 3 },
-    default: {},
-  }),
+  // Cards are glass (iOS) or tonal surfaces (Android): a drop shadow behind a
+  // translucent surface shows through it, so cards stay flat and are defined
+  // by the glass edge or a hairline border. Only opaque objects (the hero,
+  // floating buttons) carry a shadow.
+  card: {},
   hero: Platform.select({
     ios: {
       shadowColor: '#000000',

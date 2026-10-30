@@ -4,7 +4,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../../../components/Icon';
 import * as Haptics from 'expo-haptics';
 
 import { useSettings } from '../../../context/SettingsContext';
@@ -20,7 +20,6 @@ import DuaArabicText from '../../../components/dua/DuaArabicText';
 import DuaZikrFlow, { type DuaZikrProgress } from '../../../components/dua/DuaZikrFlow';
 import FavouriteButton from '../../../components/dua/FavouriteButton';
 import SurfaceCard from '../../../components/SurfaceCard';
-import NoorDivider from '../../../components/NoorDivider';
 
 const ARABIC_FONT_SIZES: DuaArabicFontSize[] = ['small', 'medium', 'large'];
 
@@ -132,7 +131,7 @@ export default function DuaReadingScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('duas.back')}
         >
-          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+          <Icon name="chevron-back" size={24} color={colors.primary} />
         </Pressable>
         {currentIndex >= 0 && siblings.length > 0 ? (
           <View style={styles.positionPill}>
@@ -143,7 +142,7 @@ export default function DuaReadingScreen() {
         ) : null}
         {zikrProgress ? (
           <View style={styles.counterPill}>
-            <Ionicons name="repeat" size={12} color={colors.onPrimary} />
+            <Icon name="repeat" size={12} color={colors.onFill} />
             <Text style={styles.counterPillText}>
               {zikrProgress.count} / {zikrProgress.target}
             </Text>
@@ -160,7 +159,7 @@ export default function DuaReadingScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('duas.share')}
           >
-            <Ionicons name="share-outline" size={22} color={colors.primary} />
+            <Icon name="share-outline" size={22} color={colors.primary} />
           </Pressable>
           <FavouriteButton
             isFavourite={favourited}
@@ -182,7 +181,7 @@ export default function DuaReadingScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('duas.decreaseArabicTextSize')}
           >
-            <Ionicons name="remove" size={18} color={canShrinkFont ? colors.primary : colors.textMuted} />
+            <Icon name="remove" size={18} color={canShrinkFont ? colors.primary : colors.textMuted} />
           </Pressable>
           <Text style={styles.fontSizeGlyph}>Aa</Text>
           <Pressable
@@ -193,7 +192,7 @@ export default function DuaReadingScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('duas.increaseArabicTextSize')}
           >
-            <Ionicons name="add" size={18} color={canGrowFont ? colors.primary : colors.textMuted} />
+            <Icon name="add" size={18} color={canGrowFont ? colors.primary : colors.textMuted} />
           </Pressable>
         </View>
       </View>
@@ -239,7 +238,6 @@ export default function DuaReadingScreen() {
 
             {benefitsText ? (
               <>
-                <NoorDivider compact />
                 <Text style={styles.sectionLabel}>{t('duas.benefits')}</Text>
                 <Text style={styles.benefitsText}>{benefitsText}</Text>
               </>
@@ -256,7 +254,7 @@ export default function DuaReadingScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('duas.previous')}
         >
-          <Ionicons name="chevron-back" size={18} color={previousDua ? colors.primary : colors.textMuted} />
+          <Icon name="chevron-back" size={18} color={previousDua ? colors.primary : colors.textMuted} />
           <Text style={[styles.navButtonText, !previousDua && styles.navButtonTextDisabled]}>{t('duas.previous')}</Text>
         </Pressable>
         <Pressable
@@ -267,7 +265,7 @@ export default function DuaReadingScreen() {
           accessibilityLabel={t('duas.next')}
         >
           <Text style={[styles.navButtonText, !nextDua && styles.navButtonTextDisabled]}>{t('duas.next')}</Text>
-          <Ionicons name="chevron-forward" size={18} color={nextDua ? colors.primary : colors.textMuted} />
+          <Icon name="chevron-forward" size={18} color={nextDua ? colors.primary : colors.textMuted} />
         </Pressable>
       </View>
     </View>
@@ -326,12 +324,12 @@ const createStyles = (colors: ThemeColors) =>
       paddingHorizontal: spacing.sm,
       paddingVertical: 3,
       borderRadius: radius.pill,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.fill,
     },
     counterPillText: {
       fontSize: typography.size.xs,
       fontWeight: typography.weight.bold,
-      color: colors.onPrimary,
+      color: colors.onFill,
       fontVariant: ['tabular-nums'],
     },
     arabicCard: {
@@ -413,7 +411,7 @@ const createStyles = (colors: ThemeColors) =>
       width: 3,
       height: 14,
       borderRadius: 2,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.fill,
     },
     sourceText: {
       fontSize: typography.size.xs,

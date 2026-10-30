@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from './Icon';
 
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
@@ -10,7 +10,7 @@ interface Props {
   onPress: () => void;
 }
 
-/** One row in the language picker: label + a small filled vermilion circle-check when selected. */
+/** One row in the language picker: label + a small filled mint circle-check when selected. */
 export default function LanguageRow({ label, selected, onPress }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
@@ -25,7 +25,7 @@ export default function LanguageRow({ label, selected, onPress }: Props) {
       <Text style={styles.label}>{label}</Text>
       {selected ? (
         <View style={styles.check}>
-          <Ionicons name="checkmark" size={14} color={colors.onPrimary} />
+          <Icon name="checkmark" size={14} color={colors.onFill} />
         </View>
       ) : (
         <View style={styles.checkEmpty} />
@@ -56,7 +56,7 @@ const createStyles = (colors: ThemeColors) =>
       width: 24,
       height: 24,
       borderRadius: radius.pill,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.fill,
       alignItems: 'center',
       justifyContent: 'center',
     },

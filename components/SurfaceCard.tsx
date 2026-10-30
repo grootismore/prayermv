@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { useRef, type ReactNode } from 'react';
+import { Animated, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Pressable, type PanGesture } from 'react-native-gesture-handler';
 
-import { cardPadding, minTouchTarget, radius, shadow, type ThemeColors } from '../lib/theme';
-import { useThemedStyles } from '../lib/useTheme';
+import { cardPadding, minTouchTarget, radius, shadow } from '../lib/theme';
+import { useTheme } from '../lib/useTheme';
+import GlassSurface from './GlassSurface';
 
 interface Props {
   children: ReactNode;
@@ -29,7 +30,25 @@ interface Props {
   simultaneousWithExternalGesture?: PanGesture;
 }
 
-/** The app's one card surface: matte lacquer-black or limewash, rounded, hairline border, soft depth shadow. Pressable when `onPress` is given, with restrained native press feedback. */
+// The card is a wrapper (shadow, press scale) around the glass surface, so
+// whatever positions the card in its parent has to live on the wrapper.
+const OUTER_KEYS = new Set([
+  'flex', 'flexGrow', 'flexShrink', 'flexBasis', 'alignSelf', 'width', 'maxWidth', 'minWidth',
+  'position', 'top', 'left', 'right', 'bottom', 'zIndex',
+  'margin', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight', 'marginHorizontal', 'marginVertical',
+  'marginStart', 'marginEnd',
+]);
+
+function splitStyle(style: StyleProp<ViewStyle>): [ViewStyle, ViewStyle] {
+  const outer: Record<string, unknown> = {};
+  const inner: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(StyleSheet.flatten(style) ?? {})) {
+    (OUTER_KEYS.has(key) ? outer : inner)[key] = value;
+  }
+  return [outer as ViewStyle, inner as ViewStyle];
+}
+
+/** The app's one card surface: platform glass (see GlassSurface), generously rounded. Pressable when `onPress` is given, sinking slightly while held. */
 export default function SurfaceCard({
   children,
   onPress,
@@ -41,50 +60,49 @@ export default function SurfaceCard({
   accessibilityRole,
   simultaneousWithExternalGesture,
 }: Props) {
-  const styles = useThemedStyles(createStyles);
-  const base = [styles.card, elevated && styles.elevated, padded && styles.padded, style];
+  const { colors } = useTheme();
+  const scale = useRef(new Animated.Value(1)).current;
+  const sink = (to: number) =>
+    Animated.spring(scale, { toValue: to, useNativeDriver: true, speed: 40, bounciness: 0 }).start();
+
+  const [outerStyle, innerStyle] = splitStyle(style);
+  const surface = (
+    <GlassSurface radius={radius.lg} elevated={elevated} style={[styles.card, padded && styles.padded, innerStyle]}>
+      {children}
+    </GlassSurface>
+  );
 
   if (onPress) {
     return (
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [...base, pressed && styles.pressed]}
-        accessibilityRole={accessibilityRole ?? 'button'}
-        accessibilityLabel={accessibilityLabel}
-        accessibilityHint={accessibilityHint}
-        hitSlop={4}
-        simultaneousWithExternalGesture={simultaneousWithExternalGesture}
-      >
-        {children}
-      </Pressable>
+      <Animated.View style={[{ transform: [{ scale }] }, shadow.card, outerStyle]}>
+        <Pressable
+          onPress={onPress}
+          onPressIn={() => sink(0.98)}
+          onPressOut={() => sink(1)}
+          accessibilityRole={accessibilityRole ?? 'button'}
+          accessibilityLabel={accessibilityLabel}
+          accessibilityHint={accessibilityHint}
+          hitSlop={4}
+          simultaneousWithExternalGesture={simultaneousWithExternalGesture}
+        >
+          {surface}
+        </Pressable>
+      </Animated.View>
     );
   }
 
   return (
-    <View style={base} accessible={!!accessibilityLabel} accessibilityLabel={accessibilityLabel}>
-      {children}
+    <View
+      style={[shadow.card, outerStyle]}
+      accessible={!!accessibilityLabel}
+      accessibilityLabel={accessibilityLabel}
+    >
+      {surface}
     </View>
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    card: {
-      backgroundColor: colors.surface,
-      borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: colors.border,
-      overflow: 'hidden',
-      minHeight: minTouchTarget,
-      ...shadow.card,
-    },
-    elevated: {
-      backgroundColor: colors.surfaceElevated,
-    },
-    padded: {
-      padding: cardPadding,
-    },
-    pressed: {
-      backgroundColor: colors.surfacePressed,
-    },
-  });
+const styles = StyleSheet.create({
+  card: { minHeight: minTouchTarget },
+  padded: { padding: cardPadding },
+});

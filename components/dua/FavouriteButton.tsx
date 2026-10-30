@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../Icon';
 
 import { minTouchTarget } from '../../lib/theme';
 import { useTheme } from '../../lib/useTheme';
@@ -23,7 +23,7 @@ export default function FavouriteButton({ isFavourite, onToggle, addLabel, remov
       accessibilityLabel={isFavourite ? removeLabel : addLabel}
       accessibilityState={{ selected: isFavourite }}
     >
-      <Ionicons
+      <Icon
         name={isFavourite ? 'heart' : 'heart-outline'}
         size={24}
         color={isFavourite ? colors.gold : colors.textSecondary}

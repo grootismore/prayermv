@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
+import { Appearance, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 
-import { SettingsProvider } from '../context/SettingsContext';
+import { SettingsProvider, useSettings } from '../context/SettingsContext';
 import { useTheme } from '../lib/useTheme';
 import ToastHost from '../components/ToastHost';
 import {
@@ -40,6 +41,15 @@ export default function RootLayout() {
 /** Split out from RootLayout so it can call useTheme(), which needs to be inside SettingsProvider. */
 function AppShell() {
   const { colors, scheme } = useTheme();
+  const { themeMode } = useSettings();
+
+  // The system tab bar and iOS glass follow the *native* appearance, not our
+  // React theme - so when the user forces Light or Dark in Settings, tell the
+  // OS too ('unspecified' hands control back to the system).
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    Appearance.setColorScheme(themeMode === 'system' ? 'unspecified' : themeMode);
+  }, [themeMode]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>

@@ -1,19 +1,19 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from './Icon';
 
 import { minTouchTarget, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
 
 interface Props {
   title: string;
-  /** A secondary vermilion action line beneath the title (e.g. "Change island"). */
+  /** A secondary accent action line beneath the title (e.g. "Change island"). */
   actionLabel?: string;
   chevron?: boolean;
   onPress?: () => void;
   accessibilityLabel?: string;
 }
 
-/** A generic settings row: title (+ optional vermilion action line) with a trailing chevron, inside a pressable native-style row. */
+/** A generic settings row: title (+ optional accent action line) with a trailing chevron, inside a pressable native-style row. */
 export default function SettingRow({ title, actionLabel, chevron = true, onPress, accessibilityLabel }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
@@ -28,7 +28,7 @@ export default function SettingRow({ title, actionLabel, chevron = true, onPress
         <Text style={styles.title}>{title}</Text>
         {actionLabel ? <Text style={styles.actionLabel}>{actionLabel}</Text> : null}
       </View>
-      {chevron ? <Ionicons name="chevron-forward" size={20} color={colors.textMuted} /> : null}
+      {chevron ? <Icon name="chevron-forward" size={20} color={colors.textMuted} /> : null}
     </Pressable>
   );
 }

@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
-import LacquerBand from './LacquerBand';
+import AmbientBackground from './AmbientBackground';
 
 /**
  * Branded, full-bleed loading state - used anywhere the app has real data
@@ -16,9 +16,9 @@ export default function LoadingScreen({ label }: { label?: string }) {
   const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.root}>
+      <AmbientBackground />
       <SafeAreaView style={styles.safe}>
-        <LacquerBand style={styles.band} thin={1} thick={3} gap={3} />
-        <ActivityIndicator size="small" color={colors.primary} style={styles.spinner} />
+        <ActivityIndicator size="large" color={colors.primary} />
         {label ? <Text style={styles.label}>{label}</Text> : null}
       </SafeAreaView>
     </View>
@@ -29,7 +29,5 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     root: { flex: 1, backgroundColor: colors.background },
     safe: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    band: { width: 72 },
-    spinner: { marginTop: spacing.lg },
-    label: { marginTop: spacing.sm, fontSize: typography.size.sm, color: colors.textSecondary, fontWeight: typography.weight.semibold },
+    label: { marginTop: spacing.md, fontSize: typography.size.base, color: colors.textSecondary, fontWeight: typography.weight.semibold },
   });

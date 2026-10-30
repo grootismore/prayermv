@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
 import { useSettings } from '../../context/SettingsContext';
 import { useNextPrayer, formatCountdown } from '../../lib/useNextPrayer';
 import { getPrayerTimesForDate } from '../../lib/prayerTimes';
-import { minTouchTarget, spacing, typography, type ThemeColors } from '../../lib/theme';
+import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import { useReduceMotion } from '../../lib/useReduceMotion';
@@ -18,10 +17,22 @@ import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
 import NextPrayerHero from '../../components/NextPrayerHero';
 import PrayerTimeRow from '../../components/PrayerTimeRow';
-import NoorDivider from '../../components/NoorDivider';
+import Icon from '../../components/Icon';
+import PressableScale from '../../components/PressableScale';
+import GlassSurface from '../../components/GlassSurface';
 import LoadingScreen from '../../components/LoadingScreen';
 
 const SWIPE_THRESHOLD = 45;
+
+// Each prayer's own glyph: an SF Symbol on iOS, an Ionicon on Android.
+const PRAYER_ICON: Record<string, { name: 'moon-outline' | 'sunny-outline' | 'partly-sunny-outline'; sf: 'moon.haze.fill' | 'sunrise.fill' | 'sun.max.fill' | 'sun.haze.fill' | 'sunset.fill' | 'moon.stars.fill' }> = {
+  fajr: { name: 'moon-outline', sf: 'moon.haze.fill' },
+  sunrise: { name: 'sunny-outline', sf: 'sunrise.fill' },
+  dhuhr: { name: 'sunny-outline', sf: 'sun.max.fill' },
+  asr: { name: 'partly-sunny-outline', sf: 'sun.haze.fill' },
+  maghrib: { name: 'partly-sunny-outline', sf: 'sunset.fill' },
+  isha: { name: 'moon-outline', sf: 'moon.stars.fill' },
+};
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -176,39 +187,41 @@ export default function HomeScreen() {
         />
       )}
 
-      <NoorDivider compact />
-
-      <View style={styles.dayNavRow}>
-        <Pressable
+      <GlassSurface radius={radius.pill} style={styles.dayNav}>
+        <PressableScale
           onPress={goToPreviousDay}
           hitSlop={8}
           style={styles.dayNavButton}
+          accessibilityRole="button"
           accessibilityLabel={t('home.previousDay')}
         >
-          <Ionicons name="chevron-back" size={20} color={colors.primary} />
-        </Pressable>
-        <Pressable
+          <Icon name="chevron-back" size={18} color={colors.primary} />
+        </PressableScale>
+        <PressableScale
           onPress={goToToday}
           disabled={dayOffset === 0}
-          style={styles.dayLabelButton}
+          style={styles.dayLabelSlot}
           accessibilityRole="button"
           accessibilityLabel={dayOffset === 0 ? dayLabel : `${dayLabel}, ${t('home.today')}`}
           accessibilityHint={dayOffset === 0 ? undefined : t('home.today')}
         >
-          <Text style={styles.sectionTitle} numberOfLines={1}>
-            {dayLabel}
-          </Text>
-          {dayOffset !== 0 && <Ionicons name="return-down-back" size={16} color={colors.primary} />}
-        </Pressable>
-        <Pressable
+          <View style={styles.dayLabelButton}>
+            <Text style={styles.sectionTitle} numberOfLines={1}>
+              {dayLabel}
+            </Text>
+            {dayOffset !== 0 && <Icon name="return-down-back" size={15} color={colors.primary} />}
+          </View>
+        </PressableScale>
+        <PressableScale
           onPress={goToNextDay}
           hitSlop={8}
           style={styles.dayNavButton}
+          accessibilityRole="button"
           accessibilityLabel={t('home.nextDay')}
         >
-          <Ionicons name="chevron-forward" size={20} color={colors.primary} />
-        </Pressable>
-      </View>
+          <Icon name="chevron-forward" size={18} color={colors.primary} />
+        </PressableScale>
+      </GlassSurface>
 
       <Animated.View
         {...panResponder.panHandlers}
@@ -224,6 +237,7 @@ export default function HomeScreen() {
                 key={entry.call}
                 label={t(`prayers.${entry.call}`)}
                 time={entry.string}
+                icon={PRAYER_ICON[entry.call]}
                 isNext={isNext}
                 isCurrent={isCurrent}
                 isPast={isPast}
@@ -240,8 +254,8 @@ export default function HomeScreen() {
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
   islandName: {
-    fontSize: typography.size.xxl,
-    fontWeight: typography.weight.bold,
+    fontSize: typography.size.display,
+    fontWeight: typography.weight.heavy,
     color: colors.textPrimary,
     marginBottom: spacing.xxs,
   },
@@ -253,11 +267,12 @@ const createStyles = (colors: ThemeColors) =>
   },
   dateText: { fontSize: typography.size.sm, color: colors.textSecondary },
   dateDivider: { fontSize: typography.size.sm, color: colors.gold, marginHorizontal: spacing.xs },
-  dayNavRow: {
+  dayNav: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.xs,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.xxs,
   },
   dayNavButton: {
     width: minTouchTarget,
@@ -265,8 +280,8 @@ const createStyles = (colors: ThemeColors) =>
     alignItems: 'center',
     justifyContent: 'center',
   },
+  dayLabelSlot: { flex: 1 },
   dayLabelButton: {
-    flex: 1,
     minHeight: minTouchTarget,
     flexDirection: 'row',
     alignItems: 'center',

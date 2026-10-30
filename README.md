@@ -58,9 +58,11 @@ language, and notification preferences - stays on your device.
 
 ## Design
 
-Noor+ takes its look from Maldivian lacquerwork (liyelaa jehun): vermilion and
-ochre incised lines on lacquer-black at night, or pale coral-stone limewash by day -
-built to be read at a glance, in English, Dhivehi or Arabic.
+Noor+ is built to feel native on each platform: emerald and mint over deep
+forest green by night, or a pale mint wash by day. On iOS 26 the tab bar and
+cards use system liquid glass; on older iOS they use a system blur, and on
+Android the Material navigation bar and tonal surfaces. It's meant to be read
+at a glance, in English, Dhivehi or Arabic.
 
 ## Contributing
 
