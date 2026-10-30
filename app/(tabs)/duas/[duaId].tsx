@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Text from '../../../components/Text';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';

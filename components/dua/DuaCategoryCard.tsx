@@ -1,12 +1,18 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Text from '../Text';
 
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
+import Icon from '../Icon';
+import PressableScale from '../PressableScale';
+import { CATEGORY_ICON } from './categoryIcons';
 
 interface Props {
+  /** Looks up the drawn glyph; without a match the emoji `icon` is shown instead. */
+  categoryId: string;
   title: string;
   description?: string;
-  /** A single emoji character, not an Ionicons glyph name - see data/duas/categories.ts. */
+  /** A single emoji character, the fallback when `categoryId` has no drawn glyph - see data/duas/categories.ts. */
   icon: string;
   count: number;
   countLabel: string;
@@ -14,22 +20,25 @@ interface Props {
 }
 
 /**
- * A category row for the Duas home screen: a count bubble, the title (and an
- * optional short description), and a large emoji - deliberately simple and
- * scannable across all 44 categories, rather than an icon+chevron treatment.
+ * A category row for the Duas home screen: a glyph tile, the title (and an
+ * optional short description) aligned to the reading edge, then the count
+ * and a chevron - scannable across all the categories.
  */
-export default function DuaCategoryCard({ title, description, icon, count, countLabel, onPress }: Props) {
+export default function DuaCategoryCard({ categoryId, title, description, icon, count, countLabel, onPress }: Props) {
+  const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
+  const glyph = CATEGORY_ICON[categoryId];
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      pressedScale={0.985}
+      contentStyle={styles.row}
       accessibilityRole="button"
       accessibilityLabel={`${title}, ${countLabel}`}
     >
-      <View style={styles.countBubble}>
-        <Text style={styles.countText}>{count}</Text>
+      <View style={styles.tile}>
+        {glyph ? <Icon {...glyph} size={22} color={colors.primary} /> : <Text style={styles.emoji}>{icon}</Text>}
       </View>
       <View style={styles.textCol}>
         <Text style={styles.title} numberOfLines={1}>
@@ -41,8 +50,9 @@ export default function DuaCategoryCard({ title, description, icon, count, count
           </Text>
         ) : null}
       </View>
-      <Text style={styles.emoji}>{icon}</Text>
-    </Pressable>
+      <Text style={styles.count}>{count}</Text>
+      <Icon name="chevron-forward" size={14} color={colors.textMuted} />
+    </PressableScale>
   );
 }
 
@@ -51,49 +61,36 @@ const createStyles = (colors: ThemeColors) =>
     row: {
       flexDirection: 'row',
       alignItems: 'center',
-      minHeight: minTouchTarget + 16,
+      minHeight: minTouchTarget + 20,
       paddingVertical: spacing.sm,
       paddingHorizontal: spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.separator,
       gap: spacing.sm,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.separator,
     },
-    pressed: {
-      backgroundColor: colors.surfacePressed,
-    },
-    countBubble: {
-      width: 36,
-      height: 36,
-      borderRadius: radius.pill,
+    tile: {
+      width: 44,
+      height: 44,
+      borderRadius: radius.md,
       backgroundColor: colors.primarySoft,
       alignItems: 'center',
       justifyContent: 'center',
     },
-    countText: {
-      fontSize: typography.size.sm,
-      fontWeight: typography.weight.bold,
-      color: colors.primary,
-      fontVariant: ['tabular-nums'],
-    },
-    textCol: {
-      flex: 1,
-      gap: 2,
-      alignItems: 'center',
-    },
+    emoji: { fontSize: 22 },
+    textCol: { flex: 1, gap: 2 },
     title: {
       fontSize: typography.size.md,
       fontWeight: typography.weight.semibold,
       color: colors.textPrimary,
-      textAlign: 'center',
     },
     description: {
       fontSize: typography.size.sm,
       color: colors.textSecondary,
-      textAlign: 'center',
     },
-    emoji: {
-      fontSize: 28,
-      width: 36,
-      textAlign: 'center',
+    count: {
+      fontSize: typography.size.sm,
+      fontWeight: typography.weight.semibold,
+      color: colors.textMuted,
+      fontVariant: ['tabular-nums'],
     },
   });

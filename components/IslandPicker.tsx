@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { View, Text, TextInput, SectionList, Pressable, StyleSheet } from 'react-native';
+import { View, SectionList, Pressable, StyleSheet } from 'react-native';
+import Text from './Text';
+import TextInput from './TextInput';
 import { useTranslation } from 'react-i18next';
 import Icon from './Icon';
 

@@ -1,4 +1,5 @@
-import { StyleSheet, Switch, Text, View, Platform } from 'react-native';
+import { StyleSheet, Switch, View, Platform } from 'react-native';
+import Text from './Text';
 
 import { minTouchTarget, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, View, StyleSheet, Text } from 'react-native';
-import Svg, { Circle, Rect, Path, Line, Defs, LinearGradient, Stop } from 'react-native-svg';
+import { Animated, Easing, View, StyleSheet } from 'react-native';
+import Text from './Text';
+import Svg, { Circle, Rect, Path, Line, Defs, LinearGradient, RadialGradient, Stop } from 'react-native-svg';
 
 import { shadow, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const CARDINAL_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
+const TICKS = Array.from({ length: 72 }, (_, i) => i * 5);
 const CARDINAL_LABELS: Record<number, string> = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' };
 
 /**
@@ -51,7 +53,7 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
 
   const center = size / 2;
   const ringRadius = center - 8;
-  const labelRadius = ringRadius - 20;
+  const labelRadius = ringRadius - 34;
   // Sits just below the N label (same labelRadius geometry the cardinal
   // labels use) and above the arrow's tip when it's pointing straight up,
   // so the badge never overlaps either.
@@ -71,36 +73,44 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
     >
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <Defs>
-          <LinearGradient id="ringGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <RadialGradient id="dial" cx="50%" cy="42%" r="65%">
             <Stop offset="0%" stopColor={colors.surfaceElevated} />
             <Stop offset="100%" stopColor={colors.surface} />
-          </LinearGradient>
+          </RadialGradient>
         </Defs>
-        <Circle cx={center} cy={center} r={ringRadius} fill="url(#ringGlow)" />
+        {/* A soft halo that lights up when the phone is pointing at the Qibla. */}
+        {aligned ? (
+          <Circle cx={center} cy={center} r={ringRadius + 3} fill="none" stroke={colors.fill} strokeWidth={8} opacity={0.35} />
+        ) : null}
+        <Circle cx={center} cy={center} r={ringRadius} fill="url(#dial)" />
         <Circle
           cx={center}
           cy={center}
           r={ringRadius}
           fill="none"
-          stroke={aligned ? colors.gold : colors.primary}
+          stroke={aligned ? colors.fill : colors.primary}
           strokeWidth={aligned ? 4 : 3}
         />
-        {/* A fine inner ring gives the face a turned-dish edge. */}
-        <Circle cx={center} cy={center} r={ringRadius - 4} fill="none" stroke={colors.gold} strokeWidth={1} opacity={0.6} />
-        <Circle cx={center} cy={center} r={ringRadius - 14} fill="none" stroke={colors.border} strokeWidth={1} />
-        {CARDINAL_ANGLES.map((angle) => (
-          <Rect
-            key={angle}
-            x={center - 1.5}
-            y={14}
-            width={3}
-            height={angle % 90 === 0 ? 12 : 7}
-            fill={colors.gold}
-            opacity={angle % 90 === 0 ? 0.9 : 0.5}
-            rotation={angle}
-            origin={`${center}, ${center}`}
-          />
-        ))}
+        {/* 72 fine ticks every 5 degrees, a longer one every 30, the cardinals in the accent. */}
+        {TICKS.map((angle) => {
+          const cardinal = angle % 90 === 0;
+          const major = angle % 30 === 0;
+          return (
+            <Rect
+              key={angle}
+              x={center - (cardinal ? 1.5 : 0.75)}
+              y={13}
+              width={cardinal ? 3 : 1.5}
+              height={cardinal ? 13 : major ? 9 : 4}
+              rx={0.75}
+              fill={cardinal ? colors.primary : colors.textMuted}
+              opacity={cardinal ? 1 : major ? 0.7 : 0.35}
+              rotation={angle}
+              origin={`${center}, ${center}`}
+            />
+          );
+        })}
+        <Circle cx={center} cy={center} r={ringRadius - 52} fill="none" stroke={colors.separator} strokeWidth={1} />
       </Svg>
 
       {CARDINAL_ANGLES.filter((angle) => CARDINAL_LABELS[angle]).map((angle) => {
@@ -110,7 +120,7 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
         return (
           <Text
             key={angle}
-            style={[styles.cardinalLabel, { left: x - 10, top: y - 9 }]}
+            style={[styles.cardinalLabel, angle === 0 && styles.cardinalNorth, { left: x - 10, top: y - 9 }]}
             accessibilityElementsHidden
           >
             {CARDINAL_LABELS[angle]}
@@ -140,7 +150,7 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
             },
           ]}
         >
-          <QiblaArrow size={size * 0.48} aligned={aligned} />
+          <QiblaArrow size={size * 0.4} aligned={aligned} />
         </Animated.View>
       ) : null}
     </View>
@@ -166,8 +176,8 @@ function QiblaArrow({ size, aligned }: { size: number; aligned: boolean }) {
     <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
       <Defs>
         <LinearGradient id="arrowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <Stop offset="0%" stopColor={aligned ? colors.gold : colors.primary} />
-          <Stop offset="100%" stopColor={aligned ? colors.goldMuted : colors.primaryMuted} />
+          <Stop offset="0%" stopColor={aligned ? colors.fill : colors.primary} />
+          <Stop offset="100%" stopColor={aligned ? colors.primary : colors.primaryMuted} />
         </LinearGradient>
       </Defs>
       <Path
@@ -179,8 +189,8 @@ function QiblaArrow({ size, aligned }: { size: number; aligned: boolean }) {
         fill="url(#arrowGradient)"
         strokeLinejoin="round"
       />
-      <Line x1={cx} y1={size * 0.46} x2={cx} y2={size * 0.86} stroke={colors.textMuted} strokeWidth={2} opacity={0.4} />
-      <Circle cx={cx} cy={size * 0.46} r={size * 0.05} fill={colors.gold} />
+      <Line x1={cx} y1={size * 0.46} x2={cx} y2={size * 0.86} stroke={colors.textMuted} strokeWidth={2} strokeLinecap="round" opacity={0.4} />
+      <Circle cx={cx} cy={size * 0.46} r={size * 0.07} fill={colors.surfaceElevated} stroke={aligned ? colors.fill : colors.primary} strokeWidth={2} />
     </Svg>
   );
 }
@@ -201,6 +211,7 @@ const createStyles = (colors: ThemeColors) =>
       fontWeight: typography.weight.bold,
       color: colors.textPrimary,
     },
+    cardinalNorth: { color: colors.primary },
     kaabaBadge: {
       position: 'absolute',
       width: 22,
@@ -208,7 +219,7 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 7,
       backgroundColor: colors.surfaceElevated,
       borderWidth: 1,
-      borderColor: colors.goldSoft,
+      borderColor: colors.border,
       alignItems: 'center',
       justifyContent: 'center',
     },

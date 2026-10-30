@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import Text from '../../../../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';

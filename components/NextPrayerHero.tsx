@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Text from './Text';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
 import { numeralFont } from '../lib/useNumeralFont';
+import Icon from './Icon';
 
 interface Props {
   prayerName: string;
@@ -13,6 +15,8 @@ interface Props {
   /** 0..1 - how far the gap between the previous and next prayer has run. */
   progress: number;
   numeralsReady: boolean;
+  /** The prayer's own glyph, drawn large and faint behind the text. */
+  icon: Pick<React.ComponentProps<typeof Icon>, 'name' | 'sf'>;
 }
 
 /**
@@ -21,7 +25,7 @@ interface Props {
  * shows how much of the current gap has elapsed. Dark green text on mint
  * (about 7:1) in both themes.
  */
-export default function NextPrayerHero({ prayerName, time, countdown, progress, numeralsReady }: Props) {
+export default function NextPrayerHero({ prayerName, time, countdown, progress, numeralsReady, icon }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
@@ -41,6 +45,9 @@ export default function NextPrayerHero({ prayerName, time, countdown, progress, 
         end={{ x: 1, y: 1 }}
         style={styles.card}
       >
+        <View style={styles.watermark} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <Icon {...icon} size={132} color={`${colors.heroText}1A`} />
+        </View>
         <View style={styles.body}>
           <View style={styles.nameRow}>
             <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>
@@ -71,9 +78,10 @@ const createStyles = (colors: ThemeColors) =>
     },
     body: {
       paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
-      paddingBottom: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.md,
     },
+    watermark: { position: 'absolute', end: -14, bottom: -18 },
     nameRow: {
       flexDirection: 'row',
       alignItems: 'baseline',
@@ -93,12 +101,12 @@ const createStyles = (colors: ThemeColors) =>
     },
     countdown: {
       color: colors.heroText,
-      fontSize: 52,
-      lineHeight: 60,
+      fontSize: 48,
+      lineHeight: 54,
       fontWeight: typography.weight.bold,
       fontVariant: ['tabular-nums'],
       letterSpacing: -1,
-      marginTop: spacing.sm,
+      marginTop: spacing.xs,
     },
     caption: {
       color: colors.heroTextMuted,
@@ -106,7 +114,7 @@ const createStyles = (colors: ThemeColors) =>
       fontWeight: typography.weight.semibold,
       marginTop: spacing.xxs,
     },
-    track: { height: 6, borderRadius: radius.pill, overflow: 'hidden', marginTop: spacing.md },
+    track: { height: 6, borderRadius: radius.pill, overflow: 'hidden', marginTop: spacing.sm },
     trackBed: {
       position: 'absolute',
       top: 0,

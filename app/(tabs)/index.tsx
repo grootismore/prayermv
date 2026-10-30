@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, PanResponder, Pressable, StyleSheet, View } from 'react-native';
+import Text from '../../components/Text';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 
@@ -23,6 +24,18 @@ import GlassSurface from '../../components/GlassSurface';
 import LoadingScreen from '../../components/LoadingScreen';
 
 const SWIPE_THRESHOLD = 45;
+
+// The ambient glow follows the prayer period in effect: dawn blue, sunrise
+// gold, midday mint, afternoon lime, sunset amber, night indigo. Quiet, but
+// it tells you the time of day before you read a number.
+const PERIOD_TONE: Record<string, string> = {
+  fajr: '#7CC8FF',
+  sunrise: '#FFD27A',
+  dhuhr: '#4EF08F',
+  asr: '#C8F06A',
+  maghrib: '#FF9E6B',
+  isha: '#8C9CFF',
+};
 
 // Each prayer's own glyph: an SF Symbol on iOS, an Ionicon on Android.
 const PRAYER_ICON: Record<string, { name: 'moon-outline' | 'sunny-outline' | 'partly-sunny-outline'; sf: 'moon.haze.fill' | 'sunrise.fill' | 'sun.max.fill' | 'sun.haze.fill' | 'sunset.fill' | 'moon.stars.fill' }> = {
@@ -161,7 +174,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <Screen>
+    <Screen ambientTone={PERIOD_TONE[state.currentCall ?? 'isha']}>
       <Text style={styles.islandName}>
         {localizedAtollName(island.atoll, language)} {localizedIslandName(island, language)}
       </Text>
@@ -184,6 +197,7 @@ export default function HomeScreen() {
           countdown={formatCountdown(state.millisecondsRemaining)}
           progress={heroProgress}
           numeralsReady={numeralsReady}
+          icon={PRAYER_ICON[state.next.call]}
         />
       )}
 
@@ -254,7 +268,7 @@ export default function HomeScreen() {
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
   islandName: {
-    fontSize: typography.size.display,
+    fontSize: 30,
     fontWeight: typography.weight.heavy,
     color: colors.textPrimary,
     marginBottom: spacing.xxs,
@@ -263,15 +277,15 @@ const createStyles = (colors: ThemeColors) =>
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   dateText: { fontSize: typography.size.sm, color: colors.textSecondary },
   dateDivider: { fontSize: typography.size.sm, color: colors.gold, marginHorizontal: spacing.xs },
   dayNav: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
     paddingHorizontal: spacing.xxs,
   },
   dayNavButton: {

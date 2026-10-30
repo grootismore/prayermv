@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Text from '../../components/Text';
 import { useTranslation } from 'react-i18next';
 import * as Location from 'expo-location';
 
@@ -70,7 +71,7 @@ export default function QiblaScreen() {
       )}
 
       <View style={styles.compassWrap}>
-        <QiblaCompass rotation={arrowRotation} aligned={isAligned} />
+        <QiblaCompass rotation={arrowRotation} aligned={isAligned} size={272} />
         {qiblaBearing != null && (
           <Text
             style={[styles.bearingText, isAligned && styles.bearingTextAligned]}
@@ -105,8 +106,8 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     content: { flexGrow: 1, alignItems: 'center', justifyContent: 'center' },
   title: {
-    fontSize: typography.size.xl,
-    fontWeight: typography.weight.bold,
+    fontSize: 30,
+    fontWeight: typography.weight.heavy,
     color: colors.textPrimary,
     marginBottom: spacing.lg,
   },
