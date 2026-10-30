@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../../../../components/Icon';
 
 import { useSettings } from '../../../../context/SettingsContext';
 import { useDuaPreferences } from '../../../../hooks/useDuaPreferences';
@@ -44,7 +44,7 @@ export default function DuaCategoryScreen() {
           accessibilityRole="button"
           accessibilityLabel={t('duas.back')}
         >
-          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+          <Icon name="chevron-back" size={24} color={colors.primary} />
         </Pressable>
         <View style={styles.headerText}>
           <Text style={styles.title} numberOfLines={1}>

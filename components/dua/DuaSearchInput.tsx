@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../Icon';
 
 import { radius, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
@@ -18,7 +18,7 @@ export default function DuaSearchInput({ value, onChangeText, placeholder, clear
 
   return (
     <View style={styles.wrap}>
-      <Ionicons name="search" size={17} color={colors.textMuted} style={styles.icon} />
+      <Icon name="search" size={17} color={colors.textMuted} style={styles.icon} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -31,7 +31,7 @@ export default function DuaSearchInput({ value, onChangeText, placeholder, clear
       />
       {value.length > 0 && (
         <Pressable onPress={() => onChangeText('')} hitSlop={8} accessibilityRole="button" accessibilityLabel={clearAccessibilityLabel}>
-          <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+          <Icon name="close-circle" size={18} color={colors.textMuted} />
         </Pressable>
       )}
     </View>

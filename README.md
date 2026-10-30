@@ -58,9 +58,11 @@ language, and notification preferences - stays on your device.
 
 ## Design
 
-Noor+ uses a calm "Ocean Night" look - midnight navy, lagoon cyan, and a
-touch of sunrise gold - meant to feel at home on an island evening as much
-as at Fajr.
+Noor+ is built to feel native on each platform: emerald and mint over deep
+forest green by night, or a pale mint wash by day. On iOS 26 the tab bar and
+cards use system liquid glass; on older iOS they use a system blur, and on
+Android the Material navigation bar and tonal surfaces. It's meant to be read
+at a glance, in English, Dhivehi or Arabic.
 
 ## Contributing
 

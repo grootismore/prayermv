@@ -9,7 +9,7 @@ interface Props {
   onValueChange: (value: boolean) => void;
 }
 
-/** A prayer-notification toggle row using React Native's native Switch, themed with the lagoon-cyan active track. */
+/** A prayer-notification toggle row using React Native's native Switch, themed with the mint active track. */
 export default function NotificationSwitchRow({ label, value, onValueChange }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
@@ -20,8 +20,8 @@ export default function NotificationSwitchRow({ label, value, onValueChange }: P
         <Switch
           value={value}
           onValueChange={onValueChange}
-          trackColor={{ true: colors.primaryMuted, false: colors.surfaceElevated }}
-          thumbColor={Platform.OS === 'android' ? (value ? colors.primary : colors.textMuted) : undefined}
+          trackColor={{ true: colors.fill, false: colors.surfaceElevated }}
+          thumbColor={Platform.OS === 'android' ? (value ? colors.onFill : colors.textMuted) : undefined}
           ios_backgroundColor={colors.surfaceElevated}
           accessibilityRole="switch"
           accessibilityLabel={label}

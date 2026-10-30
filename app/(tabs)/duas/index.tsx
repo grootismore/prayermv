@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../../../components/Icon';
 
 import { useSettings } from '../../../context/SettingsContext';
 import { useDuaPreferences } from '../../../hooks/useDuaPreferences';
@@ -17,9 +17,6 @@ import { useTheme, useThemedStyles } from '../../../lib/useTheme';
 import Screen from '../../../components/Screen';
 import SurfaceCard from '../../../components/SurfaceCard';
 import SectionHeader from '../../../components/SectionHeader';
-import NoorDivider from '../../../components/NoorDivider';
-import WaveDecoration from '../../../components/WaveDecoration';
-import SunAccent from '../../../components/SunAccent';
 import DuaSearchInput from '../../../components/dua/DuaSearchInput';
 import DuaCategoryCard from '../../../components/dua/DuaCategoryCard';
 import DuaCard from '../../../components/dua/DuaCard';
@@ -101,16 +98,7 @@ export default function DuasHomeScreen() {
   }
 
   return (
-    <Screen
-      backgroundDecoration={
-        <>
-          <WaveDecoration variant="header" />
-          <View style={[styles.sunSpot, { top: insets.top + 4 }]}>
-            <SunAccent size={24} />
-          </View>
-        </>
-      }
-    >
+    <Screen>
       <Text style={styles.title}>{t('duas.title')}</Text>
       <Text style={styles.intro}>{t('duas.intro')}</Text>
 
@@ -124,7 +112,7 @@ export default function DuasHomeScreen() {
       <View style={styles.featuredRow}>
         {featuredMorning && (
           <SurfaceCard onPress={() => openDua(featuredMorning)} style={styles.featuredCard} elevated>
-            <Ionicons name="sunny-outline" size={20} color={colors.gold} />
+            <Icon name="sunny-outline" size={20} color={colors.gold} />
             <Text style={styles.featuredLabel}>{t('duas.featuredMorning')}</Text>
             <Text style={styles.featuredTitle} numberOfLines={2}>
               {getDuaTitleText(featuredMorning, resolvedLanguage)}
@@ -133,7 +121,7 @@ export default function DuasHomeScreen() {
         )}
         {featuredEvening && (
           <SurfaceCard onPress={() => openDua(featuredEvening)} style={styles.featuredCard} elevated>
-            <Ionicons name="moon-outline" size={20} color={colors.primary} />
+            <Icon name="moon-outline" size={20} color={colors.primary} />
             <Text style={styles.featuredLabel}>{t('duas.featuredEvening')}</Text>
             <Text style={styles.featuredTitle} numberOfLines={2}>
               {getDuaTitleText(featuredEvening, resolvedLanguage)}
@@ -151,13 +139,12 @@ export default function DuasHomeScreen() {
         <>
           <SectionHeader title={t('duas.favourites')} />
           <SurfaceCard style={styles.emptyFavouritesCard}>
-            <Ionicons name="heart-outline" size={22} color={colors.textMuted} />
+            <Icon name="heart-outline" size={22} color={colors.textMuted} />
             <Text style={styles.emptyFavouritesText}>{t('duas.noFavourites')}</Text>
           </SurfaceCard>
         </>
       )}
 
-      <NoorDivider compact />
 
       <SectionHeader title={t('duas.categories')} />
       <SurfaceCard padded={false}>
@@ -182,7 +169,6 @@ export default function DuasHomeScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    sunSpot: { position: 'absolute', right: 8 },
     searchScreenPadding: { flex: 1, padding: spacing.lg },
     title: {
       fontSize: typography.size.xl,

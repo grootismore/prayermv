@@ -1,94 +1,99 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { spacing, typography, type ThemeColors } from '../lib/theme';
-import { useThemedStyles } from '../lib/useTheme';
+import { spacing, typography, radius, type ThemeColors } from '../lib/theme';
+import { useTheme, useThemedStyles } from '../lib/useTheme';
 import { numeralFont } from '../lib/useNumeralFont';
+import Icon from './Icon';
+
+type IconProps = Pick<React.ComponentProps<typeof Icon>, 'name' | 'sf'>;
 
 interface Props {
   label: string;
   time: string;
-  /** The next upcoming prayer - gets the cyan side indicator, tint, and time color. */
+  /** The prayer's own glyph (sunrise, sun, moon...). */
+  icon: IconProps;
+  /** The next upcoming prayer - sits on a mint fill with a bell. */
   isNext?: boolean;
-  /** The prayer period currently in effect (not necessarily "next") - a lighter tint only. */
+  /** The prayer period currently in effect (not necessarily "next") - a soft tint. */
   isCurrent?: boolean;
+  /** Already passed today - recedes and shows a check. */
+  isPast?: boolean;
   numeralsReady?: boolean;
   accessibilityLabel?: string;
 }
 
-/** One row in a prayer-times list: name on the leading edge, time on the trailing edge, with a highlighted state for the next prayer. */
+/** One row in the day's list: glyph, name, time, and a trailing status mark. */
 export default function PrayerTimeRow({
   label,
   time,
+  icon,
   isNext = false,
   isCurrent = false,
+  isPast = false,
   numeralsReady = false,
   accessibilityLabel,
 }: Props) {
+  const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
+  const dim = isPast && !isNext && !isCurrent;
+  const ink = isNext ? colors.onFill : dim ? colors.textMuted : colors.textPrimary;
   return (
-    <View
-      style={[styles.row, isCurrent && !isNext && styles.rowCurrent, isNext && styles.rowNext]}
-      accessible
-      accessibilityLabel={accessibilityLabel ?? `${label}, ${time}${isNext ? ', next prayer' : ''}`}
-    >
-      <View style={[styles.indicator, isNext && styles.indicatorActive]} />
-      <Text style={[styles.label, isNext && styles.labelActive]}>{label}</Text>
-      <Text
-        style={[
-          styles.time,
-          isNext && styles.timeActive,
-          numeralsReady && { fontFamily: numeralFont.semibold },
-        ]}
+    <View style={styles.slot}>
+      <View
+        style={[styles.row, isCurrent && !isNext && styles.rowCurrent, isNext && styles.rowNext]}
+        accessible
+        accessibilityLabel={accessibilityLabel ?? `${label}, ${time}${isNext ? ', next prayer' : ''}`}
       >
-        {time}
-      </Text>
+        <Icon {...icon} size={20} color={isNext ? colors.onFill : dim ? colors.textMuted : colors.primary} />
+        <Text style={[styles.label, { color: ink }, isNext && styles.labelNext]}>{label}</Text>
+        <Text
+          style={[
+            styles.time,
+            { color: ink },
+            isNext && styles.timeNext,
+            numeralsReady && { fontFamily: numeralFont.semibold },
+          ]}
+        >
+          {time}
+        </Text>
+        <View style={styles.status}>
+          {isNext ? (
+            <Icon name="notifications" size={16} color={colors.onFill} />
+          ) : isPast ? (
+            <Icon name="checkmark-circle" size={18} color={colors.primary} />
+          ) : null}
+        </View>
+      </View>
     </View>
   );
 }
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
+    slot: { paddingHorizontal: spacing.xs, paddingVertical: 2 },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
-      // Not a touch target (this row has no onPress) - a bit shorter than
-      // minTouchTarget so all 6 rows fit on screen without scrolling.
-      minHeight: 40,
-      paddingHorizontal: spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.separator,
+      gap: spacing.sm,
+      // Not a touch target (no onPress); sized so all 6 rows plus the hero
+      // fit one screen on a small phone at default text size.
+      minHeight: 52,
+      paddingHorizontal: spacing.sm,
+      borderRadius: radius.md,
     },
-    rowCurrent: {
-      backgroundColor: colors.surfaceElevated,
-    },
-    rowNext: {
-      backgroundColor: colors.primarySoft,
-    },
-    indicator: {
-      width: 3,
-      height: 22,
-      borderRadius: 2,
-      marginRight: spacing.sm,
-      backgroundColor: 'transparent',
-    },
-    indicatorActive: {
-      backgroundColor: colors.primary,
-    },
+    rowCurrent: { backgroundColor: colors.primarySoft },
+    rowNext: { backgroundColor: colors.fill },
     label: {
       flex: 1,
-      fontSize: typography.size.md,
+      fontSize: typography.size.lg,
       fontWeight: typography.weight.semibold,
-      color: colors.textPrimary,
     },
-    labelActive: {
-      color: colors.primary,
-    },
+    labelNext: { fontWeight: typography.weight.bold },
     time: {
-      fontSize: typography.size.md,
-      color: colors.textSecondary,
+      fontSize: typography.size.xl,
+      fontVariant: ['tabular-nums'],
     },
-    timeActive: {
-      color: colors.primary,
-      fontWeight: typography.weight.bold,
-    },
+    timeNext: { fontWeight: typography.weight.bold },
+    // Fixed width so times line up whether or not a status mark is shown.
+    status: { width: 20, alignItems: 'center' },
   });

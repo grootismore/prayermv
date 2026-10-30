@@ -90,7 +90,7 @@ module.exports = {
         'expo-splash-screen',
         {
           // Light-mode default: the original navy wordmark reads cleanly on
-          // this pale lagoon background (lightColors.background). The `dark`
+          // this pale mint background (lightColors.background). The `dark`
           // variant below is Expo's officially-supported OS-appearance
           // splash override (iOS asset-catalog dark variant / Android
           // values-night) - it's the only way a *native* splash (rendered
@@ -98,15 +98,15 @@ module.exports = {
           // it follows the device's system scheme, not this app's own
           // in-app Appearance setting.
           image: './assets/splash-icon.png',
-          backgroundColor: '#E4F4F6',
+          backgroundColor: '#EAF8F0',
           imageWidth: 160,
           resizeMode: 'contain',
           dark: {
             // Recolored wordmark (navy -> near-white) - the original asset's
-            // text was only ~1.3:1 contrast against this navy background,
-            // effectively illegible; see assets/splash-icon-dark.png.
+            // text was illegible on a dark background; see
+            // assets/splash-icon-dark.png. Matches darkColors.background.
             image: './assets/splash-icon-dark.png',
-            backgroundColor: '#011C53',
+            backgroundColor: '#07241E',
           },
         },
       ],

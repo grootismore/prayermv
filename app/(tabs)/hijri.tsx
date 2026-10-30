@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../../components/Icon';
 
 import { useSettings } from '../../context/SettingsContext';
 import { getTodayHijri, getHijriMonthInfo, getHijriMonthName } from '../../lib/hijri';
@@ -13,9 +13,6 @@ import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
-import NoorDivider from '../../components/NoorDivider';
-import WaveDecoration from '../../components/WaveDecoration';
-import SunAccent from '../../components/SunAccent';
 
 export default function HijriScreen() {
   const { t } = useTranslation();
@@ -59,7 +56,10 @@ export default function HijriScreen() {
     ? getHijriMonthName(todayHijri.month, language)
     : getGregorianMonthName(todayGregorian.month, language);
 
-  const weekdaysShort = t('hijri.weekdaysShort', { returnObjects: true }) as string[];
+  // Native tabs mount every tab up front, possibly before i18n has loaded, in
+  // which case t() hands back the key string instead of the array.
+  const weekdays = t('hijri.weekdaysShort', { returnObjects: true });
+  const weekdaysShort = Array.isArray(weekdays) ? (weekdays as string[]) : [];
   const weeks = useMemo(
     () => buildCalendarWeeks(monthInfo.firstDayOfWeek, monthInfo.daysInMonth),
     [monthInfo.firstDayOfWeek, monthInfo.daysInMonth]
@@ -107,26 +107,23 @@ export default function HijriScreen() {
       <Text style={styles.title}>{t('hijri.title')}</Text>
 
       <SurfaceCard elevated style={styles.todayCard}>
-        <SunAccent size={20} />
         <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
         <Text style={styles.todayDate}>
           <Text style={numeralStyle}>{todayDateNum}</Text> {todayMonthName}{' '}
           <Text style={numeralStyle}>{todayYear}</Text>
         </Text>
-        <WaveDecoration variant="card" />
       </SurfaceCard>
 
-      <NoorDivider compact />
 
       <View style={styles.monthNav}>
         <Pressable onPress={goToPreviousMonth} hitSlop={12} style={styles.navButton} accessibilityLabel={t('hijri.previousMonth')}>
-          <Ionicons name="chevron-back" size={22} color={colors.primary} />
+          <Icon name="chevron-back" size={22} color={colors.primary} />
         </Pressable>
         <Text style={styles.monthLabel}>
           {monthInfo.monthName} <Text style={numeralStyle}>{viewYear}</Text>
         </Text>
         <Pressable onPress={goToNextMonth} hitSlop={12} style={styles.navButton} accessibilityLabel={t('hijri.nextMonth')}>
-          <Ionicons name="chevron-forward" size={22} color={colors.primary} />
+          <Icon name="chevron-forward" size={22} color={colors.primary} />
         </Pressable>
       </View>
 
@@ -183,7 +180,7 @@ const createStyles = (colors: ThemeColors) =>
   title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.xs },
   todayCard: {
     alignItems: 'center',
-    paddingTop: spacing.sm,
+    paddingTop: spacing.lg,
     paddingBottom: spacing.md,
     marginTop: spacing.sm,
     overflow: 'hidden',
@@ -230,9 +227,9 @@ const createStyles = (colors: ThemeColors) =>
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dayCircleToday: { backgroundColor: colors.primary },
+  dayCircleToday: { backgroundColor: colors.fill },
   dayText: { fontSize: typography.size.sm, color: colors.textPrimary },
-  dayTextToday: { color: colors.onPrimary, fontWeight: typography.weight.bold },
+  dayTextToday: { color: colors.onFill, fontWeight: typography.weight.bold },
   eventDot: {
     width: 4,
     height: 4,

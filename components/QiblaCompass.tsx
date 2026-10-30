@@ -8,7 +8,7 @@ import { useTheme, useThemedStyles } from '../lib/useTheme';
 interface Props {
   /** Degrees to rotate the arrow, or null while heading/bearing aren't known yet. */
   rotation: number | null;
-  /** Highlights the ring/arrow cyan-gold once the phone is pointed at the Qibla. */
+  /** Turns the ring/arrow ochre once the phone is pointed at the Qibla. */
   aligned?: boolean;
   size?: number;
 }
@@ -83,14 +83,16 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
           r={ringRadius}
           fill="none"
           stroke={aligned ? colors.gold : colors.primary}
-          strokeWidth={aligned ? 3 : 2}
+          strokeWidth={aligned ? 4 : 3}
         />
+        {/* A fine inner ring gives the face a turned-dish edge. */}
+        <Circle cx={center} cy={center} r={ringRadius - 4} fill="none" stroke={colors.gold} strokeWidth={1} opacity={0.6} />
         <Circle cx={center} cy={center} r={ringRadius - 14} fill="none" stroke={colors.border} strokeWidth={1} />
         {CARDINAL_ANGLES.map((angle) => (
           <Rect
             key={angle}
             x={center - 1.5}
-            y={10}
+            y={14}
             width={3}
             height={angle % 90 === 0 ? 12 : 7}
             fill={colors.gold}

@@ -1,5 +1,4 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
@@ -26,13 +25,9 @@ import LanguageRow from '../../components/LanguageRow';
 import NotificationSwitchRow from '../../components/NotificationSwitchRow';
 import SegmentedControl from '../../components/SegmentedControl';
 import TranslationLanguagePicker from '../../components/dua/TranslationLanguagePicker';
-import NoorDivider from '../../components/NoorDivider';
-import WaveDecoration from '../../components/WaveDecoration';
-import SunAccent from '../../components/SunAccent';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const styles = useThemedStyles(createStyles);
   const {
     island,
@@ -159,16 +154,7 @@ export default function SettingsScreen() {
   }
 
   return (
-    <Screen
-      backgroundDecoration={
-        <>
-          <WaveDecoration variant="header" />
-          <View style={[styles.sunSpot, { top: insets.top + 4 }]}>
-            <SunAccent size={24} />
-          </View>
-        </>
-      }
-    >
+    <Screen>
       <Text style={styles.title}>{t('settings.title')}</Text>
 
       <SectionHeader title={t('settings.island')} />
@@ -295,7 +281,6 @@ export default function SettingsScreen() {
         <SettingRow title={t('settings.testAdhanButton')} chevron={false} onPress={handleTestAdhan} />
       </SurfaceCard>
 
-      <NoorDivider />
 
       <SectionHeader title={t('settings.about')} />
       <SurfaceCard>
@@ -309,7 +294,6 @@ export default function SettingsScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    sunSpot: { position: 'absolute', right: 8 },
     title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
     rowCard: { marginTop: spacing.md },
     fieldLabel: {

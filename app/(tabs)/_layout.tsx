@@ -1,127 +1,49 @@
-import { View, StyleSheet, type ColorValue } from 'react-native';
-import { Tabs } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Platform } from 'react-native';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
 
-import { radius, shadow, spacing, tabBarMetrics, typography, type ThemeColors } from '../../lib/theme';
-import { useTheme, useThemedStyles } from '../../lib/useTheme';
+import { useTheme } from '../../lib/useTheme';
 
-type IconName = keyof typeof Ionicons.glyphMap;
-
-// The pill wraps only the icon - the label beneath it is rendered by
-// react-navigation's own tabBarLabel (tabBarActiveTintColor/tabBarLabelStyle
-// below), the same native Text sizing every React Navigation tab bar relies
-// on, rather than a hand-rolled one prone to clipping/truncating on
-// narrower devices.
-function TabIcon({ name, color, focused }: { name: IconName; color: ColorValue; focused: boolean }) {
-  const styles = useThemedStyles(createStyles);
-  return (
-    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-      <Ionicons name={name} color={color} size={tabBarMetrics.iconSize} />
-    </View>
-  );
-}
-
+/**
+ * The system tab bar, not a drawn one: a real UITabBar on iOS (liquid glass
+ * on iOS 26, which also minimizes on scroll) and a Material navigation bar
+ * on Android. Only colours are themed - on iOS the background is left to the
+ * system so the glass isn't switched off.
+ */
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const styles = useThemedStyles(createStyles);
-  // The tab bar's own height only covers its icon/label content - the
-  // home-indicator safe area below it is added as real padding (not just
-  // left for the OS to overlay), and its background color extends through
-  // that padding, so there's no unstyled gap between the bar and the true
-  // bottom edge of the screen on any device.
-  const insets = useSafeAreaInsets();
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarLabelStyle: styles.label,
-        tabBarStyle: [styles.tabBar, { height: tabBarMetrics.height + insets.bottom, paddingBottom: insets.bottom }],
-        tabBarItemStyle: styles.tabItem,
-      }}
+    <NativeTabs
+      tintColor={colors.primary}
+      iconColor={{ default: colors.textSecondary, selected: colors.primary }}
+      labelStyle={{ default: { color: colors.textSecondary }, selected: { color: colors.primary } }}
+      minimizeBehavior="onScrollDown"
+      {...(Platform.OS === 'android'
+        ? { backgroundColor: colors.backgroundDeep, indicatorColor: colors.primarySoft, rippleColor: colors.primarySoft }
+        : null)}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: t('tabs.home'),
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon name={focused ? 'home' : 'home-outline'} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="qibla"
-        options={{
-          title: t('tabs.qibla'),
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon name={focused ? 'compass' : 'compass-outline'} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="hijri"
-        options={{
-          title: t('tabs.hijri'),
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="duas"
-        options={{
-          title: t('tabs.duas'),
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon name={focused ? 'book' : 'book-outline'} color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: t('tabs.settings'),
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon name={focused ? 'settings' : 'settings-outline'} color={color} focused={focused} />
-          ),
-        }}
-      />
-    </Tabs>
+      <NativeTabs.Trigger name="index">
+        <NativeTabs.Trigger.Label>{t('tabs.home')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="qibla">
+        <NativeTabs.Trigger.Label>{t('tabs.qibla')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'safari', selected: 'safari.fill' }} md="explore" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="hijri">
+        <NativeTabs.Trigger.Label>{t('tabs.hijri')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="calendar" md="calendar_month" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="duas">
+        <NativeTabs.Trigger.Label>{t('tabs.duas')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'book', selected: 'book.fill' }} md="menu_book" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="settings">
+        <NativeTabs.Trigger.Label>{t('tabs.settings')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'gearshape', selected: 'gearshape.fill' }} md="settings" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
-
-const createStyles = (colors: ThemeColors) =>
-  StyleSheet.create({
-    tabBar: {
-      backgroundColor: colors.backgroundDeep,
-      borderTopWidth: 0,
-      borderTopLeftRadius: tabBarMetrics.topRadius,
-      borderTopRightRadius: tabBarMetrics.topRadius,
-      paddingTop: spacing.sm,
-      ...shadow.floating,
-    },
-    tabItem: {
-      paddingTop: 0,
-    },
-    iconWrap: {
-      width: 44,
-      height: 28,
-      borderRadius: radius.pill,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    iconWrapActive: {
-      backgroundColor: colors.primarySoft,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    label: {
-      fontSize: typography.size.xs,
-      fontWeight: typography.weight.semibold,
-      marginTop: 2,
-    },
-  });

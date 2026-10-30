@@ -1,13 +1,13 @@
 import { Platform } from 'react-native';
 
 /**
- * Noor+ design tokens - a lagoon-cyan and sunrise-gold palette over either
- * a midnight-navy ("Ocean Night") or a pale sky/foam ("Ocean Day")
- * background. Centralized here so no screen hardcodes a color, spacing,
- * radius, or type value directly. Which palette is active is resolved by
- * lib/useTheme.ts (from the user's Appearance setting + the system
- * scheme) - screens/components should get `colors` from `useTheme()`,
- * never import a fixed palette from here directly.
+ * Noor+ design tokens - emerald and mint over deep forest green ("Forest
+ * Night") or a pale mint wash ("Mint Day"), meant to sit under iOS liquid
+ * glass and Material surfaces. Centralized here so no screen hardcodes a
+ * color, spacing, radius, or type value directly. Which palette is active
+ * is resolved by lib/useTheme.ts (from the user's Appearance setting + the
+ * system scheme) - screens/components should get `colors` from
+ * `useTheme()`, never import a fixed palette from here directly.
  */
 export interface ThemeColors {
   background: string;
@@ -32,66 +32,90 @@ export interface ThemeColors {
   success: string;
   warning: string;
   danger: string;
+  /** Mint fill for filled controls (primary button, selected segment, today marker) - the same bright mint in both themes. */
+  fill: string;
+  /** Text/icon on a `fill` surface. */
+  onFill: string;
+  /** Ambient screen-background gradient stops (top -> bottom). */
+  bgFrom: string;
+  bgTo: string;
+  /** Translucent card fill used where real glass isn't available (Android, iOS < 26, Reduce Transparency). */
+  glassFill: string;
+  /** Hero card gradient (Home's next prayer) and its text colours. */
+  heroFrom: string;
+  heroTo: string;
+  heroText: string;
+  heroTextMuted: string;
 }
 
-// background/backgroundDeep are matched to the navy baked into the
-// official Noor+ app icon/logo mark, so the icon, splash screen, and
-// in-app screens all read as the same navy rather than three near-misses.
+// Forest Night: a deep, slightly blue-green ground (never black) so mint
+// reads as light, not neon. Every text/surface pair is >= 4.5:1.
 export const darkColors: ThemeColors = {
-  background: '#011C53',
-  backgroundDeep: '#010F2E',
-  surface: '#072952',
-  surfaceElevated: '#0A3565',
-  surfacePressed: '#0D4178',
-  primary: '#13E2E6',
-  primaryMuted: '#0AA8C6',
-  primarySoft: 'rgba(19, 226, 230, 0.12)',
-  onPrimary: '#010F2E',
-  gold: '#FFC83D',
-  goldMuted: '#D8A82D',
-  goldSoft: 'rgba(255, 200, 61, 0.12)',
-  textPrimary: '#F7FBFF',
-  textSecondary: '#A9C3E2',
-  textMuted: '#7894B5',
-  border: 'rgba(53, 190, 255, 0.24)',
-  separator: 'rgba(130, 190, 235, 0.15)',
-  overlay: 'rgba(1, 14, 36, 0.78)',
-  success: '#13E2C5',
-  warning: '#FFC83D',
-  danger: '#FF6675',
+  background: '#07241E',
+  backgroundDeep: '#041A15',
+  surface: '#0F342B',
+  surfaceElevated: '#154338',
+  surfacePressed: '#1B5244',
+  primary: '#5CF39A',
+  primaryMuted: '#35D67B',
+  primarySoft: 'rgba(92, 243, 154, 0.16)',
+  onPrimary: '#04261A',
+  gold: '#FFD166',
+  goldMuted: '#D9AA3A',
+  goldSoft: 'rgba(255, 209, 102, 0.16)',
+  textPrimary: '#F2FBF6',
+  textSecondary: '#B6D3C5',
+  textMuted: '#92B5A5',
+  border: 'rgba(255, 255, 255, 0.14)',
+  separator: 'rgba(255, 255, 255, 0.09)',
+  overlay: 'rgba(4, 26, 21, 0.8)',
+  success: '#5CF39A',
+  warning: '#FFD166',
+  danger: '#FF7A85',
+  fill: '#4EF08F',
+  onFill: '#04261A',
+  bgFrom: '#0E3D33',
+  bgTo: '#051D17',
+  glassFill: 'rgba(255, 255, 255, 0.08)',
+  heroFrom: '#8CF7BC',
+  heroTo: '#3FDC85',
+  heroText: '#04261A',
+  heroTextMuted: '#0B5A38',
 };
 
-// Not just an inversion of the dark palette - primary/gold are deepened a
-// step from their dark-mode values so they hold contrast against a light
-// background instead of washing out, the way the bright cyan/gold read
-// fine floating on midnight navy but wouldn't on white. The neutrals
-// (background/surface/etc.) are a lagoon-turquoise tinted scale rather
-// than white/blue-white - plain white would abandon the "Ocean" identity
-// the dark theme carries; this keeps that same lagoon cast, just very
-// pale, at every step from backgroundDeep down to the barely-there
-// surfaceElevated.
+// Mint Day: a pale mint wash with white cards. primary (text/icons) is a
+// deep green so it holds contrast; the bright mint lives only in `fill`.
 export const lightColors: ThemeColors = {
-  background: '#E4F4F6',
-  backgroundDeep: '#D0EDF1',
-  surface: '#F2F9FA',
-  surfaceElevated: '#F8FBFC',
-  surfacePressed: '#CCECF0',
-  primary: '#0A8CA6',
-  primaryMuted: '#0AA8C6',
-  primarySoft: 'rgba(10, 140, 166, 0.10)',
+  background: '#EAF8F0',
+  backgroundDeep: '#DCF1E6',
+  surface: '#FFFFFF',
+  surfaceElevated: '#FFFFFF',
+  surfacePressed: '#E4F4EB',
+  primary: '#0A7640',
+  primaryMuted: '#16A05B',
+  primarySoft: 'rgba(11, 127, 67, 0.10)',
   onPrimary: '#FFFFFF',
-  gold: '#B87A0A',
-  goldMuted: '#8F600A',
-  goldSoft: 'rgba(184, 122, 10, 0.12)',
-  textPrimary: '#0B1E3D',
-  textSecondary: '#48607F',
-  textMuted: '#7C8FA6',
-  border: 'rgba(10, 90, 140, 0.18)',
-  separator: 'rgba(10, 60, 110, 0.10)',
-  overlay: 'rgba(228, 244, 246, 0.85)',
-  success: '#0E8E77',
-  warning: '#B87A0A',
-  danger: '#D63B52',
+  gold: '#8A5A00',
+  goldMuted: '#6E4700',
+  goldSoft: 'rgba(138, 90, 0, 0.12)',
+  textPrimary: '#0A2A1F',
+  textSecondary: '#33564A',
+  textMuted: '#4F6B5E',
+  border: 'rgba(10, 42, 31, 0.12)',
+  separator: 'rgba(10, 42, 31, 0.08)',
+  overlay: 'rgba(234, 248, 240, 0.9)',
+  success: '#0B7F43',
+  warning: '#8A5A00',
+  danger: '#C62828',
+  fill: '#4EF08F',
+  onFill: '#04261A',
+  bgFrom: '#D4F5E4',
+  bgTo: '#F4FBF7',
+  glassFill: 'rgba(255, 255, 255, 0.72)',
+  heroFrom: '#8CF7BC',
+  heroTo: '#3FDC85',
+  heroText: '#04261A',
+  heroTextMuted: '#0B5A38',
 };
 
 /** 4/8pt spacing scale - use these instead of ad-hoc margin/padding numbers. */
@@ -106,10 +130,10 @@ export const spacing = {
 };
 
 export const radius = {
-  sm: 10,
-  md: 16,
-  lg: 22,
-  xl: 28,
+  sm: 12,
+  md: 18,
+  lg: 24,
+  xl: 32,
   pill: 999,
 };
 
@@ -162,16 +186,11 @@ export const tabBarMetrics = {
 // is light or dark, the same way most native UIs keep shadows black-based
 // even in dark mode.
 export const shadow = {
-  card: Platform.select({
-    ios: {
-      shadowColor: '#000000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.16,
-      shadowRadius: 12,
-    },
-    android: { elevation: 3 },
-    default: {},
-  }),
+  // Cards are glass (iOS) or tonal surfaces (Android): a drop shadow behind a
+  // translucent surface shows through it, so cards stay flat and are defined
+  // by the glass edge or a hairline border. Only opaque objects (the hero,
+  // floating buttons) carry a shadow.
+  card: {},
   hero: Platform.select({
     ios: {
       shadowColor: '#000000',

@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../Icon';
 
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
@@ -43,7 +43,7 @@ export default function DuaCard({
           </View>
           {repetitionsLabel ? (
             <View style={styles.repBadge}>
-              <Ionicons name="repeat" size={12} color={colors.gold} />
+              <Icon name="repeat" size={12} color={colors.gold} />
               <Text style={styles.repBadgeText}>{repetitionsLabel}</Text>
             </View>
           ) : null}
@@ -56,8 +56,8 @@ export default function DuaCard({
         </Text>
       </View>
       <View style={styles.trailing}>
-        {isFavourite ? <Ionicons name="heart" size={16} color={colors.gold} style={styles.heart} /> : null}
-        <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+        {isFavourite ? <Icon name="heart" size={16} color={colors.gold} style={styles.heart} /> : null}
+        <Icon name="chevron-forward" size={20} color={colors.textMuted} />
       </View>
     </Pressable>
   );

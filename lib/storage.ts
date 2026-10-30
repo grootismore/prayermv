@@ -116,7 +116,7 @@ export async function saveCalendarMode(mode: CalendarMode): Promise<void> {
 
 /**
  * Which appearance the app uses - defaults to 'dark' rather than 'system',
- * since Noor+'s "Ocean Night" look has always been the only theme that
+ * since Noor+'s dark look has always been the only theme that
  * existed until now; nobody should see a surprise appearance change on
  * update just because their device happens to be in light mode. Users who
  * want to follow the system (or force Light) can pick that explicitly in
