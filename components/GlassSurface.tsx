@@ -42,7 +42,8 @@ export default function GlassSurface({ children, radius, elevated = false, style
   const reduce = useReduceTransparency();
   const shape = { borderRadius: radius, overflow: 'hidden' as const };
   // Glass over a pale ground goes milky and loses its edge, so it gets a
-  // hairline and (in Day) a slight white tint to stay defined.
+  // hairline and a faint mint tint, so cards pick up the green of the ground
+  // instead of reading as flat white (Day) or grey (Night).
   const edge = { borderWidth: StyleSheet.hairlineWidth, borderColor: colors.border };
   const solid = elevated ? colors.surfaceElevated : colors.surface;
 
@@ -51,7 +52,7 @@ export default function GlassSurface({ children, radius, elevated = false, style
       <GlassView
         glassEffectStyle="regular"
         colorScheme={scheme}
-        tintColor={scheme === 'light' ? 'rgba(255,255,255,0.45)' : undefined}
+        tintColor={scheme === 'light' ? 'rgba(200,245,222,0.5)' : 'rgba(92,243,154,0.07)'}
         style={[shape, edge, style]}
       >
         {children}

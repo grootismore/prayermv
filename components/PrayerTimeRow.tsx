@@ -4,15 +4,15 @@ import Text from './Text';
 import { spacing, typography, radius, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
 import { numeralFont } from '../lib/useNumeralFont';
+import { PRAYER_ICON, prayerHue } from '../lib/prayerStyle';
+import type { PrayerName } from '../lib/prayerTimes';
 import Icon from './Icon';
-
-type IconProps = Pick<React.ComponentProps<typeof Icon>, 'name' | 'sf'>;
 
 interface Props {
   label: string;
   time: string;
-  /** The prayer's own glyph (sunrise, sun, moon...). */
-  icon: IconProps;
+  /** Which prayer this is - sets its glyph and its colour. */
+  prayer: PrayerName;
   /** The next upcoming prayer - sits on a mint fill with a bell. */
   isNext?: boolean;
   /** The prayer period currently in effect (not necessarily "next") - a soft tint. */
@@ -27,15 +27,16 @@ interface Props {
 export default function PrayerTimeRow({
   label,
   time,
-  icon,
+  prayer,
   isNext = false,
   isCurrent = false,
   isPast = false,
   numeralsReady = false,
   accessibilityLabel,
 }: Props) {
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
   const styles = useThemedStyles(createStyles);
+  const hue = prayerHue(prayer, scheme);
   const dim = isPast && !isNext && !isCurrent;
   const ink = isNext ? colors.onFill : dim ? colors.textMuted : colors.textPrimary;
   return (
@@ -45,7 +46,9 @@ export default function PrayerTimeRow({
         accessible
         accessibilityLabel={accessibilityLabel ?? `${label}, ${time}${isNext ? ', next prayer' : ''}`}
       >
-        <Icon {...icon} size={20} color={isNext ? colors.onFill : dim ? colors.textMuted : colors.primary} />
+        <View style={[styles.tile, { backgroundColor: isNext ? `${colors.onFill}1A` : `${hue}2B` }, dim && styles.tileDim]}>
+          <Icon {...PRAYER_ICON[prayer]} size={18} color={isNext ? colors.onFill : hue} />
+        </View>
         <Text style={[styles.label, { color: ink }, isNext && styles.labelNext]}>{label}</Text>
         <Text
           style={[
@@ -84,6 +87,14 @@ const createStyles = (colors: ThemeColors) =>
     },
     rowCurrent: { backgroundColor: colors.primarySoft },
     rowNext: { backgroundColor: colors.fill },
+    tile: {
+      width: 32,
+      height: 32,
+      borderRadius: radius.sm - 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    tileDim: { opacity: 0.5 },
     label: {
       flex: 1,
       fontSize: typography.size.lg,

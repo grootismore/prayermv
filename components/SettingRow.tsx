@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Text from './Text';
 import Icon from './Icon';
@@ -12,10 +13,12 @@ interface Props {
   chevron?: boolean;
   onPress?: () => void;
   accessibilityLabel?: string;
+  /** An IconTile (or similar) shown before the title. */
+  leading?: ReactNode;
 }
 
 /** A generic settings row: title (+ optional accent action line) with a trailing chevron, inside a pressable native-style row. */
-export default function SettingRow({ title, actionLabel, chevron = true, onPress, accessibilityLabel }: Props) {
+export default function SettingRow({ title, actionLabel, chevron = true, onPress, accessibilityLabel, leading }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   return (
@@ -25,6 +28,7 @@ export default function SettingRow({ title, actionLabel, chevron = true, onPress
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={accessibilityLabel ?? [title, actionLabel].filter(Boolean).join(', ')}
     >
+      {leading}
       <View style={styles.textCol}>
         <Text style={styles.title}>{title}</Text>
         {actionLabel ? <Text style={styles.actionLabel}>{actionLabel}</Text> : null}
@@ -43,6 +47,7 @@ const createStyles = (colors: ThemeColors) =>
       minHeight: minTouchTarget,
       paddingVertical: spacing.xs,
       paddingHorizontal: spacing.md,
+      gap: spacing.sm,
     },
     pressed: {
       opacity: 0.7,

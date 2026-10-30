@@ -27,7 +27,7 @@ import {
 import { initI18n } from '../lib/i18n';
 import i18n from '../lib/i18n';
 import { rescheduleTodayNotifications } from '../lib/notifications';
-import { syncWidgetIsland } from '../lib/widgetSync';
+import { syncWidgetIsland, syncWidgetLanguage } from '../lib/widgetSync';
 
 interface SettingsContextValue {
   isLoaded: boolean;
@@ -82,6 +82,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         setIsland(found);
         syncWidgetIsland(found?.islandId ?? null);
       }
+      syncWidgetLanguage(resolvedLanguage);
       setLanguage(resolvedLanguage);
       setNotificationPrefs(prefs);
       setEndingReminderPrefs(storedEndingReminderPrefs);
@@ -102,6 +103,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const changeLanguage = useCallback(async (nextLanguage: AppLanguage) => {
     setLanguage(nextLanguage);
+    syncWidgetLanguage(nextLanguage);
     await saveLanguage(nextLanguage);
     await i18n.changeLanguage(nextLanguage);
   }, []);

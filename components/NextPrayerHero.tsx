@@ -1,35 +1,38 @@
-import { StyleSheet, View } from 'react-native';
-import Text from './Text';
+import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
 import { numeralFont } from '../lib/useNumeralFont';
+import { PRAYER_ICON } from '../lib/prayerStyle';
+import type { PrayerName } from '../lib/prayerTimes';
+import DayArc from './DayArc';
 import Icon from './Icon';
+import StarPattern from './StarPattern';
 
 interface Props {
+  prayer: PrayerName;
   prayerName: string;
   time: string;
   countdown: string;
-  /** 0..1 - how far the gap between the previous and next prayer has run. */
-  progress: number;
+  /** Where each prayer falls across the day, 0..1 - the dots on the arc. */
+  dayMarks: number[];
+  /** Where now falls on the same scale - the sun on the arc. */
+  dayProgress: number;
   numeralsReady: boolean;
-  /** The prayer's own glyph, drawn large and faint behind the text. */
-  icon: Pick<React.ComponentProps<typeof Icon>, 'name' | 'sf'>;
 }
 
 /**
- * Home's one bright object: the next prayer on a mint gradient, its time,
- * and a countdown set large enough to read at arm's length. The foot band
- * shows how much of the current gap has elapsed. Dark green text on mint
- * (about 7:1) in both themes.
+ * Home's one bright object: the next prayer on a mint gradient over a faint
+ * field of eight-pointed stars, its time, a countdown set large enough to
+ * read at arm's length, and the day drawn as the sun's arc with the sun
+ * where you are now. Dark green on mint (about 7:1) in both themes.
  */
-export default function NextPrayerHero({ prayerName, time, countdown, progress, numeralsReady, icon }: Props) {
+export default function NextPrayerHero({ prayer, prayerName, time, countdown, dayMarks, dayProgress, numeralsReady }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
-  const pct = Math.min(1, Math.max(0, progress));
   const numerals = numeralsReady && { fontFamily: numeralFont.bold };
 
   return (
@@ -45,23 +48,26 @@ export default function NextPrayerHero({ prayerName, time, countdown, progress, 
         end={{ x: 1, y: 1 }}
         style={styles.card}
       >
-        <View style={styles.watermark} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          <Icon {...icon} size={132} color={`${colors.heroText}1A`} />
-        </View>
+        <StarPattern color={colors.heroText} opacity={0.1} />
         <View style={styles.body}>
           <View style={styles.nameRow}>
-            <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>
-              {prayerName}
-            </Text>
+            <View style={styles.nameGroup}>
+              <View style={styles.tile}>
+                <Icon {...PRAYER_ICON[prayer]} size={20} color={colors.heroText} />
+              </View>
+              <Text style={styles.name} numberOfLines={1}>
+                {prayerName}
+              </Text>
+            </View>
             <Text style={[styles.time, numerals]}>{time}</Text>
           </View>
-          <Text style={[styles.countdown, numerals]} numberOfLines={1} adjustsFontSizeToFit>
+          {/* Fixed size, not adjustsFontSizeToFit: on iOS that measured before the numeral font loaded and shrank the countdown to a speck. allowFontScaling is off because it is already display-sized. */}
+          <Text style={[styles.countdown, numerals]} numberOfLines={1} allowFontScaling={false}>
             {countdown}
           </Text>
           <Text style={styles.caption}>{t('home.nextPrayer')}</Text>
-          <View style={styles.track} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-            <View style={styles.trackBed} />
-            <View style={[styles.fill, { width: `${pct * 100}%` }]} />
+          <View style={styles.arc}>
+            <DayArc marks={dayMarks} progress={dayProgress} color={colors.heroText} />
           </View>
         </View>
       </LinearGradient>
@@ -79,14 +85,22 @@ const createStyles = (colors: ThemeColors) =>
     body: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.md,
-      paddingBottom: spacing.md,
+      paddingBottom: spacing.sm,
     },
-    watermark: { position: 'absolute', end: -14, bottom: -18 },
     nameRow: {
       flexDirection: 'row',
-      alignItems: 'baseline',
+      alignItems: 'center',
       justifyContent: 'space-between',
       gap: spacing.md,
+    },
+    nameGroup: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexShrink: 1 },
+    tile: {
+      width: 36,
+      height: 36,
+      borderRadius: radius.sm,
+      backgroundColor: `${colors.heroText}1F`,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     name: {
       flexShrink: 1,
@@ -114,19 +128,5 @@ const createStyles = (colors: ThemeColors) =>
       fontWeight: typography.weight.semibold,
       marginTop: spacing.xxs,
     },
-    track: { height: 6, borderRadius: radius.pill, overflow: 'hidden', marginTop: spacing.sm },
-    trackBed: {
-      position: 'absolute',
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: colors.heroText,
-      opacity: 0.16,
-    },
-    fill: {
-      height: 6,
-      borderRadius: radius.pill,
-      backgroundColor: colors.heroText,
-    },
+    arc: { marginTop: spacing.xs },
   });

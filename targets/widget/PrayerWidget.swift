@@ -136,26 +136,54 @@ enum WidgetLanguage: String, AppEnum {
     ]
 }
 
+/// What the widget's Language setting can be set to. "Match App" (the
+/// default) follows the language the app mirrors into the shared App Group
+/// (lib/widgetSync.ts's syncWidgetLanguage()); the other three pin the
+/// widget to one language regardless of the app. Kept separate from
+/// WidgetLanguage so everything that switches over the three real
+/// languages stays exhaustive - an entry only ever carries a resolved one.
+enum WidgetLanguageChoice: String, AppEnum {
+    case app, en, dv, ar
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Language"
+
+    static var caseDisplayRepresentations: [WidgetLanguageChoice: DisplayRepresentation] = [
+        .app: DisplayRepresentation(title: "Match App Language"),
+        .en: DisplayRepresentation(title: "English"),
+        .dv: DisplayRepresentation(title: "Dhivehi"),
+        .ar: DisplayRepresentation(title: "Arabic"),
+    ]
+
+    func resolved() -> WidgetLanguage {
+        switch self {
+        case .en: return .en
+        case .dv: return .dv
+        case .ar: return .ar
+        case .app:
+            return PrayerData.appLanguageCode().flatMap(WidgetLanguage.init(rawValue:)) ?? .en
+        }
+    }
+}
+
 /// Island defaults to IslandEntity.matchApp (via IslandEntityQuery's
 /// defaultResult()), which means "match whatever island the app itself
 /// currently has selected" (via the shared App Group data
 /// lib/widgetSync.ts writes - see PrayerData.appSelectedIslandId()).
 /// Picking a real island explicitly here, in the widget's own edit UI
 /// (long-press -> Edit Widget), overrides that and pins the widget to
-/// that island regardless of what the app is set to. Language remains its
-/// own independent widget-only setting, since the widget has no way to
-/// read the app's language choice.
+/// that island regardless of what the app is set to. Language works the
+/// same way: it defaults to the app's language and can be pinned.
 struct SelectIslandIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Select Island"
     static var description = IntentDescription(
-        "Choose which island's prayer times to show, and the display language. Leave Island as \"Match App Selection\" to always match the island currently selected in the app."
+        "Choose which island's prayer times to show, and the display language. Leave them on \"Match App\" to always follow the island and language selected in the app."
     )
 
     @Parameter(title: "Island")
     var island: IslandEntity
 
-    @Parameter(title: "Language", default: .en)
-    var language: WidgetLanguage
+    @Parameter(title: "Language", default: .app)
+    var language: WidgetLanguageChoice
 }
 
 struct PrayerEntry: TimelineEntry {
@@ -164,13 +192,16 @@ struct PrayerEntry: TimelineEntry {
     let moment: PrayerMoment?
     let today: [PrayerMoment]
     let language: WidgetLanguage
+    /// When the prayer period now in effect began (the previous prayer's
+    /// time) - the start of the progress ring/bar toward `moment`.
+    let periodStart: Date?
 }
 
 struct PrayerProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> PrayerEntry {
         let fallback = PrayerData.island(for: PrayerData.defaultIslandId)
         let label = fallback.map { "\($0.atoll) \($0.island)" } ?? "-"
-        return PrayerEntry(date: Date(), islandLabel: label, moment: nil, today: [], language: .en)
+        return PrayerEntry(date: Date(), islandLabel: label, moment: nil, today: [], language: .en, periodStart: nil)
     }
 
     func snapshot(for configuration: SelectIslandIntent, in context: Context) async -> PrayerEntry {
@@ -208,12 +239,29 @@ struct PrayerProvider: AppIntentTimelineProvider {
 
     private func makeEntry(for configuration: SelectIslandIntent, on date: Date) -> PrayerEntry {
         let islandId = resolvedIslandId(for: configuration)
-        let language = configuration.language
+        let language = configuration.language.resolved()
         let raw = PrayerData.island(for: islandId)
         let label = raw.map { localizedIslandLabel(id: $0.islandId, atoll: $0.atoll, name: $0.island, language: language) } ?? "-"
         let today = PrayerData.todayMoments(islandId: islandId, now: date)
         let moment = PrayerData.nextMoment(islandId: islandId, now: date)
-        return PrayerEntry(date: date, islandLabel: label, moment: moment, today: today, language: language)
+        return PrayerEntry(
+            date: date,
+            islandLabel: label,
+            moment: moment,
+            today: today,
+            language: language,
+            periodStart: periodStart(islandId: islandId, now: date)
+        )
+    }
+
+    /// The most recent prayer time at or before `now` - today's, or
+    /// yesterday's Isha when `now` is before today's Fajr.
+    private func periodStart(islandId: Int, now: Date) -> Date? {
+        if let last = PrayerData.todayMoments(islandId: islandId, now: now).last(where: { $0.date <= now }) {
+            return last.date
+        }
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: now) ?? now
+        return PrayerData.todayMoments(islandId: islandId, now: yesterday).last?.date
     }
 }
 
@@ -246,13 +294,11 @@ private func localizedShortPrayerName(_ prayer: PrayerName, _ language: WidgetLa
     language == .en ? prayer.shortName : localizedPrayerName(prayer, language)
 }
 
-/// Matches lib/theme.ts's Noor+ "Ocean Night" palette in the RN app, so the
-/// widget reads as the same product rather than a generic system card.
-/// Fixed (non-adaptive) colors throughout, same reasoning as before: this
-/// gradient has no separate dark-mode variant, so text needs to be legible
-/// against it regardless of the device's system appearance rather than
-/// following .primary/.secondary, which shift with Dark Mode independently
-/// of our background.
+
+/// Matches lib/theme.ts's Noor+ palette (Forest Night, with the mint hero
+/// gradient) so the widget reads as the same product as the app. Fixed
+/// colors throughout: the backgrounds have no separate light variant, so
+/// text must stay legible on them whatever the system appearance is.
 private extension Color {
     init(hex: UInt32) {
         self.init(
@@ -264,35 +310,70 @@ private extension Color {
 
     static let widgetBackground = Color(hex: 0x07241E)
     static let widgetBackgroundDeep = Color(hex: 0x041A15)
+    static let widgetGround = Color(hex: 0x0E3D33)
+    static let widgetGroundDeep = Color(hex: 0x051D17)
     static let widgetPrimary = Color(hex: 0x5CF39A)
     static let widgetGold = Color(hex: 0xFFD166)
     static let widgetTextPrimary = Color(hex: 0xF2FBF6)
     static let widgetMutedOnDark = Color(hex: 0xB6D3C5)
+    static let widgetQuietOnDark = Color(hex: 0x92B5A5)
+    static let widgetHeroFrom = Color(hex: 0x8CF7BC)
+    static let widgetHeroTo = Color(hex: 0x3FDC85)
+    static let widgetOnMint = Color(hex: 0x04261A)
+    static let widgetOnMintMuted = Color(hex: 0x0B5A38)
 }
 
-/// A small gold "sun" accent - the same motif as components/SunAccent.tsx
-/// in the RN app (a soft radial glow behind a solid disc), used there as a
-/// restrained highlight on hero cards. Replaces the old geometric-star
-/// badge from the emerald theme, which the RN redesign also retired.
-private struct SunAccentShape: View {
-    var size: CGFloat
+/// Each prayer's own glyph - the same sun-and-moon set Home's list uses.
+private func prayerSymbol(_ prayer: PrayerName) -> String {
+    switch prayer {
+    case .fajr: return "moon.haze.fill"
+    case .sunrise: return "sunrise.fill"
+    case .dhuhr: return "sun.max.fill"
+    case .asr: return "sun.haze.fill"
+    case .maghrib: return "sunset.fill"
+    case .isha: return "moon.stars.fill"
+    }
+}
 
+/// Dhivehi text uses MV MAG Round (bundled in the widget target and listed
+/// in its Info.plist's UIAppFonts - PostScript name "MvMAGR"); it has a
+/// single bold weight and no Latin letters. Everything else stays on the
+/// system font. If the font ever failed to register, .custom falls back to
+/// the system font rather than breaking.
+private func widgetFont(_ size: CGFloat, _ weight: Font.Weight = .semibold, language: WidgetLanguage) -> Font {
+    language == .dv ? Font.custom("MvMAGR", size: size) : Font.system(size: size, weight: weight)
+}
+
+/// Digits always use the system rounded face, tabular so times line up.
+private func timeFont(_ size: CGFloat, _ weight: Font.Weight = .bold) -> Font {
+    Font.system(size: size, weight: weight, design: .rounded).monospacedDigit()
+}
+
+private struct WidgetGround: View {
     var body: some View {
         ZStack {
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [Color.widgetGold.opacity(0.55), Color.widgetGold.opacity(0)],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: size
-                    )
-                )
-                .frame(width: size * 2, height: size * 2)
-            Circle()
-                .fill(Color.widgetGold)
-                .frame(width: size * 0.8, height: size * 0.8)
+            LinearGradient(
+                colors: [Color.widgetGround, Color.widgetGroundDeep],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            RadialGradient(
+                colors: [Color.widgetPrimary.opacity(0.2), Color.clear],
+                center: .topLeading,
+                startRadius: 0,
+                endRadius: 260
+            )
         }
+    }
+}
+
+private struct MintGradient: View {
+    var body: some View {
+        LinearGradient(
+            colors: [Color.widgetHeroFrom, Color.widgetHeroTo],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 }
 
@@ -308,93 +389,251 @@ struct PrayerWidgetView: View {
             .environment(\.layoutDirection, entry.language == .ar ? .rightToLeft : .leftToRight)
     }
 
+    private var language: WidgetLanguage { entry.language }
+
+    private func name(_ prayer: PrayerName) -> String {
+        localizedPrayerName(prayer, language)
+    }
+
+    /// The span from the previous prayer to the next, when both are known -
+    /// what the lock-screen ring and bar count through, live, with no
+    /// timeline refreshes.
+    private var period: ClosedRange<Date>? {
+        guard let start = entry.periodStart, let end = entry.moment?.date, start < end else { return nil }
+        return start...end
+    }
+
     @ViewBuilder
     private var content: some View {
         switch family {
         case .accessoryCircular:
-            VStack(spacing: 1) {
-                Text(entry.moment.map { localizedShortPrayerName($0.name, entry.language) } ?? "-")
-                    .font(.system(size: 11, weight: .semibold))
-                Text(entry.moment?.timeString ?? "--:--")
-                    .font(.system(size: 14, weight: .bold))
-            }
-            .minimumScaleFactor(0.7)
-            .lineLimit(1)
-            // Lock screen accessory widgets are rendered by the system in a
-            // vibrant/monochrome material that overrides most custom
-            // colors anyway - a solid fill would just be discarded (or
-            // look wrong), so leave it transparent.
-            .containerBackground(for: .widget) {
-                Color.clear
-            }
+            circular
         case .accessoryRectangular:
-            VStack(alignment: .leading, spacing: 2) {
-                Text(entry.moment.map { localizedPrayerName($0.name, entry.language) } ?? "-")
-                    .font(.headline)
-                Text(entry.moment?.timeString ?? "--:--")
-                    .font(.caption)
-            }
-            .containerBackground(for: .widget) {
-                Color.clear
-            }
+            rectangular
+        case .accessoryInline:
+            inline
+        case .systemSmall:
+            small
         default:
-            // .systemMedium - a wide card with the next prayer up top and
-            // the whole day's times in a row underneath, rather than a
-            // small square showing only the next prayer. Styled as a
-            // miniature version of the app's own hero cards (Home's
-            // next-prayer card, the Calendar screen's today card): a
-            // midnight-navy gradient with a lagoon-cyan highlight on the
-            // active prayer and a small gold sun accent, matching the
-            // Noor+ "Ocean Night" theme rather than a flat system card.
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
+            medium
+        }
+    }
+
+    // MARK: Lock screen
+
+    @ViewBuilder
+    private var circular: some View {
+        Group {
+            if let moment = entry.moment, let range = period {
+                ProgressView(timerInterval: range, countsDown: false) {
+                    EmptyView()
+                } currentValueLabel: {
+                    VStack(spacing: 0) {
+                        Image(systemName: prayerSymbol(moment.name))
+                            .font(.system(size: 11, weight: .semibold))
+                        Text(moment.timeString)
+                            .font(timeFont(12))
+                            .minimumScaleFactor(0.7)
+                            .lineLimit(1)
+                    }
+                }
+                .progressViewStyle(.circular)
+            } else {
+                VStack(spacing: 1) {
+                    Text(entry.moment.map { localizedShortPrayerName($0.name, language) } ?? "-")
+                        .font(widgetFont(11, language: language))
+                    Text(entry.moment?.timeString ?? "--:--")
+                        .font(timeFont(14))
+                }
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
+            }
+        }
+        // Lock screen accessory widgets are rendered by the system in a
+        // vibrant/monochrome material that overrides most custom colors
+        // anyway - a solid fill would just be discarded.
+        .containerBackground(for: .widget) { Color.clear }
+    }
+
+    @ViewBuilder
+    private var rectangular: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 4) {
+                if let moment = entry.moment {
+                    Image(systemName: prayerSymbol(moment.name))
+                        .font(.system(size: 13, weight: .semibold))
+                        .widgetAccentable()
+                    Text(name(moment.name))
+                        .font(widgetFont(15, .bold, language: language))
+                        .widgetAccentable()
+                    Spacer(minLength: 4)
+                    Text(moment.timeString)
+                        .font(timeFont(15))
+                } else {
+                    Text("-").font(.headline)
+                }
+            }
+            if let moment = entry.moment {
+                if let range = period {
+                    ProgressView(timerInterval: range, countsDown: false) {
+                        EmptyView()
+                    } currentValueLabel: {
+                        EmptyView()
+                    }
+                    .progressViewStyle(.linear)
+                }
+                Text(moment.date, style: .timer)
+                    .font(.system(size: 12, weight: .medium))
+                    .monospacedDigit()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .containerBackground(for: .widget) { Color.clear }
+    }
+
+    @ViewBuilder
+    private var inline: some View {
+        if let moment = entry.moment {
+            Label {
+                Text("\(name(moment.name)) \(moment.timeString)")
+            } icon: {
+                Image(systemName: prayerSymbol(moment.name))
+            }
+        } else {
+            Text("-")
+        }
+    }
+
+    // MARK: Home screen
+
+    /// systemSmall: the app's mint hero in miniature - the next prayer, its
+    /// time at a glance, and a live countdown.
+    @ViewBuilder
+    private var small: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let moment = entry.moment {
+                HStack(spacing: 5) {
+                    Image(systemName: prayerSymbol(moment.name))
+                        .font(.system(size: 13, weight: .semibold))
                     Text(entry.islandLabel)
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color.widgetMutedOnDark)
-                    Spacer()
-                    if let moment = entry.moment {
-                        Text("\(localizedPrayerName(moment.name, entry.language)) \u{00B7} \(moment.timeString)")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundStyle(Color.widgetPrimary)
-                    }
+                        .font(widgetFont(11, language: language))
+                        .lineLimit(1)
                 }
+                .foregroundStyle(Color.widgetOnMintMuted)
 
-                Spacer(minLength: 0)
+                Spacer(minLength: 2)
 
-                HStack(spacing: 0) {
-                    ForEach(entry.today, id: \.name) { item in
-                        VStack(spacing: 3) {
-                            Text(localizedPrayerName(item.name, entry.language))
-                                .font(.system(size: 10))
-                                .foregroundStyle(Color.widgetMutedOnDark)
-                            Text(item.timeString)
-                                .font(.system(size: 13, weight: .semibold))
-                                .minimumScaleFactor(0.8)
-                                .lineLimit(1)
-                                .foregroundStyle(
-                                    item.name == entry.moment?.name ? Color.widgetPrimary : Color.widgetTextPrimary
-                                )
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
+                Text(name(moment.name))
+                    .font(widgetFont(19, .bold, language: language))
+                    .foregroundStyle(Color.widgetOnMint)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Text(moment.timeString)
+                    .font(timeFont(38))
+                    .foregroundStyle(Color.widgetOnMint)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+                Text(moment.date, style: .timer)
+                    .font(.system(size: 13, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.widgetOnMintMuted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Text("-").foregroundStyle(Color.widgetOnMint)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        // Required since iOS 17 - without it WidgetKit shows its own
+        // "Please adopt containerBackground API" placeholder instead of
+        // this view at all.
+        .containerBackground(for: .widget) { MintGradient() }
+    }
+
+    /// systemMedium: a mint hero panel for the next prayer beside the whole
+    /// day as a ledger - the next row on a mint pill, passed prayers dimmed.
+    @ViewBuilder
+    private var medium: some View {
+        HStack(spacing: 12) {
+            heroPanel
+                .frame(width: 138)
+            VStack(spacing: 1) {
+                ForEach(entry.today, id: \.name) { item in
+                    ledgerRow(item)
                 }
             }
-            .padding()
-            .overlay(alignment: .top) {
-                SunAccentShape(size: 10)
-                    .padding(.top, 4)
-            }
-            // Required since iOS 17 - without it WidgetKit shows its own
-            // "Please adopt containerBackground API" placeholder instead of
-            // this view at all.
-            .containerBackground(for: .widget) {
-                LinearGradient(
-                    colors: [Color.widgetBackground, Color.widgetBackgroundDeep],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+        }
+        .containerBackground(for: .widget) { WidgetGround() }
+    }
+
+    @ViewBuilder
+    private var heroPanel: some View {
+        ZStack(alignment: .bottomTrailing) {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.widgetHeroFrom, Color.widgetHeroTo],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                 )
+            if let moment = entry.moment {
+                Image(systemName: prayerSymbol(moment.name))
+                    .font(.system(size: 70))
+                    .foregroundStyle(Color.widgetOnMint.opacity(0.1))
+                    .offset(x: 12, y: 10)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(entry.islandLabel)
+                        .font(widgetFont(10, language: language))
+                        .foregroundStyle(Color.widgetOnMintMuted)
+                        .lineLimit(1)
+                    Spacer(minLength: 0)
+                    Text(name(moment.name))
+                        .font(widgetFont(17, .bold, language: language))
+                        .foregroundStyle(Color.widgetOnMint)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    Text(moment.timeString)
+                        .font(timeFont(30))
+                        .foregroundStyle(Color.widgetOnMint)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+                    Text(moment.date, style: .timer)
+                        .font(.system(size: 12, weight: .semibold))
+                        .monospacedDigit()
+                        .foregroundStyle(Color.widgetOnMintMuted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    @ViewBuilder
+    private func ledgerRow(_ item: PrayerMoment) -> some View {
+        let isNext = item.name == entry.moment?.name
+        let isPast = !isNext && item.date <= entry.date
+        let ink: Color = isNext ? .widgetOnMint : (isPast ? .widgetQuietOnDark : .widgetTextPrimary)
+
+        HStack(spacing: 6) {
+            Image(systemName: prayerSymbol(item.name))
+                .font(.system(size: 10, weight: .semibold))
+                .frame(width: 14)
+            Text(name(item.name))
+                .font(widgetFont(11, language: language))
+                .lineLimit(1)
+            Spacer(minLength: 2)
+            Text(item.timeString)
+                .font(timeFont(12, .semibold))
+        }
+        .foregroundStyle(ink)
+        .padding(.horizontal, 8)
+        .frame(maxHeight: .infinity)
+        .background {
+            if isNext {
+                RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color.widgetPrimary)
             }
         }
     }
@@ -408,7 +647,7 @@ struct PrayerWidget: Widget {
             PrayerWidgetView(entry: entry)
         }
         .configurationDisplayName("Prayer Times")
-        .description("Shows today's prayer times for your chosen island.")
-        .supportedFamilies([.systemMedium, .accessoryCircular, .accessoryRectangular])
+        .description("Shows the next prayer and today's times for your chosen island.")
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }
