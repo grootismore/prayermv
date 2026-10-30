@@ -14,7 +14,7 @@ interface Props {
   onChange: (key: string) => void;
 }
 
-/** A pill-shaped two-or-more-option switch (e.g. Hijri / Gregorian) - dark outlined track, solid cyan fill on the selected segment. */
+/** A pill-shaped two-or-more-option switch (e.g. Hijri / Gregorian) - dark outlined track, solid vermilion fill on the selected segment. */
 export default function SegmentedControl({ segments, selectedKey, onChange }: Props) {
   const styles = useThemedStyles(createStyles);
   return (

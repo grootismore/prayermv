@@ -23,7 +23,7 @@ const FONT_SIZES: Record<DuaArabicFontSize, number> = {
  * back to the system font before then, same conditional-upgrade pattern
  * as lib/useNumeralFont.ts) with full harakat, right-to-left direction, a
  * generous line height so diacritics are never clipped, and selectable
- * text. Never uses Space Grotesk, which has no Arabic glyphs.
+ * text. Never uses the Latin numeral face, which has no Arabic glyphs.
  */
 export default function DuaArabicText({ text, fontSize = 'medium', align = 'right', style }: Props) {
   const arabicFontReady = useDuaArabicFont();

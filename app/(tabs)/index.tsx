@@ -1,31 +1,30 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 import { useSettings } from '../../context/SettingsContext';
 import { useNextPrayer, formatCountdown } from '../../lib/useNextPrayer';
 import { getPrayerTimesForDate } from '../../lib/prayerTimes';
-import { minTouchTarget, shadow, spacing, typography, type ThemeColors } from '../../lib/theme';
+import { minTouchTarget, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
+import { useReduceMotion } from '../../lib/useReduceMotion';
 import { getTodayHijri, getHijriMonthName } from '../../lib/hijri';
 import { getTodayGregorian, getGregorianMonthName } from '../../lib/gregorian';
 import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
+import NextPrayerHero from '../../components/NextPrayerHero';
 import PrayerTimeRow from '../../components/PrayerTimeRow';
 import NoorDivider from '../../components/NoorDivider';
-import WaveDecoration from '../../components/WaveDecoration';
-import SunAccent from '../../components/SunAccent';
 import LoadingScreen from '../../components/LoadingScreen';
 
 const SWIPE_THRESHOLD = 45;
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   const { island, language } = useSettings();
@@ -50,18 +49,26 @@ export default function HomeScreen() {
   // rather than picking a direction at random each time.
   const dayChangeDirection = useRef<1 | -1>(1);
   const goToPreviousDay = () => {
+    Haptics.selectionAsync();
     dayChangeDirection.current = -1;
     setDayOffset((o) => o - 1);
   };
   const goToNextDay = () => {
+    Haptics.selectionAsync();
     dayChangeDirection.current = 1;
     setDayOffset((o) => o + 1);
+  };
+  const goToToday = () => {
+    Haptics.selectionAsync();
+    dayChangeDirection.current = dayOffset > 0 ? -1 : 1;
+    setDayOffset(0);
   };
 
   // The day list previously swapped instantly on every swipe/arrow tap,
   // which reads as a jump-cut rather than a transition. Crossfading in
   // (opacity 0->1) with a small slide from the direction the user just
   // navigated makes it read as one list replacing another instead.
+  const reduceMotion = useReduceMotion();
   const dayFade = useRef(new Animated.Value(1)).current;
   const daySlide = useRef(new Animated.Value(0)).current;
   const isFirstDayRender = useRef(true);
@@ -70,6 +77,7 @@ export default function HomeScreen() {
       isFirstDayRender.current = false;
       return;
     }
+    if (reduceMotion) return;
     dayFade.setValue(0);
     daySlide.setValue(dayChangeDirection.current * 14);
     Animated.parallel([
@@ -86,7 +94,7 @@ export default function HomeScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [dayOffset, dayFade, daySlide]);
+  }, [dayOffset, dayFade, daySlide, reduceMotion]);
 
   const viewDate = useMemo(() => {
     const d = new Date();
@@ -108,6 +116,24 @@ export default function HomeScreen() {
     return t('home.prayerTimesOn', { date: `${viewDate.getDate()} ${monthName}` });
   }, [dayOffset, viewDate, language, t]);
 
+  // How far the gap between the previous and next prayer has run, for the
+  // hero's progress band. The previous prayer can belong to yesterday (before
+  // today's Fajr), so yesterday's list is included in the search.
+  const heroProgress = useMemo(() => {
+    if (!island || !state?.next) return 0;
+    const now = state.next.date.getTime() - state.millisecondsRemaining;
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const earlier = [...getPrayerTimesForDate(island.islandId, yesterday), ...state.today];
+    let prev: number | null = null;
+    for (const entry of earlier) {
+      const at = entry.date.getTime();
+      if (at <= now) prev = at;
+    }
+    if (prev == null) return 0;
+    return (now - prev) / (state.next.date.getTime() - prev);
+  }, [island, state?.next, state?.today, state?.millisecondsRemaining]);
+
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gesture) =>
@@ -124,16 +150,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <Screen
-      backgroundDecoration={
-        <>
-          <WaveDecoration variant="header" />
-          <View style={[styles.sunSpot, { top: insets.top + 4 }]}>
-            <SunAccent size={24} />
-          </View>
-        </>
-      }
-    >
+    <Screen>
       <Text style={styles.islandName}>
         {localizedAtollName(island.atoll, language)} {localizedIslandName(island, language)}
       </Text>
@@ -150,17 +167,13 @@ export default function HomeScreen() {
       </View>
 
       {state.next && (
-        <SurfaceCard elevated style={styles.nextCard}>
-          <SunAccent size={22} />
-          <Text style={styles.nextLabel}>{t('home.nextPrayer')}</Text>
-          <Text style={styles.nextPrayerName}>{t(`prayers.${state.next.call}`)}</Text>
-          <Text style={[styles.nextTime, numeralsReady && styles.numeralFont]}>{state.next.string}</Text>
-          <View style={styles.countdownDivider} />
-          <Text style={[styles.countdown, numeralsReady && styles.numeralFontBold]}>
-            {formatCountdown(state.millisecondsRemaining)}
-          </Text>
-          <WaveDecoration variant="card" />
-        </SurfaceCard>
+        <NextPrayerHero
+          prayerName={t(`prayers.${state.next.call}`)}
+          time={state.next.string}
+          countdown={formatCountdown(state.millisecondsRemaining)}
+          progress={heroProgress}
+          numeralsReady={numeralsReady}
+        />
       )}
 
       <NoorDivider compact />
@@ -174,9 +187,19 @@ export default function HomeScreen() {
         >
           <Ionicons name="chevron-back" size={20} color={colors.primary} />
         </Pressable>
-        <Text style={styles.sectionTitle} numberOfLines={1}>
-          {dayLabel}
-        </Text>
+        <Pressable
+          onPress={goToToday}
+          disabled={dayOffset === 0}
+          style={styles.dayLabelButton}
+          accessibilityRole="button"
+          accessibilityLabel={dayOffset === 0 ? dayLabel : `${dayLabel}, ${t('home.today')}`}
+          accessibilityHint={dayOffset === 0 ? undefined : t('home.today')}
+        >
+          <Text style={styles.sectionTitle} numberOfLines={1}>
+            {dayLabel}
+          </Text>
+          {dayOffset !== 0 && <Ionicons name="return-down-back" size={16} color={colors.primary} />}
+        </Pressable>
         <Pressable
           onPress={goToNextDay}
           hitSlop={8}
@@ -195,6 +218,7 @@ export default function HomeScreen() {
           {dayEntries.map((entry) => {
             const isNext = dayOffset === 0 && state.next?.call === entry.call;
             const isCurrent = dayOffset === 0 && state.currentCall === entry.call && !isNext;
+            const isPast = dayOffset < 0 || (dayOffset === 0 && entry.date.getTime() <= Date.now());
             return (
               <PrayerTimeRow
                 key={entry.call}
@@ -202,6 +226,7 @@ export default function HomeScreen() {
                 time={entry.string}
                 isNext={isNext}
                 isCurrent={isCurrent}
+                isPast={isPast}
                 numeralsReady={numeralsReady}
               />
             );
@@ -214,7 +239,6 @@ export default function HomeScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-  sunSpot: { position: 'absolute', right: 8 },
   islandName: {
     fontSize: typography.size.xxl,
     fontWeight: typography.weight.bold,
@@ -225,47 +249,10 @@ const createStyles = (colors: ThemeColors) =>
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   dateText: { fontSize: typography.size.sm, color: colors.textSecondary },
   dateDivider: { fontSize: typography.size.sm, color: colors.gold, marginHorizontal: spacing.xs },
-  nextCard: {
-    alignItems: 'center',
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
-    overflow: 'hidden',
-    ...shadow.hero,
-  },
-  nextLabel: {
-    color: colors.textSecondary,
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.semibold,
-    letterSpacing: 0.5,
-    marginTop: spacing.xs,
-  },
-  nextPrayerName: {
-    color: colors.textPrimary,
-    fontSize: 26,
-    fontWeight: typography.weight.heavy,
-    marginTop: spacing.xxs,
-  },
-  nextTime: { color: colors.textSecondary, fontSize: typography.size.lg, marginTop: 2 },
-  countdownDivider: {
-    width: 40,
-    height: 1,
-    backgroundColor: colors.border,
-    marginTop: spacing.sm,
-  },
-  countdown: {
-    color: colors.primary,
-    fontSize: 24,
-    fontWeight: typography.weight.bold,
-    marginTop: spacing.xs,
-    fontVariant: ['tabular-nums'],
-    letterSpacing: 1,
-  },
-  numeralFont: { fontFamily: numeralFont.semibold },
-  numeralFontBold: { fontFamily: numeralFont.bold },
   dayNavRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -278,13 +265,19 @@ const createStyles = (colors: ThemeColors) =>
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sectionTitle: {
+  dayLabelButton: {
     flex: 1,
+    minHeight: minTouchTarget,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+  },
+  sectionTitle: {
     textAlign: 'center',
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
     color: colors.textSecondary,
-    letterSpacing: 0.5,
   },
   });
 

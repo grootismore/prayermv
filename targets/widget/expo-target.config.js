@@ -7,8 +7,8 @@ module.exports = (config) => ({
   deploymentTarget: '17.0',
   frameworks: ['AppIntents'],
   colors: {
-    $accent: '#13E2E6',
-    $widgetBackground: '#011C53',
+    $accent: '#FF7355',
+    $widgetBackground: '#150E0B',
   },
   // Lets the widget read the app's selected island from the shared
   // UserDefaults suite the app writes to (see lib/widgetSync.ts and

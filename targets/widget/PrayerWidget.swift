@@ -262,12 +262,12 @@ private extension Color {
         )
     }
 
-    static let widgetBackground = Color(hex: 0x011C53)
-    static let widgetBackgroundDeep = Color(hex: 0x010F2E)
-    static let widgetPrimary = Color(hex: 0x13E2E6)
-    static let widgetGold = Color(hex: 0xFFC83D)
-    static let widgetTextPrimary = Color(hex: 0xF7FBFF)
-    static let widgetMutedOnDark = Color(hex: 0xA9C3E2)
+    static let widgetBackground = Color(hex: 0x150E0B)
+    static let widgetBackgroundDeep = Color(hex: 0x0E0807)
+    static let widgetPrimary = Color(hex: 0xFF7355)
+    static let widgetGold = Color(hex: 0xF5B83D)
+    static let widgetTextPrimary = Color(hex: 0xF6EEE2)
+    static let widgetMutedOnDark = Color(hex: 0xCBBBA9)
 }
 
 /// A small gold "sun" accent - the same motif as components/SunAccent.tsx

@@ -14,8 +14,7 @@ import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
 import NoorDivider from '../../components/NoorDivider';
-import WaveDecoration from '../../components/WaveDecoration';
-import SunAccent from '../../components/SunAccent';
+import LacquerBand from '../../components/LacquerBand';
 
 export default function HijriScreen() {
   const { t } = useTranslation();
@@ -107,13 +106,12 @@ export default function HijriScreen() {
       <Text style={styles.title}>{t('hijri.title')}</Text>
 
       <SurfaceCard elevated style={styles.todayCard}>
-        <SunAccent size={20} />
+        <LacquerBand style={styles.cardBand} thin={1} thick={2} gap={2} />
         <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
         <Text style={styles.todayDate}>
           <Text style={numeralStyle}>{todayDateNum}</Text> {todayMonthName}{' '}
           <Text style={numeralStyle}>{todayYear}</Text>
         </Text>
-        <WaveDecoration variant="card" />
       </SurfaceCard>
 
       <NoorDivider compact />
@@ -183,11 +181,12 @@ const createStyles = (colors: ThemeColors) =>
   title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.xs },
   todayCard: {
     alignItems: 'center',
-    paddingTop: spacing.sm,
+    paddingTop: spacing.lg,
     paddingBottom: spacing.md,
     marginTop: spacing.sm,
     overflow: 'hidden',
   },
+  cardBand: { position: 'absolute', top: spacing.sm, left: 0, right: 0 },
   todayLabel: { color: colors.textSecondary, fontSize: typography.size.sm, fontWeight: typography.weight.semibold, marginTop: spacing.xs },
   todayDate: { color: colors.textPrimary, fontSize: typography.size.lg, fontWeight: typography.weight.heavy, marginTop: spacing.xxs },
   monthNav: {

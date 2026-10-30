@@ -18,8 +18,6 @@ import Screen from '../../../components/Screen';
 import SurfaceCard from '../../../components/SurfaceCard';
 import SectionHeader from '../../../components/SectionHeader';
 import NoorDivider from '../../../components/NoorDivider';
-import WaveDecoration from '../../../components/WaveDecoration';
-import SunAccent from '../../../components/SunAccent';
 import DuaSearchInput from '../../../components/dua/DuaSearchInput';
 import DuaCategoryCard from '../../../components/dua/DuaCategoryCard';
 import DuaCard from '../../../components/dua/DuaCard';
@@ -101,16 +99,7 @@ export default function DuasHomeScreen() {
   }
 
   return (
-    <Screen
-      backgroundDecoration={
-        <>
-          <WaveDecoration variant="header" />
-          <View style={[styles.sunSpot, { top: insets.top + 4 }]}>
-            <SunAccent size={24} />
-          </View>
-        </>
-      }
-    >
+    <Screen>
       <Text style={styles.title}>{t('duas.title')}</Text>
       <Text style={styles.intro}>{t('duas.intro')}</Text>
 
@@ -182,7 +171,6 @@ export default function DuasHomeScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    sunSpot: { position: 'absolute', right: 8 },
     searchScreenPadding: { flex: 1, padding: spacing.lg },
     title: {
       fontSize: typography.size.xl,

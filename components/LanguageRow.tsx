@@ -10,7 +10,7 @@ interface Props {
   onPress: () => void;
 }
 
-/** One row in the language picker: label + a small filled cyan circle-check when selected. */
+/** One row in the language picker: label + a small filled vermilion circle-check when selected. */
 export default function LanguageRow({ label, selected, onPress }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);

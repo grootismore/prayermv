@@ -1,4 +1,4 @@
-import { useFonts, SpaceGrotesk_600SemiBold, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
+import { useFonts, BricolageGrotesque_600SemiBold, BricolageGrotesque_700Bold } from '@expo-google-fonts/bricolage-grotesque';
 
 /**
  * Numbers only (countdown, prayer times, calendar digits) - never applied
@@ -8,11 +8,11 @@ import { useFonts, SpaceGrotesk_600SemiBold, SpaceGrotesk_700Bold } from '@expo-
  * gate to get wrong - text just upgrades to the custom font once loaded.
  */
 export function useNumeralFont(): boolean {
-  const [loaded] = useFonts({ SpaceGrotesk_600SemiBold, SpaceGrotesk_700Bold });
+  const [loaded] = useFonts({ BricolageGrotesque_600SemiBold, BricolageGrotesque_700Bold });
   return loaded;
 }
 
 export const numeralFont = {
-  bold: 'SpaceGrotesk_700Bold',
-  semibold: 'SpaceGrotesk_600SemiBold',
+  bold: 'BricolageGrotesque_700Bold',
+  semibold: 'BricolageGrotesque_600SemiBold',
 } as const;

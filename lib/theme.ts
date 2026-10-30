@@ -1,9 +1,9 @@
 import { Platform } from 'react-native';
 
 /**
- * Noor+ design tokens - a lagoon-cyan and sunrise-gold palette over either
- * a midnight-navy ("Ocean Night") or a pale sky/foam ("Ocean Day")
- * background. Centralized here so no screen hardcodes a color, spacing,
+ * Noor+ design tokens - the "Liyelaa" world, after Maldivian lacquerwork
+ * (liyelaa jehun): vermilion and ochre incised on lacquer-black ("Lacquer
+ * Night") or on pale coral-stone limewash ("Limewash Day"). Centralized here so no screen hardcodes a color, spacing,
  * radius, or type value directly. Which palette is active is resolved by
  * lib/useTheme.ts (from the user's Appearance setting + the system
  * scheme) - screens/components should get `colors` from `useTheme()`,
@@ -32,66 +32,73 @@ export interface ThemeColors {
   success: string;
   warning: string;
   danger: string;
+  /** The hero vessel (Home's next-prayer card): one committed vermilion field used the same way in both themes. */
+  heroBackground: string;
+  /** Text on `heroBackground`. */
+  heroText: string;
+  /** Secondary text on `heroBackground` - tinted from the field, not gray. */
+  heroTextMuted: string;
 }
 
-// background/backgroundDeep are matched to the navy baked into the
-// official Noor+ app icon/logo mark, so the icon, splash screen, and
-// in-app screens all read as the same navy rather than three near-misses.
+// Lacquer-black is warm (a hint of oxblood), never blue - vermilion is the
+// one committed colour, ochre the quiet accent. Every text/surface pair
+// below was picked for >=4.5:1 (textMuted on background is ~5.4:1).
 export const darkColors: ThemeColors = {
-  background: '#011C53',
-  backgroundDeep: '#010F2E',
-  surface: '#072952',
-  surfaceElevated: '#0A3565',
-  surfacePressed: '#0D4178',
-  primary: '#13E2E6',
-  primaryMuted: '#0AA8C6',
-  primarySoft: 'rgba(19, 226, 230, 0.12)',
-  onPrimary: '#010F2E',
-  gold: '#FFC83D',
-  goldMuted: '#D8A82D',
-  goldSoft: 'rgba(255, 200, 61, 0.12)',
-  textPrimary: '#F7FBFF',
-  textSecondary: '#A9C3E2',
-  textMuted: '#7894B5',
-  border: 'rgba(53, 190, 255, 0.24)',
-  separator: 'rgba(130, 190, 235, 0.15)',
-  overlay: 'rgba(1, 14, 36, 0.78)',
-  success: '#13E2C5',
-  warning: '#FFC83D',
-  danger: '#FF6675',
+  background: '#150E0B',
+  backgroundDeep: '#0E0807',
+  surface: '#21150F',
+  surfaceElevated: '#2C1C14',
+  surfacePressed: '#38241A',
+  primary: '#FF7355',
+  primaryMuted: '#E85A3C',
+  primarySoft: 'rgba(255, 115, 85, 0.14)',
+  onPrimary: '#150E0B',
+  gold: '#F5B83D',
+  goldMuted: '#C99528',
+  goldSoft: 'rgba(245, 184, 61, 0.14)',
+  textPrimary: '#F6EEE2',
+  textSecondary: '#CBBBA9',
+  textMuted: '#9C8978',
+  border: 'rgba(246, 238, 226, 0.16)',
+  separator: 'rgba(246, 238, 226, 0.10)',
+  overlay: 'rgba(14, 8, 7, 0.82)',
+  success: '#6FCF8E',
+  warning: '#F5B83D',
+  danger: '#FF6B7A',
+  heroBackground: '#FF6040',
+  heroText: '#150E0B',
+  heroTextMuted: '#4A1D12',
 };
 
-// Not just an inversion of the dark palette - primary/gold are deepened a
-// step from their dark-mode values so they hold contrast against a light
-// background instead of washing out, the way the bright cyan/gold read
-// fine floating on midnight navy but wouldn't on white. The neutrals
-// (background/surface/etc.) are a lagoon-turquoise tinted scale rather
-// than white/blue-white - plain white would abandon the "Ocean" identity
-// the dark theme carries; this keeps that same lagoon cast, just very
-// pale, at every step from backgroundDeep down to the barely-there
-// surfaceElevated.
+// Day is limewash coral-stone (a cool, slightly green grey - the walls of
+// Hukuru Miskiy), not cream: outdoors in tropical glare a flat pale ground
+// with deep ink reads best. primary/gold are deepened a step so they hold
+// contrast on it.
 export const lightColors: ThemeColors = {
-  background: '#E4F4F6',
-  backgroundDeep: '#D0EDF1',
-  surface: '#F2F9FA',
-  surfaceElevated: '#F8FBFC',
-  surfacePressed: '#CCECF0',
-  primary: '#0A8CA6',
-  primaryMuted: '#0AA8C6',
-  primarySoft: 'rgba(10, 140, 166, 0.10)',
+  background: '#ECEFEA',
+  backgroundDeep: '#DEE3DC',
+  surface: '#F7F8F4',
+  surfaceElevated: '#FFFFFF',
+  surfacePressed: '#E1E6DE',
+  primary: '#B5301A',
+  primaryMuted: '#C8341B',
+  primarySoft: 'rgba(181, 48, 26, 0.10)',
   onPrimary: '#FFFFFF',
-  gold: '#B87A0A',
-  goldMuted: '#8F600A',
-  goldSoft: 'rgba(184, 122, 10, 0.12)',
-  textPrimary: '#0B1E3D',
-  textSecondary: '#48607F',
-  textMuted: '#7C8FA6',
-  border: 'rgba(10, 90, 140, 0.18)',
-  separator: 'rgba(10, 60, 110, 0.10)',
-  overlay: 'rgba(228, 244, 246, 0.85)',
-  success: '#0E8E77',
-  warning: '#B87A0A',
-  danger: '#D63B52',
+  gold: '#8A5A00',
+  goldMuted: '#6E4700',
+  goldSoft: 'rgba(138, 90, 0, 0.12)',
+  textPrimary: '#1B120E',
+  textSecondary: '#55473E',
+  textMuted: '#76675C',
+  border: 'rgba(27, 18, 14, 0.16)',
+  separator: 'rgba(27, 18, 14, 0.09)',
+  overlay: 'rgba(236, 239, 234, 0.88)',
+  success: '#1F7A45',
+  warning: '#8A5A00',
+  danger: '#B3261E',
+  heroBackground: '#C8341B',
+  heroText: '#FFFFFF',
+  heroTextMuted: '#FFF0EB',
 };
 
 /** 4/8pt spacing scale - use these instead of ad-hoc margin/padding numbers. */
@@ -107,9 +114,9 @@ export const spacing = {
 
 export const radius = {
   sm: 10,
-  md: 16,
-  lg: 22,
-  xl: 28,
+  md: 14,
+  lg: 16,
+  xl: 24,
   pill: 999,
 };
 

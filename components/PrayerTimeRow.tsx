@@ -7,36 +7,51 @@ import { numeralFont } from '../lib/useNumeralFont';
 interface Props {
   label: string;
   time: string;
-  /** The next upcoming prayer - gets the cyan side indicator, tint, and time color. */
+  /** The next upcoming prayer - gets the band mark, tint, and vermilion text. */
   isNext?: boolean;
-  /** The prayer period currently in effect (not necessarily "next") - a lighter tint only. */
+  /** The prayer period currently in effect (not necessarily "next") - a lighter tint and a single ochre line. */
   isCurrent?: boolean;
+  /** Already passed today - recedes so the eye lands on what's still ahead. */
+  isPast?: boolean;
   numeralsReady?: boolean;
   accessibilityLabel?: string;
 }
 
-/** One row in a prayer-times list: name on the leading edge, time on the trailing edge, with a highlighted state for the next prayer. */
+/** One row in the ledger of prayer times: name on the leading edge, time on the trailing edge. */
 export default function PrayerTimeRow({
   label,
   time,
   isNext = false,
   isCurrent = false,
+  isPast = false,
   numeralsReady = false,
   accessibilityLabel,
 }: Props) {
   const styles = useThemedStyles(createStyles);
+  const dim = isPast && !isNext && !isCurrent;
   return (
     <View
       style={[styles.row, isCurrent && !isNext && styles.rowCurrent, isNext && styles.rowNext]}
       accessible
       accessibilityLabel={accessibilityLabel ?? `${label}, ${time}${isNext ? ', next prayer' : ''}`}
     >
-      <View style={[styles.indicator, isNext && styles.indicatorActive]} />
-      <Text style={[styles.label, isNext && styles.labelActive]}>{label}</Text>
+      <View style={styles.mark}>
+        {isNext ? (
+          <>
+            <View style={[styles.line, styles.lineThin, styles.lineNext]} />
+            <View style={[styles.line, styles.lineThick, styles.lineNext]} />
+            <View style={[styles.line, styles.lineThin, styles.lineNext]} />
+          </>
+        ) : isCurrent ? (
+          <View style={[styles.line, styles.lineThick, styles.lineCurrent]} />
+        ) : null}
+      </View>
+      <Text style={[styles.label, isNext && styles.labelActive, dim && styles.dim]}>{label}</Text>
       <Text
         style={[
           styles.time,
           isNext && styles.timeActive,
+          dim && styles.dim,
           numeralsReady && { fontFamily: numeralFont.semibold },
         ]}
       >
@@ -51,44 +66,39 @@ const createStyles = (colors: ThemeColors) =>
     row: {
       flexDirection: 'row',
       alignItems: 'center',
-      // Not a touch target (this row has no onPress) - a bit shorter than
-      // minTouchTarget so all 6 rows fit on screen without scrolling.
-      minHeight: 40,
+      // Not a touch target (no onPress); sized so all 6 rows plus the hero
+      // fit one screen on a small phone at default text size.
+      minHeight: 48,
       paddingHorizontal: spacing.md,
-      borderBottomWidth: 1,
+      borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.separator,
     },
-    rowCurrent: {
-      backgroundColor: colors.surfaceElevated,
-    },
-    rowNext: {
-      backgroundColor: colors.primarySoft,
-    },
-    indicator: {
-      width: 3,
-      height: 22,
-      borderRadius: 2,
+    rowCurrent: { backgroundColor: colors.surfaceElevated },
+    rowNext: { backgroundColor: colors.primarySoft },
+    mark: {
+      width: 10,
+      height: 24,
       marginRight: spacing.sm,
-      backgroundColor: 'transparent',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
     },
-    indicatorActive: {
-      backgroundColor: colors.primary,
-    },
+    line: { height: '100%' },
+    lineThin: { width: 1 },
+    lineThick: { width: 3 },
+    lineNext: { backgroundColor: colors.primary },
+    lineCurrent: { backgroundColor: colors.gold, marginLeft: 3 },
     label: {
       flex: 1,
-      fontSize: typography.size.md,
+      fontSize: typography.size.lg,
       fontWeight: typography.weight.semibold,
       color: colors.textPrimary,
     },
-    labelActive: {
-      color: colors.primary,
-    },
+    labelActive: { color: colors.primary, fontWeight: typography.weight.bold },
     time: {
-      fontSize: typography.size.md,
-      color: colors.textSecondary,
+      fontSize: typography.size.xl,
+      color: colors.textPrimary,
+      fontVariant: ['tabular-nums'],
     },
-    timeActive: {
-      color: colors.primary,
-      fontWeight: typography.weight.bold,
-    },
+    timeActive: { color: colors.primary, fontWeight: typography.weight.bold },
+    dim: { color: colors.textMuted },
   });

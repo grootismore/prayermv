@@ -58,9 +58,9 @@ language, and notification preferences - stays on your device.
 
 ## Design
 
-Noor+ uses a calm "Ocean Night" look - midnight navy, lagoon cyan, and a
-touch of sunrise gold - meant to feel at home on an island evening as much
-as at Fajr.
+Noor+ takes its look from Maldivian lacquerwork (liyelaa jehun): vermilion and
+ochre incised lines on lacquer-black at night, or pale coral-stone limewash by day -
+built to be read at a glance, in English, Dhivehi or Arabic.
 
 ## Contributing
 

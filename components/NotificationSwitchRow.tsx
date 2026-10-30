@@ -9,7 +9,7 @@ interface Props {
   onValueChange: (value: boolean) => void;
 }
 
-/** A prayer-notification toggle row using React Native's native Switch, themed with the lagoon-cyan active track. */
+/** A prayer-notification toggle row using React Native's native Switch, themed with the vermilion active track. */
 export default function NotificationSwitchRow({ label, value, onValueChange }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);

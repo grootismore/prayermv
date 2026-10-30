@@ -8,7 +8,7 @@ import {
 
 /**
  * The Arabic dua/dhikr text font - a proper Arabic typeface with full
- * harakat support, distinct from Space Grotesk (lib/useNumeralFont.ts,
+ * harakat support, distinct from the Latin numeral face (lib/useNumeralFont.ts,
  * numerals only - no Arabic glyphs at all) and from the system font used
  * for Dhivehi/English UI text. Returns whether the font is ready yet, the
  * same conditional-upgrade pattern as useNumeralFont - the reading screen

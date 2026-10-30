@@ -1,23 +1,27 @@
-import { View, StyleSheet, type ColorValue } from 'react-native';
+import { Platform, View, StyleSheet, type ColorValue } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
-import { radius, shadow, spacing, tabBarMetrics, typography, type ThemeColors } from '../../lib/theme';
+import { radius, spacing, tabBarMetrics, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
+import LacquerBand from '../../components/LacquerBand';
+
+const isIOS = Platform.OS === 'ios';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-// The pill wraps only the icon - the label beneath it is rendered by
-// react-navigation's own tabBarLabel (tabBarActiveTintColor/tabBarLabelStyle
-// below), the same native Text sizing every React Navigation tab bar relies
-// on, rather than a hand-rolled one prone to clipping/truncating on
-// narrower devices.
+// Platform-adaptive active state: Android gets Material 3's pill behind the
+// icon; iOS keeps the bare tinted/filled glyph, as UITabBar does. The label
+// beneath is react-navigation's own tabBarLabel (tabBarActiveTintColor /
+// tabBarLabelStyle below), the same native Text sizing every React
+// Navigation tab bar relies on, rather than a hand-rolled one prone to
+// clipping/truncating on narrower devices.
 function TabIcon({ name, color, focused }: { name: IconName; color: ColorValue; focused: boolean }) {
   const styles = useThemedStyles(createStyles);
   return (
-    <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
+    <View style={[styles.iconWrap, focused && !isIOS && styles.iconWrapActive]}>
       <Ionicons name={name} color={color} size={tabBarMetrics.iconSize} />
     </View>
   );
@@ -37,6 +41,12 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
+        // The lacquer rim: the app's one ornament doubles as the bar's top edge.
+        tabBarBackground: () => (
+          <View style={styles.rim}>
+            <LacquerBand thin={1} thick={2} gap={2} />
+          </View>
+        ),
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
@@ -99,16 +109,23 @@ const createStyles = (colors: ThemeColors) =>
     tabBar: {
       backgroundColor: colors.backgroundDeep,
       borderTopWidth: 0,
-      borderTopLeftRadius: tabBarMetrics.topRadius,
-      borderTopRightRadius: tabBarMetrics.topRadius,
       paddingTop: spacing.sm,
-      ...shadow.floating,
+      // Flat: the band rim carries the edge, so no shadow (one elevation language).
+      elevation: 0,
     },
     tabItem: {
       paddingTop: 0,
     },
+    rim: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+    },
     iconWrap: {
-      width: 44,
+      // Android's M3 indicator is 64x32; iOS has no indicator, so the
+      // wrapper just keeps the glyph centred at the same height.
+      width: isIOS ? 44 : 56,
       height: 28,
       borderRadius: radius.pill,
       alignItems: 'center',
@@ -116,8 +133,6 @@ const createStyles = (colors: ThemeColors) =>
     },
     iconWrapActive: {
       backgroundColor: colors.primarySoft,
-      borderWidth: 1,
-      borderColor: colors.border,
     },
     label: {
       fontSize: typography.size.xs,

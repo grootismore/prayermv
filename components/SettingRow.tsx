@@ -6,14 +6,14 @@ import { useTheme, useThemedStyles } from '../lib/useTheme';
 
 interface Props {
   title: string;
-  /** A secondary cyan action line beneath the title (e.g. "Change island"). */
+  /** A secondary vermilion action line beneath the title (e.g. "Change island"). */
   actionLabel?: string;
   chevron?: boolean;
   onPress?: () => void;
   accessibilityLabel?: string;
 }
 
-/** A generic settings row: title (+ optional cyan action line) with a trailing chevron, inside a pressable native-style row. */
+/** A generic settings row: title (+ optional vermilion action line) with a trailing chevron, inside a pressable native-style row. */
 export default function SettingRow({ title, actionLabel, chevron = true, onPress, accessibilityLabel }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);

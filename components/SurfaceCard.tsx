@@ -29,7 +29,7 @@ interface Props {
   simultaneousWithExternalGesture?: PanGesture;
 }
 
-/** The app's one card surface: dark tonal navy, rounded, thin cyan-tinted border, soft depth shadow. Pressable when `onPress` is given, with restrained native press feedback. */
+/** The app's one card surface: matte lacquer-black or limewash, rounded, hairline border, soft depth shadow. Pressable when `onPress` is given, with restrained native press feedback. */
 export default function SurfaceCard({
   children,
   onPress,

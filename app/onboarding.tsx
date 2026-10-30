@@ -14,8 +14,7 @@ import type { AppLanguage } from '../lib/storage';
 import { minTouchTarget, radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
 import { showToast } from '../lib/toast';
-import WaveDecoration from '../components/WaveDecoration';
-import SunAccent from '../components/SunAccent';
+import LacquerBand from '../components/LacquerBand';
 
 type Step = 'language' | 'welcome' | 'island';
 
@@ -82,10 +81,11 @@ export default function OnboardingScreen() {
   if (step === 'welcome') {
     return (
       <View style={styles.welcomeRoot}>
-        <WaveDecoration variant="header" />
         <SafeAreaView style={styles.welcomeSafe} edges={['top', 'bottom']}>
           <View style={styles.welcomeHero}>
-            <SunAccent size={34} />
+            <View style={styles.welcomeMark}>
+              <LacquerBand color={colors.heroText} thin={2} thick={6} gap={5} />
+            </View>
             <Text style={styles.welcomeAppName}>{t('common.appName')}</Text>
             <Text style={styles.welcomeTagline}>{t('onboarding.tagline')}</Text>
           </View>
@@ -155,6 +155,14 @@ const createStyles = (colors: ThemeColors) =>
     paddingHorizontal: spacing.xl,
     justifyContent: 'space-between',
   },
+  welcomeMark: {
+    width: 96,
+    height: 96,
+    borderRadius: radius.lg,
+    backgroundColor: colors.heroBackground,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+  },
   welcomeHero: {
     alignItems: 'center',
     marginTop: spacing.xxl + spacing.sm,
@@ -195,7 +203,7 @@ const createStyles = (colors: ThemeColors) =>
     gap: spacing.xs,
     minHeight: minTouchTarget + 4,
     backgroundColor: colors.primary,
-    borderRadius: radius.pill,
+    borderRadius: radius.md,
     marginBottom: spacing.lg,
     ...shadow.floating,
   },

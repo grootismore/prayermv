@@ -3,8 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
-import SunAccent from './SunAccent';
-import WaveDecoration from './WaveDecoration';
+import LacquerBand from './LacquerBand';
 
 /**
  * Branded, full-bleed loading state - used anywhere the app has real data
@@ -17,9 +16,8 @@ export default function LoadingScreen({ label }: { label?: string }) {
   const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.root}>
-      <WaveDecoration variant="header" />
       <SafeAreaView style={styles.safe}>
-        <SunAccent size={32} />
+        <LacquerBand style={styles.band} thin={1} thick={3} gap={3} />
         <ActivityIndicator size="small" color={colors.primary} style={styles.spinner} />
         {label ? <Text style={styles.label}>{label}</Text> : null}
       </SafeAreaView>
@@ -31,6 +29,7 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     root: { flex: 1, backgroundColor: colors.background },
     safe: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    band: { width: 72 },
     spinner: { marginTop: spacing.lg },
     label: { marginTop: spacing.sm, fontSize: typography.size.sm, color: colors.textSecondary, fontWeight: typography.weight.semibold },
   });

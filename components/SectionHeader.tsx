@@ -26,7 +26,7 @@ const createStyles = (colors: ThemeColors) =>
     title: {
       fontSize: typography.size.base,
       fontWeight: typography.weight.bold,
-      color: colors.primary,
+      color: colors.gold,
       marginBottom: spacing.xxs,
       marginTop: spacing.md,
       letterSpacing: 0.3,
