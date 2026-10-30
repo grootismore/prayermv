@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from './Icon';
 
 import { radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
@@ -78,7 +78,7 @@ export default function ToastHost() {
         },
       ]}
     >
-      <Ionicons name="checkmark-circle" size={16} color={colors.primary} style={styles.icon} />
+      <Icon name="checkmark-circle" size={16} color={colors.primary} style={styles.icon} />
       <Text style={styles.text} numberOfLines={2}>
         {message}
       </Text>

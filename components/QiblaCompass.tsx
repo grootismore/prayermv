@@ -85,7 +85,7 @@ export default function QiblaCompass({ rotation, aligned = false, size = 240 }: 
           stroke={aligned ? colors.gold : colors.primary}
           strokeWidth={aligned ? 4 : 3}
         />
-        {/* Incised inner line - the second of the lacquer band's three lines. */}
+        {/* A fine inner ring gives the face a turned-dish edge. */}
         <Circle cx={center} cy={center} r={ringRadius - 4} fill="none" stroke={colors.gold} strokeWidth={1} opacity={0.6} />
         <Circle cx={center} cy={center} r={ringRadius - 14} fill="none" stroke={colors.border} strokeWidth={1} />
         {CARDINAL_ANGLES.map((angle) => (

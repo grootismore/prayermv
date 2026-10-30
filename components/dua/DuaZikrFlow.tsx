@@ -289,7 +289,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     dotActive: {
       width: 20,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.fill,
       borderColor: colors.primary,
     },
     dotDone: {

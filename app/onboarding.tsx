@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { Image, View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from '../components/Icon';
+import type { Ionicons } from '@expo/vector-icons';
 
 import IslandPicker from '../components/IslandPicker';
 import LanguageRow from '../components/LanguageRow';
@@ -14,7 +15,8 @@ import type { AppLanguage } from '../lib/storage';
 import { minTouchTarget, radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
 import { showToast } from '../lib/toast';
-import LacquerBand from '../components/LacquerBand';
+import AmbientBackground from '../components/AmbientBackground';
+import PressableScale from '../components/PressableScale';
 
 type Step = 'language' | 'welcome' | 'island';
 
@@ -54,6 +56,7 @@ export default function OnboardingScreen() {
   if (step === 'language') {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <AmbientBackground />
         <View style={styles.header}>
           <Text style={styles.title}>{t('onboarding.chooseLanguageTitle')}</Text>
           <Text style={styles.subtitle}>{t('onboarding.chooseLanguageSubtitle')}</Text>
@@ -69,10 +72,10 @@ export default function OnboardingScreen() {
               />
             ))}
           </SurfaceCard>
-          <Pressable style={styles.welcomeButton} onPress={() => setStep('welcome')}>
+          <PressableScale style={styles.buttonSlot} contentStyle={styles.welcomeButton} onPress={() => setStep('welcome')} accessibilityRole="button">
             <Text style={styles.welcomeButtonText}>{t('common.continue')}</Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.onPrimary} />
-          </Pressable>
+            <Icon name="arrow-forward" size={18} color={colors.onFill} />
+          </PressableScale>
         </View>
       </SafeAreaView>
     );
@@ -81,11 +84,10 @@ export default function OnboardingScreen() {
   if (step === 'welcome') {
     return (
       <View style={styles.welcomeRoot}>
+        <AmbientBackground />
         <SafeAreaView style={styles.welcomeSafe} edges={['top', 'bottom']}>
           <View style={styles.welcomeHero}>
-            <View style={styles.welcomeMark}>
-              <LacquerBand color={colors.heroText} thin={2} thick={6} gap={5} />
-            </View>
+            <Image source={require('../assets/icon.png')} style={styles.welcomeMark} accessibilityIgnoresInvertColors />
             <Text style={styles.welcomeAppName}>{t('common.appName')}</Text>
             <Text style={styles.welcomeTagline}>{t('onboarding.tagline')}</Text>
           </View>
@@ -94,17 +96,17 @@ export default function OnboardingScreen() {
             {FEATURES.map((feature) => (
               <View key={feature.key} style={styles.featureRow}>
                 <View style={styles.featureIconWrap}>
-                  <Ionicons name={feature.icon} size={18} color={colors.gold} />
+                  <Icon name={feature.icon} size={18} color={colors.primary} />
                 </View>
                 <Text style={styles.featureText}>{t(feature.key)}</Text>
               </View>
             ))}
           </View>
 
-          <Pressable style={styles.welcomeButton} onPress={() => setStep('island')}>
+          <PressableScale style={styles.buttonSlot} contentStyle={styles.welcomeButton} onPress={() => setStep('island')} accessibilityRole="button">
             <Text style={styles.welcomeButtonText}>{t('onboarding.getStarted')}</Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.onPrimary} />
-          </Pressable>
+            <Icon name="arrow-forward" size={18} color={colors.onFill} />
+          </PressableScale>
         </SafeAreaView>
       </View>
     );
@@ -112,6 +114,7 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <AmbientBackground />
       <View style={styles.header}>
         <Text style={styles.title}>{t('onboarding.title')}</Text>
         <Text style={styles.subtitle}>{t('onboarding.subtitle')}</Text>
@@ -158,10 +161,7 @@ const createStyles = (colors: ThemeColors) =>
   welcomeMark: {
     width: 96,
     height: 96,
-    borderRadius: radius.lg,
-    backgroundColor: colors.heroBackground,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.md,
+    borderRadius: 22,
   },
   welcomeHero: {
     alignItems: 'center',
@@ -191,7 +191,7 @@ const createStyles = (colors: ThemeColors) =>
     width: 36,
     height: 36,
     borderRadius: radius.pill,
-    backgroundColor: colors.goldSoft,
+    backgroundColor: colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -202,10 +202,10 @@ const createStyles = (colors: ThemeColors) =>
     justifyContent: 'center',
     gap: spacing.xs,
     minHeight: minTouchTarget + 4,
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    marginBottom: spacing.lg,
+    backgroundColor: colors.fill,
+    borderRadius: radius.pill,
     ...shadow.floating,
   },
-  welcomeButtonText: { fontSize: typography.size.md, fontWeight: typography.weight.bold, color: colors.onPrimary },
+  buttonSlot: { marginBottom: spacing.lg },
+  welcomeButtonText: { fontSize: typography.size.md, fontWeight: typography.weight.bold, color: colors.onFill },
 });

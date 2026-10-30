@@ -21,14 +21,14 @@ Opened many times a day for a few seconds each; also used in the mosque, at nigh
 ## Capabilities and Constraints
 - Expo SDK 57, Expo Router, React Native 0.86; iOS and Android only for now.
 - Languages: en, dv, ar. dv and ar are RTL and use their own fonts.
-- Light and dark themes (Limewash Day / Lacquer Night), user-selectable.
+- Light and dark themes (Mint Day / Forest Night), user-selectable.
 - Prayer data is bundled per island; works offline.
 - Dua content has a review process (`data/duas/CONTENT_REVIEW.md`); redesign must not alter dua text.
 
 ## Brand Commitments
 - Name "Noor+ / ނޫރް+", the app icon and logo mark stay as they are.
 - English, Dhivehi and Arabic with proper RTL layout stay first-class.
-- Palette is open for redesign (not a binding commitment).
+- Visual direction pinned by the owner's reference screens: emerald/mint on deep forest green, large soft rounded cards, pill buttons, iOS liquid-glass materials, smooth native-feeling motion. Palette values are otherwise open.
 
 ## Evidence on Hand
 Real prayer-time data, dua content, Hijri events, icon and splash assets in `assets/`. No screenshots of the live app, user research, or analytics exist (the app collects none); do not fabricate any.

@@ -25,7 +25,6 @@ import LanguageRow from '../../components/LanguageRow';
 import NotificationSwitchRow from '../../components/NotificationSwitchRow';
 import SegmentedControl from '../../components/SegmentedControl';
 import TranslationLanguagePicker from '../../components/dua/TranslationLanguagePicker';
-import NoorDivider from '../../components/NoorDivider';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -282,7 +281,6 @@ export default function SettingsScreen() {
         <SettingRow title={t('settings.testAdhanButton')} chevron={false} onPress={handleTestAdhan} />
       </SurfaceCard>
 
-      <NoorDivider />
 
       <SectionHeader title={t('settings.about')} />
       <SurfaceCard>

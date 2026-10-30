@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { View, Text, TextInput, SectionList, Pressable, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import Icon from './Icon';
 
 import { getAtollGroups } from '../lib/prayerTimes';
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../lib/theme';
@@ -42,7 +42,7 @@ export default function IslandPicker({ currentIslandId, onSelect }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.searchWrap}>
-        <Ionicons name="search" size={17} color={colors.textMuted} style={styles.searchIcon} />
+        <Icon name="search" size={17} color={colors.textMuted} style={styles.searchIcon} />
         <TextInput
           value={query}
           onChangeText={setQuery}

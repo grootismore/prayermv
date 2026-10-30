@@ -1,27 +1,28 @@
 ---
-name: Noor+ (Liyelaa)
-description: A prayer companion drawn from Maldivian lacquerwork - vermilion and ochre incised on lacquer-black by night, coral-stone limewash by day.
+name: Noor+ (Glass)
+description: A native-feeling prayer companion - emerald and mint over deep forest green, system glass on iOS, Material surfaces on Android.
 colors:
-  lacquer-black: "#150E0B"
-  lacquer-deep: "#0E0807"
-  lacquer-surface: "#21150F"
-  lacquer-raised: "#2C1C14"
-  vermilion: "#FF7355"
-  vermilion-hero: "#FF6040"
-  ochre: "#F5B83D"
-  bone: "#F6EEE2"
-  bone-muted: "#CBBBA9"
-  bone-quiet: "#9C8978"
-  limewash: "#ECEFEA"
-  limewash-deep: "#DEE3DC"
-  limewash-surface: "#F7F8F4"
-  limewash-raised: "#FFFFFF"
-  vermilion-day: "#B5301A"
-  vermilion-hero-day: "#C8341B"
-  ochre-day: "#8A5A00"
-  ink: "#1B120E"
-  ink-muted: "#55473E"
-  ink-quiet: "#76675C"
+  forest: "#07241E"
+  forest-deep: "#041A15"
+  forest-surface: "#0F342B"
+  forest-raised: "#154338"
+  mint-text: "#5CF39A"
+  mint-fill: "#4EF08F"
+  mint-hero-from: "#8CF7BC"
+  mint-hero-to: "#3FDC85"
+  on-mint: "#04261A"
+  amber: "#FFD166"
+  snow: "#F2FBF6"
+  snow-muted: "#B6D3C5"
+  snow-quiet: "#92B5A5"
+  mint-wash: "#EAF8F0"
+  mint-wash-deep: "#DCF1E6"
+  card-white: "#FFFFFF"
+  emerald-text: "#0A7640"
+  amber-day: "#8A5A00"
+  pine: "#0A2A1F"
+  pine-muted: "#33564A"
+  pine-quiet: "#4F6B5E"
 typography:
   display:
     fontFamily: "Bricolage Grotesque, system-ui, sans-serif"
@@ -29,83 +30,85 @@ typography:
     fontWeight: 700
     lineHeight: "60px"
     letterSpacing: "-1px"
-  numerals:
-    fontFamily: "Bricolage Grotesque, system-ui, sans-serif"
-    fontSize: "22px"
-    fontWeight: 600
+  title:
+    fontFamily: "system-ui, sans-serif"
+    fontSize: "34px"
+    fontWeight: 800
   body:
     fontFamily: "system-ui, sans-serif"
     fontSize: "16px"
     fontWeight: 400
 rounded:
-  sm: "10px"
-  md: "14px"
-  lg: "16px"
-  xl: "24px"
+  sm: "12px"
+  md: "18px"
+  lg: "24px"
+  xl: "32px"
 spacing:
   xs: "8px"
   sm: "12px"
   md: "16px"
   lg: "24px"
 components:
-  hero-vessel:
-    backgroundColor: "{colors.vermilion-hero}"
-    textColor: "{colors.lacquer-black}"
+  hero:
+    backgroundColor: "{colors.mint-hero-to}"
+    textColor: "{colors.on-mint}"
     rounded: "{rounded.lg}"
-    padding: "16px 24px 24px"
+    padding: "24px"
   card:
-    backgroundColor: "{colors.lacquer-surface}"
-    textColor: "{colors.bone}"
+    backgroundColor: "{colors.forest-surface}"
+    textColor: "{colors.snow}"
     rounded: "{rounded.lg}"
     padding: "20px"
   button-primary:
-    backgroundColor: "{colors.vermilion}"
-    textColor: "{colors.lacquer-black}"
-    rounded: "{rounded.md}"
-    height: "48px"
+    backgroundColor: "{colors.mint-fill}"
+    textColor: "{colors.on-mint}"
+    rounded: "{rounded.xl}"
+    height: "52px"
 ---
 
-# Design System: Noor+ (Liyelaa)
+# Design System: Noor+ (Glass)
 
 ## Overview
 
-Noor+ looks like a lathe-turned lacquer vessel (*liyelaa jehun*), not a night sky. One saturated vermilion object carries the next prayer; three incised lines (thin, thick, thin) are the only ornament. Night is lacquer-black with a warm, never blue, cast; day is cool coral-stone limewash for tropical glare. The interface is an Operate surface: the world lends type, palette, density and one signature move, never the layout or the controls.
+Noor+ should feel like it shipped with the phone. Structure, navigation and materials are the platform's own: the system tab bar, SF Symbols, large titles, grouped lists, real liquid glass on iOS 26. Brand lives where the platform leaves room: the mint-on-forest palette, the numeral face, and the hero. The look follows the owner's reference screens: big soft cards, pill buttons, a bright mint highlight, calm gradients.
 
 ## Colors
 
-- **Vermilion** is the committed colour: the hero vessel, selected states, the active-row mark, primary actions.
-- **Ochre** is the quiet accent: section headers, the incised band, the "current period" line.
-- **Bone / ink** carry text. Secondary and quiet text are tinted from the same warm hue, never gray.
-- Every text/surface pair meets 4.5:1 (hero text on vermilion is 6.3:1 night, 5.3:1 day). Ochre on vermilion is 1.7:1: never place ochre text or fills on the hero.
-- The hero vessel is the same vermilion object in both themes.
+- **Forest Night** is a deep, slightly blue-green ground (never black) so mint reads as light. **Mint Day** is a pale mint wash with white cards.
+- Two mint roles: `primary` is the accent for text and icons (bright mint at night, deep emerald `#0A7640` by day, so it holds 4.5:1), and `fill` is the bright mint for filled controls in both themes, always with `onFill` dark green text.
+- Colour goes on the one thing that matters: the hero, the next-prayer row, selected states. Amber is reserved for state (Qibla aligned, warnings).
+- Every text/surface pair meets 4.5:1 in both themes; the hero's dark green on mint is about 7:1.
 
 ## Typography
 
-Bricolage Grotesque is used only for numerals (countdown, times, calendar digits), since it has no Thaana or Arabic glyphs. All translated text uses the system face; Arabic duas use Noto Naskh Arabic. The countdown is the largest element on any screen (52px, tabular figures) and is readable at arm's length. No eyebrow labels above headings: captions sit below the thing they describe.
+System font carries the UI (SF Pro on iOS, Roboto on Android). Bricolage Grotesque is used only for numerals (countdown, times, calendar digits), since it has no Thaana or Arabic glyphs. The countdown is the largest element on any screen. Screen titles are 34px heavy. No eyebrow labels above headings; captions sit below.
 
 ## Layout
 
-20dp screen padding, 4/8pt spacing scale. Home's first viewport is: island and dual date, the vermilion hero, then a six-row ledger of times. Rows are 48dp so all six fit with the hero on a small phone. Touch targets are at least 44dp.
+20dp screen padding, 4/8pt scale. Home reads top to bottom: island and dual date, the mint hero, a glass date navigator, then the day's list. The system tab bar floats over content on iOS (minimizing on scroll) and sits at the bottom on Android; screens leave the bottom inset to it.
 
 ## Elevation & Depth
 
-Matte vessels: a hairline border plus a soft shadow on cards, a stronger one on the hero only. The tab bar is flat; its top rim is the lacquer band.
+Depth comes from materials, not shadows. Cards are glass on iOS 26, a system blur on older iOS, a tonal opaque surface with a hairline border on Android, and a solid surface under Reduce Transparency. Only opaque objects (the hero, the primary button) carry a shadow.
 
 ## Shapes
 
-Cards and the hero use 16dp radius. Pills are reserved for small controls (segmented control, tab indicator).
+Cards 24, nested rows 18, controls and CTAs pill. Corners are continuous and generous, matching the system.
 
 ## Components
 
-- **LacquerBand**: three horizontal Views (1 / 3 / 1 dp by default), the app's one ornament. Used as the divider (narrowed to 72dp), the hero's top edge, the tab bar rim, the Calendar today-card edge, and the onboarding mark.
-- **NextPrayerHero**: vermilion card, prayer name and time on one baseline row, the countdown, a caption, and a foot band showing how far the current gap has run.
-- **PrayerTimeRow**: next prayer gets a three-line vertical mark and a vermilion tint; the current period gets one ochre line; passed prayers recede to the quiet text colour.
-- **Tab bar**: adaptive. Android shows a Material 3 pill behind the active icon; iOS shows the bare filled, tinted glyph.
+- **GlassSurface / SurfaceCard**: the one card material; pressable cards sink to 0.98 with a spring.
+- **NextPrayerHero**: mint gradient, prayer name and time on one baseline, the countdown, a caption, an inset progress track for the elapsed gap.
+- **PrayerTimeRow**: glyph, name, time, status. The next prayer is a mint pill with a bell; passed prayers dim and show a check.
+- **Icon**: SF Symbols on iOS, Ionicons on Android, one API.
+- **PressableScale**: spring-to-0.97 press feedback for buttons and nav controls.
+- **Tab bar**: `NativeTabs`, never drawn by the app.
 
 ## Do's and Don'ts
 
-- Do keep vermilion to the hero, selected states and primary actions.
-- Do let passed prayers recede so the eye lands on what is still ahead.
-- Don't reintroduce waves, sparkles, glows or gradient fills as decoration.
+- Do use system materials and controls first; theme colour only.
+- Do honour Reduce Motion and Reduce Transparency.
+- Do keep the bright mint to the hero, the next row and filled controls.
+- Don't draw custom navigation, shadows behind glass, or hand-rolled blur.
 - Don't put the Latin numeral face on translated text.
-- Don't add cards inside cards, or a second ornament beside the band.
+- Don't bring back waves, sparkles or decorative ornaments.

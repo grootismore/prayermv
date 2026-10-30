@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
 import { numeralFont } from '../lib/useNumeralFont';
-import LacquerBand from './LacquerBand';
 
 interface Props {
   prayerName: string;
@@ -16,10 +16,10 @@ interface Props {
 }
 
 /**
- * Home's one committed vermilion vessel: the next prayer, its time, and a
- * countdown set large enough to read at arm's length. A solid band
- * along the foot shows how much of the current gap has elapsed - the same
- * incised-line language as the dividers, doing a real job.
+ * Home's one bright object: the next prayer on a mint gradient, its time,
+ * and a countdown set large enough to read at arm's length. The foot band
+ * shows how much of the current gap has elapsed. Dark green text on mint
+ * (about 7:1) in both themes.
  */
 export default function NextPrayerHero({ prayerName, time, countdown, progress, numeralsReady }: Props) {
   const { t } = useTranslation();
@@ -30,51 +30,49 @@ export default function NextPrayerHero({ prayerName, time, countdown, progress, 
 
   return (
     <View
-      style={styles.card}
+      style={styles.shadow}
       accessible
       accessibilityLabel={`${t('home.nextPrayer')}: ${prayerName}, ${time}. ${countdown}`}
       accessibilityRole="timer"
     >
-      <LacquerBand color={colors.heroText} thin={1} thick={2} gap={2} />
-      <View style={styles.body}>
-        <View style={styles.nameRow}>
-          <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>
-            {prayerName}
+      <LinearGradient
+        colors={[colors.heroFrom, colors.heroTo]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.card}
+      >
+        <View style={styles.body}>
+          <View style={styles.nameRow}>
+            <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>
+              {prayerName}
+            </Text>
+            <Text style={[styles.time, numerals]}>{time}</Text>
+          </View>
+          <Text style={[styles.countdown, numerals]} numberOfLines={1} adjustsFontSizeToFit>
+            {countdown}
           </Text>
-          <Text style={[styles.time, numerals]}>{time}</Text>
+          <Text style={styles.caption}>{t('home.nextPrayer')}</Text>
+          <View style={styles.track} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <View style={styles.trackBed} />
+            <View style={[styles.fill, { width: `${pct * 100}%` }]} />
+          </View>
         </View>
-        <Text style={[styles.countdown, numerals]} numberOfLines={1} adjustsFontSizeToFit>
-          {countdown}
-        </Text>
-        <Text style={styles.caption}>{t('home.nextPrayer')}</Text>
-      </View>
-      <View style={styles.track} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        <View style={styles.trackBed} />
-        <View style={[styles.fill, { width: `${pct * 100}%` }]} />
-      </View>
+      </LinearGradient>
     </View>
   );
 }
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
+    shadow: { ...shadow.hero },
     card: {
-      backgroundColor: colors.heroBackground,
       borderRadius: radius.lg,
       overflow: 'hidden',
-      paddingTop: spacing.sm,
-      ...shadow.hero,
     },
     body: {
       paddingHorizontal: spacing.lg,
-      paddingTop: spacing.md,
+      paddingTop: spacing.lg,
       paddingBottom: spacing.lg,
-    },
-    caption: {
-      color: colors.heroTextMuted,
-      fontSize: typography.size.base,
-      fontWeight: typography.weight.semibold,
-      marginTop: spacing.xxs,
     },
     nameRow: {
       flexDirection: 'row',
@@ -102,7 +100,13 @@ const createStyles = (colors: ThemeColors) =>
       letterSpacing: -1,
       marginTop: spacing.sm,
     },
-    track: { height: 8 },
+    caption: {
+      color: colors.heroTextMuted,
+      fontSize: typography.size.base,
+      fontWeight: typography.weight.semibold,
+      marginTop: spacing.xxs,
+    },
+    track: { height: 6, borderRadius: radius.pill, overflow: 'hidden', marginTop: spacing.md },
     trackBed: {
       position: 'absolute',
       top: 0,
@@ -110,12 +114,11 @@ const createStyles = (colors: ThemeColors) =>
       left: 0,
       right: 0,
       backgroundColor: colors.heroText,
-      opacity: 0.22,
+      opacity: 0.16,
     },
-    // heroText on heroBackground is the app's highest-contrast pair, so the
-    // progress reads at a glance in both themes (ochre on vermilion did not).
     fill: {
-      height: 8,
+      height: 6,
+      borderRadius: radius.pill,
       backgroundColor: colors.heroText,
     },
   });

@@ -4,6 +4,7 @@ import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
 import { screenPadding, type ThemeColors } from '../lib/theme';
 import { useThemedStyles } from '../lib/useTheme';
+import AmbientBackground from './AmbientBackground';
 
 interface Props {
   children: ReactNode;
@@ -12,7 +13,7 @@ interface Props {
   edges?: Edge[];
   contentContainerStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
-  /** Purely decorative background (e.g. WaveDecoration/SunAccent) rendered edge-to-edge behind the content, ignoring screen padding. Stays fixed - it doesn't scroll with the content. */
+  /** Purely decorative background rendered edge-to-edge behind the content, drawn over the ambient gradient. Stays fixed - it doesn't scroll with the content. */
   backgroundDecoration?: ReactNode;
 }
 
@@ -20,7 +21,10 @@ interface Props {
 export default function Screen({
   children,
   scroll = true,
-  edges = ['top', 'bottom'],
+  // Bottom is left to the native tab bar: iOS adjusts the scroll view's inset
+  // for it, Android's tab host applies the bottom inset - adding it here too
+  // would double it.
+  edges = ['top'],
   contentContainerStyle,
   style,
   backgroundDecoration,
@@ -28,6 +32,7 @@ export default function Screen({
   const styles = useThemedStyles(createStyles);
   return (
     <SafeAreaView style={[styles.root, style]} edges={edges}>
+      <AmbientBackground />
       {backgroundDecoration ? (
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
           {backgroundDecoration}
@@ -37,6 +42,7 @@ export default function Screen({
         <ScrollView
           contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
           showsVerticalScrollIndicator={false}
+          contentInsetAdjustmentBehavior="automatic"
         >
           {children}
         </ScrollView>

@@ -24,16 +24,17 @@ export default function SectionHeader({ title, subtitle }: Props) {
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     title: {
-      fontSize: typography.size.base,
+      fontSize: typography.size.lg,
       fontWeight: typography.weight.bold,
-      color: colors.gold,
-      marginBottom: spacing.xxs,
-      marginTop: spacing.md,
-      letterSpacing: 0.3,
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+      marginTop: spacing.lg,
+      marginHorizontal: spacing.xs,
     },
     subtitle: {
       fontSize: typography.size.sm,
       color: colors.textSecondary,
+      marginHorizontal: spacing.xs,
       marginBottom: spacing.xs,
     },
   });
