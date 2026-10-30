@@ -6,13 +6,14 @@ import { useTheme } from '../lib/useTheme';
 
 /**
  * The ambient screen ground: a vertical forest/mint gradient with one soft
- * radial glow at the top. It's what the glass cards refract, so it carries
+ * radial glow at the top; `tone` tints that glow (Home shifts it with the
+ * time of day). It's what the glass cards refract, so it carries
  * the screen's mood while staying quiet behind content. Static, so it costs
  * nothing per frame.
  */
-export default function AmbientBackground() {
+export default function AmbientBackground({ tone }: { tone?: string }) {
   const { colors, scheme } = useTheme();
-  const glow = scheme === 'dark' ? '#4EF08F' : '#7BE3A9';
+  const glow = tone ?? (scheme === 'dark' ? '#4EF08F' : '#7BE3A9');
   return (
     <>
       <LinearGradient colors={[colors.bgFrom, colors.bgTo]} style={StyleSheet.absoluteFill} />

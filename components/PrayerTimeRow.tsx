@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Text from './Text';
 
 import { spacing, typography, radius, type ThemeColors } from '../lib/theme';
 import { useTheme, useThemedStyles } from '../lib/useTheme';
@@ -60,7 +61,7 @@ export default function PrayerTimeRow({
           {isNext ? (
             <Icon name="notifications" size={16} color={colors.onFill} />
           ) : isPast ? (
-            <Icon name="checkmark-circle" size={18} color={colors.primary} />
+            <Icon name="checkmark-circle" size={16} color={colors.textMuted} />
           ) : null}
         </View>
       </View>
@@ -70,14 +71,14 @@ export default function PrayerTimeRow({
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    slot: { paddingHorizontal: spacing.xs, paddingVertical: 2 },
+    slot: { paddingHorizontal: spacing.xs, paddingVertical: 1 },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: spacing.sm,
       // Not a touch target (no onPress); sized so all 6 rows plus the hero
       // fit one screen on a small phone at default text size.
-      minHeight: 52,
+      minHeight: 48,
       paddingHorizontal: spacing.sm,
       borderRadius: radius.md,
     },

@@ -1,4 +1,5 @@
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
+import Text from '../../components/Text';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
@@ -294,7 +295,7 @@ export default function SettingsScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.md },
+    title: { fontSize: 30, fontWeight: typography.weight.heavy, color: colors.textPrimary, marginBottom: spacing.md },
     rowCard: { marginTop: spacing.md },
     fieldLabel: {
       fontSize: typography.size.xs,

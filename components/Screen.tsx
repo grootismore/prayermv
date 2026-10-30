@@ -15,6 +15,8 @@ interface Props {
   style?: StyleProp<ViewStyle>;
   /** Purely decorative background rendered edge-to-edge behind the content, drawn over the ambient gradient. Stays fixed - it doesn't scroll with the content. */
   backgroundDecoration?: ReactNode;
+  /** Tints the ambient glow (Home passes a colour for the current prayer period). */
+  ambientTone?: string;
 }
 
 /** Shared full-bleed screen shell: themed background + safe-area handling, with or without scrolling content. */
@@ -28,11 +30,12 @@ export default function Screen({
   contentContainerStyle,
   style,
   backgroundDecoration,
+  ambientTone,
 }: Props) {
   const styles = useThemedStyles(createStyles);
   return (
     <SafeAreaView style={[styles.root, style]} edges={edges}>
-      <AmbientBackground />
+      <AmbientBackground tone={ambientTone} />
       {backgroundDecoration ? (
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
           {backgroundDecoration}

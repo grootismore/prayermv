@@ -41,11 +41,19 @@ export default function GlassSurface({ children, radius, elevated = false, style
   const { colors, scheme } = useTheme();
   const reduce = useReduceTransparency();
   const shape = { borderRadius: radius, overflow: 'hidden' as const };
+  // Glass over a pale ground goes milky and loses its edge, so it gets a
+  // hairline and (in Day) a slight white tint to stay defined.
+  const edge = { borderWidth: StyleSheet.hairlineWidth, borderColor: colors.border };
   const solid = elevated ? colors.surfaceElevated : colors.surface;
 
   if (Platform.OS === 'ios' && !reduce && LIQUID) {
     return (
-      <GlassView glassEffectStyle="regular" colorScheme={scheme} style={[shape, style]}>
+      <GlassView
+        glassEffectStyle="regular"
+        colorScheme={scheme}
+        tintColor={scheme === 'light' ? 'rgba(255,255,255,0.45)' : undefined}
+        style={[shape, edge, style]}
+      >
         {children}
       </GlassView>
     );

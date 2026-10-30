@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Alert, Animated, StyleSheet, Text, Vibration, View } from 'react-native';
+import { AccessibilityInfo, Alert, Animated, StyleSheet, Vibration, View } from 'react-native';
+import Text from '../Text';
 import { Pressable, type PanGesture } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';

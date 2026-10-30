@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import Text from '../../components/Text';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 
@@ -7,8 +9,8 @@ import { useSettings } from '../../context/SettingsContext';
 import { getTodayHijri, getHijriMonthInfo, getHijriMonthName } from '../../lib/hijri';
 import { getTodayGregorian, getGregorianMonthInfo, getGregorianMonthName } from '../../lib/gregorian';
 import { buildCalendarWeeks } from '../../lib/calendarGrid';
-import { getHijriEventsForMonth, getHijriEventForDate } from '../../lib/hijriEvents';
-import { minTouchTarget, spacing, typography, type ThemeColors } from '../../lib/theme';
+import { HIJRI_EVENTS, getHijriEventsForMonth, getHijriEventForDate, type HijriEvent } from '../../lib/hijriEvents';
+import { minTouchTarget, radius, shadow, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import Screen from '../../components/Screen';
@@ -70,6 +72,17 @@ export default function HijriScreen() {
   // only appear in Hijri mode.
   const monthEvents = isHijri ? getHijriEventsForMonth(viewMonth) : [];
 
+  // A month with no occasions would leave the card empty, so it shows the
+  // next two instead (wrapping into next year), each with its month name.
+  const upcomingEvents = useMemo(() => {
+    if (!isHijri) return [];
+    const after = HIJRI_EVENTS.filter(
+      (e) => e.month > todayHijri.month || (e.month === todayHijri.month && e.date > todayHijri.date)
+    );
+    return [...after, ...HIJRI_EVENTS].slice(0, 2);
+  }, [isHijri, todayHijri.month, todayHijri.date]);
+  const notable: HijriEvent[] = monthEvents.length > 0 ? monthEvents : upcomingEvents;
+
   function goToPreviousMonth() {
     if (isHijri) {
       if (hijriViewMonth === 1) {
@@ -106,67 +119,81 @@ export default function HijriScreen() {
     <Screen>
       <Text style={styles.title}>{t('hijri.title')}</Text>
 
-      <SurfaceCard elevated style={styles.todayCard}>
-        <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
-        <Text style={styles.todayDate}>
-          <Text style={numeralStyle}>{todayDateNum}</Text> {todayMonthName}{' '}
-          <Text style={numeralStyle}>{todayYear}</Text>
-        </Text>
+      <View style={styles.todayShadow}>
+        <LinearGradient
+          colors={[colors.heroFrom, colors.heroTo]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.todayCard}
+        >
+          <View style={styles.todayWatermark} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <Icon name="calendar-outline" size={96} color={`${colors.heroText}1A`} />
+          </View>
+          <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
+          <Text style={styles.todayDate}>
+            <Text style={numeralStyle}>{todayDateNum}</Text> {todayMonthName}{' '}
+            <Text style={numeralStyle}>{todayYear}</Text>
+          </Text>
+        </LinearGradient>
+      </View>
+
+      <SurfaceCard style={styles.gridCard}>
+        <View style={styles.monthNav}>
+          <Pressable onPress={goToPreviousMonth} hitSlop={12} style={styles.navButton} accessibilityRole="button" accessibilityLabel={t('hijri.previousMonth')}>
+            <Icon name="chevron-back" size={20} color={colors.primary} />
+          </Pressable>
+          <Text style={styles.monthLabel}>
+            {monthInfo.monthName} <Text style={numeralStyle}>{viewYear}</Text>
+          </Text>
+          <Pressable onPress={goToNextMonth} hitSlop={12} style={styles.navButton} accessibilityRole="button" accessibilityLabel={t('hijri.nextMonth')}>
+            <Icon name="chevron-forward" size={20} color={colors.primary} />
+          </Pressable>
+        </View>
+
+        <View style={styles.weekdayRow}>
+          {weekdaysShort.map((day, i) => (
+            <Text key={i} style={styles.weekdayText}>
+              {day}
+            </Text>
+          ))}
+        </View>
+
+        <View>
+          {weeks.map((week, weekIndex) => (
+            <View key={weekIndex} style={styles.weekRow}>
+              {week.map((day, dayIndex) => {
+                const isToday =
+                  day != null && viewYear === todayYear && viewMonth === todayMonth && day === todayDateNum;
+                const hasEvent = isHijri && day != null && getHijriEventForDate(viewMonth, day) != null;
+                return (
+                  <View key={dayIndex} style={styles.cell}>
+                    {day != null && (
+                      <View style={styles.dayCellInner}>
+                        <View style={[styles.dayCircle, isToday && styles.dayCircleToday]}>
+                          <Text style={[styles.dayText, numeralStyle, isToday && styles.dayTextToday]}>{day}</Text>
+                        </View>
+                        {hasEvent && <View style={styles.eventDot} />}
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
+            </View>
+          ))}
+        </View>
       </SurfaceCard>
 
-
-      <View style={styles.monthNav}>
-        <Pressable onPress={goToPreviousMonth} hitSlop={12} style={styles.navButton} accessibilityLabel={t('hijri.previousMonth')}>
-          <Icon name="chevron-back" size={22} color={colors.primary} />
-        </Pressable>
-        <Text style={styles.monthLabel}>
-          {monthInfo.monthName} <Text style={numeralStyle}>{viewYear}</Text>
-        </Text>
-        <Pressable onPress={goToNextMonth} hitSlop={12} style={styles.navButton} accessibilityLabel={t('hijri.nextMonth')}>
-          <Icon name="chevron-forward" size={22} color={colors.primary} />
-        </Pressable>
-      </View>
-
-      <View style={styles.weekdayRow}>
-        {weekdaysShort.map((day, i) => (
-          <Text key={i} style={styles.weekdayText}>
-            {day}
-          </Text>
-        ))}
-      </View>
-
-      <View>
-        {weeks.map((week, weekIndex) => (
-          <View key={weekIndex} style={styles.weekRow}>
-            {week.map((day, dayIndex) => {
-              const isToday =
-                day != null && viewYear === todayYear && viewMonth === todayMonth && day === todayDateNum;
-              const hasEvent = isHijri && day != null && getHijriEventForDate(viewMonth, day) != null;
-              return (
-                <View key={dayIndex} style={styles.cell}>
-                  {day != null && (
-                    <View style={styles.dayCellInner}>
-                      <View style={[styles.dayCircle, isToday && styles.dayCircleToday]}>
-                        <Text style={[styles.dayText, numeralStyle, isToday && styles.dayTextToday]}>{day}</Text>
-                      </View>
-                      {hasEvent && <View style={styles.eventDot} />}
-                    </View>
-                  )}
-                </View>
-              );
-            })}
-          </View>
-        ))}
-      </View>
-
-      {monthEvents.length > 0 && (
+      {notable.length > 0 && (
         <SurfaceCard style={styles.legendCard}>
-          <Text style={styles.legendHeader}>{t('hijri.notableDates')}</Text>
-          {monthEvents.map((event) => (
-            <View key={event.date} style={styles.legendRow}>
+          <Text style={styles.legendHeader}>{t(monthEvents.length > 0 ? 'hijri.notableDates' : 'hijri.upcomingDates')}</Text>
+          {notable.map((event) => (
+            <View key={`${event.month}-${event.date}`} style={styles.legendRow}>
               <View style={styles.eventDot} />
               <Text style={[styles.legendDate, numeralStyle]}>{event.date}</Text>
-              <Text style={styles.legendName}>{event.name[language]}</Text>
+              <Text style={styles.legendName}>
+                {monthEvents.length === 0 ? `${getHijriMonthName(event.month, language)} · ` : ''}
+                {event.name[language]}
+              </Text>
             </View>
           ))}
         </SurfaceCard>
@@ -177,16 +204,18 @@ export default function HijriScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-  title: { fontSize: typography.size.xl, fontWeight: typography.weight.bold, color: colors.textPrimary, marginBottom: spacing.xs },
+  title: { fontSize: 30, fontWeight: typography.weight.heavy, color: colors.textPrimary, marginBottom: spacing.xs },
+  todayShadow: { ...shadow.hero, marginTop: spacing.xs },
   todayCard: {
-    alignItems: 'center',
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-    marginTop: spacing.sm,
+    borderRadius: radius.lg,
     overflow: 'hidden',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  todayLabel: { color: colors.textSecondary, fontSize: typography.size.sm, fontWeight: typography.weight.semibold, marginTop: spacing.xs },
-  todayDate: { color: colors.textPrimary, fontSize: typography.size.lg, fontWeight: typography.weight.heavy, marginTop: spacing.xxs },
+  todayWatermark: { position: 'absolute', end: -8, bottom: -14 },
+  todayLabel: { color: colors.heroTextMuted, fontSize: typography.size.sm, fontWeight: typography.weight.semibold },
+  todayDate: { color: colors.heroText, fontSize: typography.size.xl, fontWeight: typography.weight.heavy, marginTop: spacing.xxs },
+  gridCard: { marginTop: spacing.md, paddingVertical: spacing.sm, paddingHorizontal: spacing.sm },
   monthNav: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -238,13 +267,12 @@ const createStyles = (colors: ThemeColors) =>
     marginTop: 2,
   },
   legendCard: {
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
   },
   legendHeader: {
     fontSize: typography.size.sm,
     fontWeight: typography.weight.bold,
     color: colors.textSecondary,
-    letterSpacing: 0.5,
     marginBottom: spacing.xs,
   },
   legendRow: {

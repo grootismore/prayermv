@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text } from 'react-native';
+import { Animated, Easing, StyleSheet } from 'react-native';
+import Text from './Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from './Icon';
 

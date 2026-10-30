@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import Text from './Text';
 import Icon from './Icon';
 
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../lib/theme';

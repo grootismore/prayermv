@@ -1,4 +1,5 @@
-import { StyleSheet, Text, type StyleProp, type TextStyle } from 'react-native';
+import { StyleSheet, type StyleProp, type TextStyle } from 'react-native';
+import Text from '../Text';
 
 import type { DuaArabicFontSize } from '../../types/dua';
 import { duaArabicFont, useDuaArabicFont } from '../../lib/useDuaArabicFont';

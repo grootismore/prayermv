@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
+import Text from '../../../components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
@@ -153,6 +154,7 @@ export default function DuasHomeScreen() {
           return (
             <DuaCategoryCard
               key={category.id}
+              categoryId={category.id}
               title={category.title[resolvedLanguage]}
               description={category.description?.[resolvedLanguage]}
               icon={category.icon}
@@ -171,8 +173,8 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     searchScreenPadding: { flex: 1, padding: spacing.lg },
     title: {
-      fontSize: typography.size.xl,
-      fontWeight: typography.weight.bold,
+      fontSize: 30,
+      fontWeight: typography.weight.heavy,
       color: colors.textPrimary,
       marginBottom: spacing.xxs,
     },
