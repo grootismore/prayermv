@@ -99,6 +99,15 @@ enum PrayerData {
         return defaults.integer(forKey: selectedIslandKey)
     }
 
+    private static let selectedLanguageKey = "selectedLanguage"
+
+    /// The app's UI language code ("en", "dv" or "ar"), mirrored into the
+    /// shared App Group by lib/widgetSync.ts - nil until the app has run
+    /// once with the widget installed.
+    static func appLanguageCode() -> String? {
+        UserDefaults(suiteName: AppGroupConfig.identifier)?.string(forKey: selectedLanguageKey)
+    }
+
     private static func daysIntoYear(_ date: Date) -> Int {
         var utcCalendar = Calendar(identifier: .gregorian)
         utcCalendar.timeZone = TimeZone(identifier: "UTC")!

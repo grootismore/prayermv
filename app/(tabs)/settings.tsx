@@ -15,13 +15,15 @@ import { ENDING_REMINDER_MINUTES_OPTIONS } from '../../lib/storage';
 import type { AppLanguage, CalendarMode, NotificationPrefs, ThemeMode } from '../../lib/storage';
 import type { DuaArabicFontSize, DuaTranslationLanguage } from '../../types/dua';
 import { spacing, typography, type ThemeColors } from '../../lib/theme';
-import { useThemedStyles } from '../../lib/useTheme';
+import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { showToast } from '../../lib/toast';
 import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
 import SectionHeader from '../../components/SectionHeader';
 import SettingRow from '../../components/SettingRow';
+import IconTile from '../../components/IconTile';
+import { PRAYER_ICON, prayerHue } from '../../lib/prayerStyle';
 import LanguageRow from '../../components/LanguageRow';
 import NotificationSwitchRow from '../../components/NotificationSwitchRow';
 import SegmentedControl from '../../components/SegmentedControl';
@@ -30,6 +32,7 @@ import TranslationLanguagePicker from '../../components/dua/TranslationLanguageP
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyles);
+  const { colors, scheme } = useTheme();
   const {
     island,
     language,
@@ -161,6 +164,7 @@ export default function SettingsScreen() {
       <SectionHeader title={t('settings.island')} />
       <SurfaceCard padded={false}>
         <SettingRow
+          leading={<IconTile icon={{ name: 'location-outline', sf: 'mappin.and.ellipse' }} tint={colors.primary} />}
           title={island ? `${localizedAtollName(island.atoll, language)} ${localizedIslandName(island, language)}` : '-'}
           actionLabel={t('home.changeIsland')}
           onPress={() => router.push({ pathname: '/onboarding', params: { skipIntro: '1' } })}
@@ -205,6 +209,7 @@ export default function SettingsScreen() {
         {NOTIFIABLE_PRAYERS.map((prayer) => (
           <NotificationSwitchRow
             key={prayer}
+            leading={<IconTile icon={PRAYER_ICON[prayer]} tint={prayerHue(prayer, scheme)} />}
             label={t(`prayers.${prayer}`)}
             value={notificationPrefs[prayer as keyof NotificationPrefs]}
             onValueChange={(value) => handleToggle(prayer as any, value)}
@@ -214,12 +219,17 @@ export default function SettingsScreen() {
       <Text style={styles.silentModeNote}>{t('settings.silentModeNote')}</Text>
 
       <SurfaceCard style={styles.rowCard} padded={false}>
-        <SettingRow title={t('settings.soundPreview')} onPress={handlePreviewSound} />
+        <SettingRow
+          leading={<IconTile icon={{ name: 'volume-high-outline', sf: 'speaker.wave.2.fill' }} tint={colors.primary} />}
+          title={t('settings.soundPreview')}
+          onPress={handlePreviewSound}
+        />
       </SurfaceCard>
 
       <SectionHeader title={t('settings.endingReminder')} subtitle={t('settings.endingReminderSubtitle')} />
       <SurfaceCard padded={false}>
         <NotificationSwitchRow
+          leading={<IconTile icon={{ name: 'notifications-outline', sf: 'bell.badge.fill' }} tint={colors.gold} />}
           label={t('settings.endingReminderLabel')}
           value={endingReminderPrefs.enabled}
           onValueChange={handleEndingReminderToggle}
@@ -239,6 +249,7 @@ export default function SettingsScreen() {
       <SectionHeader title={t('settings.qibla')} subtitle={t('settings.qiblaHapticsSubtitle')} />
       <SurfaceCard padded={false}>
         <NotificationSwitchRow
+          leading={<IconTile icon={{ name: 'phone-portrait-outline', sf: 'iphone.radiowaves.left.and.right' }} tint={colors.primary} />}
           label={t('settings.qiblaHapticsLabel')}
           value={qiblaHapticsEnabled}
           onValueChange={handleQiblaHapticsChange}

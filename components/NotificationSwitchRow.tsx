@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { StyleSheet, Switch, View, Platform } from 'react-native';
 import Text from './Text';
 
@@ -8,14 +9,17 @@ interface Props {
   label: string;
   value: boolean;
   onValueChange: (value: boolean) => void;
+  /** An IconTile (or similar) shown before the label. */
+  leading?: ReactNode;
 }
 
 /** A prayer-notification toggle row using React Native's native Switch, themed with the mint active track. */
-export default function NotificationSwitchRow({ label, value, onValueChange }: Props) {
+export default function NotificationSwitchRow({ label, value, onValueChange, leading }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.row}>
+      {leading}
       <Text style={styles.label}>{label}</Text>
       <View style={styles.switchWrap}>
         <Switch
@@ -41,6 +45,8 @@ const createStyles = (colors: ThemeColors) =>
       minHeight: minTouchTarget,
       paddingLeft: spacing.md,
       paddingRight: spacing.xxl,
+      gap: spacing.sm,
+      paddingVertical: spacing.xs,
       borderBottomWidth: 1,
       borderBottomColor: colors.separator,
     },

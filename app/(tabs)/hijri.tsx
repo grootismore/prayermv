@@ -9,12 +9,14 @@ import { useSettings } from '../../context/SettingsContext';
 import { getTodayHijri, getHijriMonthInfo, getHijriMonthName } from '../../lib/hijri';
 import { getTodayGregorian, getGregorianMonthInfo, getGregorianMonthName } from '../../lib/gregorian';
 import { buildCalendarWeeks } from '../../lib/calendarGrid';
-import { HIJRI_EVENTS, getHijriEventsForMonth, getHijriEventForDate, type HijriEvent } from '../../lib/hijriEvents';
+import { HIJRI_EVENTS, getHijriEventForDate, type HijriEvent } from '../../lib/hijriEvents';
+import { gregorianOfHijri, hijriOfGregorian } from '../../lib/dualDate';
 import { minTouchTarget, radius, shadow, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import Screen from '../../components/Screen';
 import SurfaceCard from '../../components/SurfaceCard';
+import StarPattern from '../../components/StarPattern';
 
 export default function HijriScreen() {
   const { t } = useTranslation();
@@ -67,21 +69,41 @@ export default function HijriScreen() {
     [monthInfo.firstDayOfWeek, monthInfo.daysInMonth]
   );
 
-  // Notable occasions are dates in the Hijri calendar - showing them
-  // against the Gregorian grid would need full date conversion, so they
-  // only appear in Hijri mode.
-  const monthEvents = isHijri ? getHijriEventsForMonth(viewMonth) : [];
+  // Every day of the month shown, with the other calendar's date alongside
+  // and any notable occasion it carries. Occasions are Hijri dates, so in
+  // Gregorian mode each day is converted to find them.
+  const dayInfo = useMemo(() => {
+    const out: { day: number; other: number; event?: HijriEvent }[] = [];
+    for (let d = 1; d <= monthInfo.daysInMonth; d++) {
+      if (isHijri) {
+        out.push({ day: d, other: gregorianOfHijri(viewYear, viewMonth, d).date, event: getHijriEventForDate(viewMonth, d) });
+      } else {
+        const h = hijriOfGregorian(viewYear, viewMonth, d);
+        out.push({ day: d, other: h.date, event: getHijriEventForDate(h.month, h.date) });
+      }
+    }
+    return out;
+  }, [isHijri, viewYear, viewMonth, monthInfo.daysInMonth]);
+  const infoByDay = useMemo(() => new Map(dayInfo.map((i) => [i.day, i])), [dayInfo]);
+  const monthEvents = dayInfo.filter((i) => i.event);
 
   // A month with no occasions would leave the card empty, so it shows the
-  // next two instead (wrapping into next year), each with its month name.
-  const upcomingEvents = useMemo(() => {
-    if (!isHijri) return [];
-    const after = HIJRI_EVENTS.filter(
+  // next two instead (wrapping into next year), each with its Gregorian date.
+  const upcoming = useMemo(() => {
+    const ahead = HIJRI_EVENTS.filter(
       (e) => e.month > todayHijri.month || (e.month === todayHijri.month && e.date > todayHijri.date)
-    );
-    return [...after, ...HIJRI_EVENTS].slice(0, 2);
-  }, [isHijri, todayHijri.month, todayHijri.date]);
-  const notable: HijriEvent[] = monthEvents.length > 0 ? monthEvents : upcomingEvents;
+    ).map((e) => ({ event: e, year: todayHijri.year }));
+    const wrapped = HIJRI_EVENTS.map((e) => ({ event: e, year: todayHijri.year + 1 }));
+    return [...ahead, ...wrapped].slice(0, 2).map(({ event, year }) => {
+      const g = gregorianOfHijri(year, event.month, event.date);
+      return { event, label: `${g.date} ${getGregorianMonthName(g.month, language)}` };
+    });
+  }, [todayHijri.month, todayHijri.date, todayHijri.year, language]);
+
+  // "Today" in the calendar not on show, as a quiet second line.
+  const otherToday = isHijri
+    ? `${todayGregorian.date} ${getGregorianMonthName(todayGregorian.month, language)} ${todayGregorian.year}`
+    : `${todayHijri.date} ${getHijriMonthName(todayHijri.month, language)} ${todayHijri.year}`;
 
   function goToPreviousMonth() {
     if (isHijri) {
@@ -126,14 +148,13 @@ export default function HijriScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.todayCard}
         >
-          <View style={styles.todayWatermark} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-            <Icon name="calendar-outline" size={96} color={`${colors.heroText}1A`} />
-          </View>
+          <StarPattern color={colors.heroText} opacity={0.1} />
           <Text style={styles.todayLabel}>{t('hijri.today')}</Text>
           <Text style={styles.todayDate}>
             <Text style={numeralStyle}>{todayDateNum}</Text> {todayMonthName}{' '}
             <Text style={numeralStyle}>{todayYear}</Text>
           </Text>
+          <Text style={styles.todayOther}>{otherToday}</Text>
         </LinearGradient>
       </View>
 
@@ -164,15 +185,15 @@ export default function HijriScreen() {
               {week.map((day, dayIndex) => {
                 const isToday =
                   day != null && viewYear === todayYear && viewMonth === todayMonth && day === todayDateNum;
-                const hasEvent = isHijri && day != null && getHijriEventForDate(viewMonth, day) != null;
+                const info = day != null ? infoByDay.get(day) : undefined;
                 return (
                   <View key={dayIndex} style={styles.cell}>
                     {day != null && (
                       <View style={styles.dayCellInner}>
-                        <View style={[styles.dayCircle, isToday && styles.dayCircleToday]}>
+                        <View style={[styles.dayCircle, info?.event && styles.dayCircleEvent, isToday && styles.dayCircleToday]}>
                           <Text style={[styles.dayText, numeralStyle, isToday && styles.dayTextToday]}>{day}</Text>
                         </View>
-                        {hasEvent && <View style={styles.eventDot} />}
+                        <Text style={[styles.otherText, numeralStyle]}>{info?.other}</Text>
                       </View>
                     )}
                   </View>
@@ -183,21 +204,26 @@ export default function HijriScreen() {
         </View>
       </SurfaceCard>
 
-      {notable.length > 0 && (
-        <SurfaceCard style={styles.legendCard}>
-          <Text style={styles.legendHeader}>{t(monthEvents.length > 0 ? 'hijri.notableDates' : 'hijri.upcomingDates')}</Text>
-          {notable.map((event) => (
-            <View key={`${event.month}-${event.date}`} style={styles.legendRow}>
-              <View style={styles.eventDot} />
-              <Text style={[styles.legendDate, numeralStyle]}>{event.date}</Text>
-              <Text style={styles.legendName}>
-                {monthEvents.length === 0 ? `${getHijriMonthName(event.month, language)} · ` : ''}
-                {event.name[language]}
-              </Text>
-            </View>
-          ))}
-        </SurfaceCard>
-      )}
+      <SurfaceCard style={styles.legendCard}>
+        <Text style={styles.legendHeader}>{t(monthEvents.length > 0 ? 'hijri.notableDates' : 'hijri.upcomingDates')}</Text>
+        {monthEvents.length > 0
+          ? monthEvents.map(({ day, event }) => (
+              <View key={day} style={styles.legendRow}>
+                <View style={styles.legendBadge}>
+                  <Text style={[styles.legendDay, numeralStyle]}>{day}</Text>
+                </View>
+                <Text style={styles.legendName}>{event?.name[language]}</Text>
+              </View>
+            ))
+          : upcoming.map(({ event, label }) => (
+              <View key={`${event.month}-${event.date}`} style={styles.legendRow}>
+                <View style={[styles.legendBadge, styles.legendBadgeWide]}>
+                  <Text style={[styles.legendDay, numeralStyle]}>{label}</Text>
+                </View>
+                <Text style={styles.legendName}>{event.name[language]}</Text>
+              </View>
+            ))}
+      </SurfaceCard>
     </Screen>
   );
 }
@@ -212,9 +238,9 @@ const createStyles = (colors: ThemeColors) =>
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  todayWatermark: { position: 'absolute', end: -8, bottom: -14 },
   todayLabel: { color: colors.heroTextMuted, fontSize: typography.size.sm, fontWeight: typography.weight.semibold },
   todayDate: { color: colors.heroText, fontSize: typography.size.xl, fontWeight: typography.weight.heavy, marginTop: spacing.xxs },
+  todayOther: { color: colors.heroTextMuted, fontSize: typography.size.sm, fontWeight: typography.weight.semibold, marginTop: spacing.xxs },
   gridCard: { marginTop: spacing.md, paddingVertical: spacing.sm, paddingHorizontal: spacing.sm },
   monthNav: {
     flexDirection: 'row',
@@ -240,32 +266,23 @@ const createStyles = (colors: ThemeColors) =>
   weekRow: { flexDirection: 'row' },
   cell: {
     flex: 1,
-    // Fixed (rather than aspectRatio: 1, which would make each row as
-    // tall as the screen is wide / 7) so 5-6 weeks of rows fit on screen
-    // without scrolling - the day circles below are sized to comfortably
-    // fit this height, not the other way around.
-    height: 40,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
   dayCellInner: { alignItems: 'center', justifyContent: 'center' },
   dayCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dayCircleToday: { backgroundColor: colors.fill },
-  dayText: { fontSize: typography.size.sm, color: colors.textPrimary },
+  dayCircleEvent: { borderWidth: 1.5, borderColor: colors.gold },
+  dayCircleToday: { backgroundColor: colors.fill, borderWidth: 0 },
+  dayText: { fontSize: typography.size.base, color: colors.textPrimary },
   dayTextToday: { color: colors.onFill, fontWeight: typography.weight.bold },
-  eventDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.gold,
-    marginTop: 2,
-  },
+  otherText: { fontSize: 9, color: colors.textMuted, marginTop: 1, fontVariant: ['tabular-nums'] },
   legendCard: {
     marginTop: spacing.md,
   },
@@ -278,16 +295,19 @@ const createStyles = (colors: ThemeColors) =>
   legendRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 2,
-    minHeight: 28,
+    gap: spacing.sm,
+    paddingVertical: spacing.xxs + 2,
   },
-  legendDate: {
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
-    color: colors.gold,
-    marginLeft: spacing.xs,
-    marginRight: spacing.sm,
-    minWidth: 20,
+  legendBadge: {
+    minWidth: 36,
+    height: 36,
+    paddingHorizontal: spacing.xs,
+    borderRadius: radius.sm,
+    backgroundColor: colors.goldSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  legendName: { flex: 1, fontSize: typography.size.sm, color: colors.textPrimary },
+  legendBadgeWide: { paddingHorizontal: spacing.sm },
+  legendDay: { fontSize: typography.size.base, fontWeight: typography.weight.bold, color: colors.gold },
+  legendName: { flex: 1, fontSize: typography.size.base, color: colors.textPrimary },
 });

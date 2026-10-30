@@ -81,7 +81,7 @@ Noor+ should feel like it shipped with the phone. Structure, navigation and mate
 
 ## Typography
 
-System font carries the UI (SF Pro on iOS, Roboto on Android). Bricolage Grotesque is used only for numerals (countdown, times, calendar digits), since it has no Thaana or Arabic glyphs. The countdown is the largest element on any screen. Screen titles are 34px heavy. No eyebrow labels above headings; captions sit below.
+System font carries the UI (SF Pro on iOS, Roboto on Android). Dhivehi text uses MV MAG Round (`assets/fonts/MvMAGRoundBold.otf`), a single bold weight, so Dhivehi hierarchy comes from size and colour; its Latin letters fall back to the system font. Bricolage Grotesque is used only for numerals (countdown, times, calendar digits), since it has no Thaana or Arabic glyphs. The countdown is the largest element on any screen. Screen titles are 34px heavy. No eyebrow labels above headings; captions sit below.
 
 ## Layout
 

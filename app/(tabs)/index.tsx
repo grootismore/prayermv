@@ -6,11 +6,12 @@ import * as Haptics from 'expo-haptics';
 
 import { useSettings } from '../../context/SettingsContext';
 import { useNextPrayer, formatCountdown } from '../../lib/useNextPrayer';
-import { getPrayerTimesForDate } from '../../lib/prayerTimes';
+import { getPrayerTimesForDate, type PrayerName } from '../../lib/prayerTimes';
 import { minTouchTarget, radius, spacing, typography, type ThemeColors } from '../../lib/theme';
 import { useTheme, useThemedStyles } from '../../lib/useTheme';
 import { useNumeralFont, numeralFont } from '../../lib/useNumeralFont';
 import { useReduceMotion } from '../../lib/useReduceMotion';
+import { prayerHue } from '../../lib/prayerStyle';
 import { getTodayHijri, getHijriMonthName } from '../../lib/hijri';
 import { getTodayGregorian, getGregorianMonthName } from '../../lib/gregorian';
 import { localizedIslandName, localizedAtollName } from '../../lib/islandNames';
@@ -24,28 +25,6 @@ import GlassSurface from '../../components/GlassSurface';
 import LoadingScreen from '../../components/LoadingScreen';
 
 const SWIPE_THRESHOLD = 45;
-
-// The ambient glow follows the prayer period in effect: dawn blue, sunrise
-// gold, midday mint, afternoon lime, sunset amber, night indigo. Quiet, but
-// it tells you the time of day before you read a number.
-const PERIOD_TONE: Record<string, string> = {
-  fajr: '#7CC8FF',
-  sunrise: '#FFD27A',
-  dhuhr: '#4EF08F',
-  asr: '#C8F06A',
-  maghrib: '#FF9E6B',
-  isha: '#8C9CFF',
-};
-
-// Each prayer's own glyph: an SF Symbol on iOS, an Ionicon on Android.
-const PRAYER_ICON: Record<string, { name: 'moon-outline' | 'sunny-outline' | 'partly-sunny-outline'; sf: 'moon.haze.fill' | 'sunrise.fill' | 'sun.max.fill' | 'sun.haze.fill' | 'sunset.fill' | 'moon.stars.fill' }> = {
-  fajr: { name: 'moon-outline', sf: 'moon.haze.fill' },
-  sunrise: { name: 'sunny-outline', sf: 'sunrise.fill' },
-  dhuhr: { name: 'sunny-outline', sf: 'sun.max.fill' },
-  asr: { name: 'partly-sunny-outline', sf: 'sun.haze.fill' },
-  maghrib: { name: 'partly-sunny-outline', sf: 'sunset.fill' },
-  isha: { name: 'moon-outline', sf: 'moon.stars.fill' },
-};
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -140,23 +119,20 @@ export default function HomeScreen() {
     return t('home.prayerTimesOn', { date: `${viewDate.getDate()} ${monthName}` });
   }, [dayOffset, viewDate, language, t]);
 
-  // How far the gap between the previous and next prayer has run, for the
-  // hero's progress band. The previous prayer can belong to yesterday (before
-  // today's Fajr), so yesterday's list is included in the search.
-  const heroProgress = useMemo(() => {
-    if (!island || !state?.next) return 0;
-    const now = state.next.date.getTime() - state.millisecondsRemaining;
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const earlier = [...getPrayerTimesForDate(island.islandId, yesterday), ...state.today];
-    let prev: number | null = null;
-    for (const entry of earlier) {
-      const at = entry.date.getTime();
-      if (at <= now) prev = at;
-    }
-    if (prev == null) return 0;
-    return (now - prev) / (state.next.date.getTime() - prev);
-  }, [island, state?.next, state?.today, state?.millisecondsRemaining]);
+  // The day as the sun's arc: where each prayer falls between the first and
+  // last of today's list, and where now falls on that same scale.
+  const dayArc = useMemo(() => {
+    const list = state?.today ?? [];
+    if (list.length < 2) return { marks: [] as number[], progress: 0 };
+    const start = list[0].date.getTime();
+    const end = list[list.length - 1].date.getTime();
+    const span = Math.max(1, end - start);
+    const now = state?.next ? state.next.date.getTime() - state.millisecondsRemaining : Date.now();
+    return {
+      marks: list.map((e) => (e.date.getTime() - start) / span),
+      progress: Math.min(1, Math.max(0, (now - start) / span)),
+    };
+  }, [state?.today, state?.next, state?.millisecondsRemaining]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -174,7 +150,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <Screen ambientTone={PERIOD_TONE[state.currentCall ?? 'isha']}>
+    <Screen ambientTone={prayerHue((state.currentCall ?? 'isha') as PrayerName, 'dark')}>
       <Text style={styles.islandName}>
         {localizedAtollName(island.atoll, language)} {localizedIslandName(island, language)}
       </Text>
@@ -192,12 +168,13 @@ export default function HomeScreen() {
 
       {state.next && (
         <NextPrayerHero
+          prayer={state.next.call}
           prayerName={t(`prayers.${state.next.call}`)}
           time={state.next.string}
           countdown={formatCountdown(state.millisecondsRemaining)}
-          progress={heroProgress}
+          dayMarks={dayArc.marks}
+          dayProgress={dayArc.progress}
           numeralsReady={numeralsReady}
-          icon={PRAYER_ICON[state.next.call]}
         />
       )}
 
@@ -251,7 +228,7 @@ export default function HomeScreen() {
                 key={entry.call}
                 label={t(`prayers.${entry.call}`)}
                 time={entry.string}
-                icon={PRAYER_ICON[entry.call]}
+                prayer={entry.call}
                 isNext={isNext}
                 isCurrent={isCurrent}
                 isPast={isPast}
