@@ -23,6 +23,7 @@ Opened many times a day for a few seconds each; also used in the mosque, at nigh
 - Languages: en, dv, ar. dv and ar are RTL and use their own fonts.
 - Light and dark themes (Mint Day / Forest Night), user-selectable.
 - Prayer data is bundled per island; works offline.
+- Hijri dates follow the Umm al-Qura calendar (bundled table, 1300-1500 AH, verified against ICU by `npm run validate:hijri`). The Maldives announces months by local moon sighting, so an official date can differ from Umm al-Qura by a day; a user adjustment setting was offered and not chosen.
 - Dua content has a review process (`data/duas/CONTENT_REVIEW.md`); redesign must not alter dua text.
 
 ## Brand Commitments

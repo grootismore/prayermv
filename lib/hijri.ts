@@ -1,5 +1,7 @@
-import HijriDate, { toHijri } from 'hijri-date/lib/safe';
 import type { AppLanguage } from './storage';
+import { daysInHijriMonth, hijriFromGregorian, hijriMonthStartDay, weekdayOfDay, type HijriDate } from './umalqura';
+
+export type { HijriDate };
 
 const MONTH_NAMES: Record<AppLanguage, string[]> = {
   en: [
@@ -55,8 +57,10 @@ export interface HijriMonthInfo {
   firstDayOfWeek: number;
 }
 
+/** Today's Hijri date (Umm al-Qura), from the device's local calendar date. */
 export function getTodayHijri(): HijriDate {
-  return toHijri(new Date());
+  const now = new Date();
+  return hijriFromGregorian(now.getFullYear(), now.getMonth() + 1, now.getDate());
 }
 
 export function getHijriMonthName(month: number, language: AppLanguage): string {
@@ -64,17 +68,11 @@ export function getHijriMonthName(month: number, language: AppLanguage): string 
 }
 
 export function getHijriMonthInfo(year: number, month: number, language: AppLanguage): HijriMonthInfo {
-  const nextMonth = month === 12 ? 1 : month + 1;
-  const nextYear = month === 12 ? year + 1 : year;
-  const firstOfNext = new HijriDate(nextYear, nextMonth, 1);
-  const lastOfThis = firstOfNext.clone().subtractDay();
-  const firstOfThis = new HijriDate(year, month, 1);
-
   return {
     year,
     month,
     monthName: getHijriMonthName(month, language),
-    daysInMonth: lastOfThis.date,
-    firstDayOfWeek: firstOfThis.toGregorian().getDay(),
+    daysInMonth: daysInHijriMonth(year, month),
+    firstDayOfWeek: weekdayOfDay(hijriMonthStartDay(year, month)),
   };
 }

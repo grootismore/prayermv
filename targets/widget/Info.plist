@@ -5,6 +5,7 @@
     <key>UIAppFonts</key>
     <array>
       <string>MvMAGRoundBold.otf</string>
+      <string>UthmanicDouri.ttf</string>
     </array>
     <key>NSExtension</key>
     <dict>
