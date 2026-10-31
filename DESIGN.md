@@ -25,17 +25,17 @@ colors:
   pine-quiet: "#4F6B5E"
 typography:
   display:
-    fontFamily: "Bricolage Grotesque, system-ui, sans-serif"
+    fontFamily: "Inter Tight, system-ui, sans-serif"
     fontSize: "52px"
     fontWeight: 700
     lineHeight: "60px"
     letterSpacing: "-1px"
   title:
-    fontFamily: "system-ui, sans-serif"
+    fontFamily: "Inter Tight, system-ui, sans-serif"
     fontSize: "34px"
     fontWeight: 800
   body:
-    fontFamily: "system-ui, sans-serif"
+    fontFamily: "Inter Tight, system-ui, sans-serif"
     fontSize: "16px"
     fontWeight: 400
 rounded:
@@ -81,7 +81,7 @@ Noor+ should feel like it shipped with the phone. Structure, navigation and mate
 
 ## Typography
 
-System font carries the UI (SF Pro on iOS, Roboto on Android). Dhivehi text uses MV MAG Round (`assets/fonts/MvMAGRoundBold.otf`), a single bold weight, so Dhivehi hierarchy comes from size and colour; its Latin letters fall back to the system font. Arabic (the UI in Arabic, and all dua text) uses KFGQPC Douri Uthmanic Script (`assets/fonts/UthmanicDouri.ttf`), one regular weight, with Latin letters and ﷺ falling back to the system font. Bricolage Grotesque is used only for numerals (countdown, times, calendar digits), since it has no Thaana or Arabic glyphs. The countdown is the largest element on any screen. Screen titles are 34px heavy. No eyebrow labels above headings; captions sit below.
+English text, and all digits, use Inter Tight (open-licence, bundled in four weights plus extra-bold), chosen by the script of each piece of text. It stands in for SF Compact, which apps can't reference on iOS and which Apple's licence doesn't allow bundling in a public repo or on Android. Dhivehi text uses MV MAG Round (`assets/fonts/MvMAGRoundBold.otf`), a single bold weight, so Dhivehi hierarchy comes from size and colour. Arabic (the UI in Arabic, and all dua text) uses KFGQPC Douri Uthmanic Script (`assets/fonts/UthmanicDouri.ttf`), one regular weight. Each non-Latin face lacks Latin letters, which come from Inter Tight when written alone. The native tab bar and the widget name the same faces. The countdown is the largest element on any screen. Screen titles are 34px heavy. No eyebrow labels above headings; captions sit below.
 
 ## Layout
 

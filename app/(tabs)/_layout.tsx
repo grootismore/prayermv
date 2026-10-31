@@ -3,6 +3,7 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
 
 import { useTheme } from '../../lib/useTheme';
+import { ARABIC_FAMILY, INTER, THAANA_FAMILY } from '../../lib/scriptFont';
 
 /**
  * The system tab bar, not a drawn one: a real UITabBar on iOS (liquid glass
@@ -11,14 +12,20 @@ import { useTheme } from '../../lib/useTheme';
  * system so the glass isn't switched off.
  */
 export default function TabsLayout() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors } = useTheme();
+  // The system draws these labels itself, so the app's Text wrapper can't set
+  // their font: name the face for the current language here.
+  const labelFont = i18n.language === 'dv' ? THAANA_FAMILY : i18n.language === 'ar' ? ARABIC_FAMILY : INTER.semibold;
 
   return (
     <NativeTabs
       tintColor={colors.primary}
       iconColor={{ default: colors.textSecondary, selected: colors.primary }}
-      labelStyle={{ default: { color: colors.textSecondary }, selected: { color: colors.primary } }}
+      labelStyle={{
+        default: { color: colors.textSecondary, fontFamily: labelFont },
+        selected: { color: colors.primary, fontFamily: labelFont },
+      }}
       minimizeBehavior="onScrollDown"
       {...(Platform.OS === 'android'
         ? { backgroundColor: colors.backgroundDeep, indicatorColor: colors.primarySoft, rippleColor: colors.primarySoft }

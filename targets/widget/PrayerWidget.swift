@@ -335,23 +335,36 @@ private func prayerSymbol(_ prayer: PrayerName) -> String {
     }
 }
 
-/// Dhivehi text uses MV MAG Round and Arabic text uses KFGQPC Douri
-/// Uthmanic Script - both bundled in the widget target and listed in its
-/// Info.plist's UIAppFonts (PostScript names "MvMAGR" and
-/// "KFGQPCDouriUthmanicScript-Regul"). Each has a single weight and no Latin
-/// letters. Everything else stays on the system font. If a font ever failed
-/// to register, .custom falls back to the system font rather than breaking.
+/// Fonts by script, all bundled in the widget target and listed in its
+/// Info.plist's UIAppFonts: Dhivehi is MV MAG Round ("MvMAGR"), Arabic is
+/// KFGQPC Douri Uthmanic Script ("KFGQPCDouriUthmanicScript-Regul"), and
+/// English and all digits are Inter Tight ("InterTight-Regular/Medium/
+/// SemiBold/Bold"), the open-licence stand-in the app uses for SF Compact.
+/// The Thaana and Arabic faces have a single weight and no Latin letters. If a
+/// font ever failed to register, .custom falls back to the system font rather
+/// than breaking.
+private func latinFont(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {
+    let name: String
+    switch weight {
+    case .bold, .heavy, .black: name = "InterTight-Bold"
+    case .semibold: name = "InterTight-SemiBold"
+    case .medium: name = "InterTight-Medium"
+    default: name = "InterTight-Regular"
+    }
+    return Font.custom(name, size: size)
+}
+
 private func widgetFont(_ size: CGFloat, _ weight: Font.Weight = .semibold, language: WidgetLanguage) -> Font {
     switch language {
     case .dv: return Font.custom("MvMAGR", size: size)
     case .ar: return Font.custom("KFGQPCDouriUthmanicScript-Regul", size: size)
-    case .en: return Font.system(size: size, weight: weight)
+    case .en: return latinFont(size, weight)
     }
 }
 
-/// Digits always use the system rounded face, tabular so times line up.
+/// Digits always use Inter Tight, tabular so times line up.
 private func timeFont(_ size: CGFloat, _ weight: Font.Weight = .bold) -> Font {
-    Font.system(size: size, weight: weight, design: .rounded).monospacedDigit()
+    latinFont(size, weight).monospacedDigit()
 }
 
 private struct WidgetGround: View {
@@ -475,7 +488,7 @@ struct PrayerWidgetView: View {
                     Text(moment.timeString)
                         .font(timeFont(15))
                 } else {
-                    Text("-").font(.headline)
+                    Text("-").font(latinFont(15, .bold))
                 }
             }
             if let moment = entry.moment {
@@ -488,7 +501,7 @@ struct PrayerWidgetView: View {
                     .progressViewStyle(.linear)
                 }
                 Text(moment.date, style: .timer)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(latinFont(12, .medium))
                     .monospacedDigit()
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -539,7 +552,7 @@ struct PrayerWidgetView: View {
                     .minimumScaleFactor(0.7)
                     .lineLimit(1)
                 Text(moment.date, style: .timer)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(latinFont(13, .semibold))
                     .monospacedDigit()
                     .foregroundStyle(Color.widgetOnMintMuted)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -604,7 +617,7 @@ struct PrayerWidgetView: View {
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
                     Text(moment.date, style: .timer)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(latinFont(12, .semibold))
                         .monospacedDigit()
                         .foregroundStyle(Color.widgetOnMintMuted)
                         .frame(maxWidth: .infinity, alignment: .leading)
