@@ -2,7 +2,7 @@ import { StyleSheet, type StyleProp, type TextStyle } from 'react-native';
 import Text from '../Text';
 
 import type { DuaArabicFontSize } from '../../types/dua';
-import { duaArabicFont, useDuaArabicFont } from '../../lib/useDuaArabicFont';
+import { ARABIC_FAMILY } from '../../lib/scriptFont';
 import type { ThemeColors } from '../../lib/theme';
 import { useThemedStyles } from '../../lib/useTheme';
 
@@ -20,14 +20,13 @@ const FONT_SIZES: Record<DuaArabicFontSize, number> = {
 };
 
 /**
- * Renders dua/dhikr Arabic text: Noto Naskh Arabic (once loaded - falls
- * back to the system font before then, same conditional-upgrade pattern
- * as lib/useNumeralFont.ts) with full harakat, right-to-left direction, a
- * generous line height so diacritics are never clipped, and selectable
- * text. Never uses the Latin numeral face, which has no Arabic glyphs.
+ * Renders dua/dhikr Arabic text in KFGQPC Douri Uthmanic Script (loaded
+ * behind the splash screen - see lib/scriptFont.ts) with full harakat,
+ * right-to-left direction, a generous line height so diacritics are never
+ * clipped, and selectable text. Never uses the Latin numeral face, which
+ * has no Arabic glyphs.
  */
 export default function DuaArabicText({ text, fontSize = 'medium', align = 'right', style }: Props) {
-  const arabicFontReady = useDuaArabicFont();
   const styles = useThemedStyles(createStyles);
   const size = FONT_SIZES[fontSize];
 
@@ -40,7 +39,7 @@ export default function DuaArabicText({ text, fontSize = 'medium', align = 'righ
           lineHeight: size * 1.9,
           textAlign: align,
           writingDirection: 'rtl' as const,
-          fontFamily: arabicFontReady ? duaArabicFont.regular : undefined,
+          fontFamily: ARABIC_FAMILY,
         },
         style,
       ]}

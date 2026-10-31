@@ -335,13 +335,18 @@ private func prayerSymbol(_ prayer: PrayerName) -> String {
     }
 }
 
-/// Dhivehi text uses MV MAG Round (bundled in the widget target and listed
-/// in its Info.plist's UIAppFonts - PostScript name "MvMAGR"); it has a
-/// single bold weight and no Latin letters. Everything else stays on the
-/// system font. If the font ever failed to register, .custom falls back to
-/// the system font rather than breaking.
+/// Dhivehi text uses MV MAG Round and Arabic text uses KFGQPC Douri
+/// Uthmanic Script - both bundled in the widget target and listed in its
+/// Info.plist's UIAppFonts (PostScript names "MvMAGR" and
+/// "KFGQPCDouriUthmanicScript-Regul"). Each has a single weight and no Latin
+/// letters. Everything else stays on the system font. If a font ever failed
+/// to register, .custom falls back to the system font rather than breaking.
 private func widgetFont(_ size: CGFloat, _ weight: Font.Weight = .semibold, language: WidgetLanguage) -> Font {
-    language == .dv ? Font.custom("MvMAGR", size: size) : Font.system(size: size, weight: weight)
+    switch language {
+    case .dv: return Font.custom("MvMAGR", size: size)
+    case .ar: return Font.custom("KFGQPCDouriUthmanicScript-Regul", size: size)
+    case .en: return Font.system(size: size, weight: weight)
+    }
 }
 
 /// Digits always use the system rounded face, tabular so times line up.
