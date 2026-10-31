@@ -6,6 +6,10 @@
     <array>
       <string>MvMAGRoundBold.otf</string>
       <string>UthmanicDouri.ttf</string>
+      <string>InterTight-Regular.ttf</string>
+      <string>InterTight-Medium.ttf</string>
+      <string>InterTight-SemiBold.ttf</string>
+      <string>InterTight-Bold.ttf</string>
     </array>
     <key>NSExtension</key>
     <dict>
